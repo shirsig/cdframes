@@ -54,7 +54,9 @@ function PCDC_Test()
 		return
 	end
 
-	PCDC:StartCooldown('temp', [[Interface\Icons\temp]], GetTime(), 7)
+	for i=1,10 do
+		PCDC:StartCooldown('test'..i, [[Interface\Icons\temp]], GetTime(), 7)
+	end
 end
 
 function PCDC_ToolTip(tooltipnum)
