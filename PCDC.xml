@@ -1,0 +1,431 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="PCDC.lua"/>
+	<Frame name="PCDC_Frame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER"/>
+		</Anchors>
+		<Frames>
+			<Button name="PCDC_Button">
+				<Size>
+					<AbsDimension x="32" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="PCDC_Frame" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForDrag("LeftButton")
+					</OnLoad>
+					<OnDragStart>
+						PCDC_OnDragStart();
+					</OnDragStart>
+					<OnDragStop>
+						PCDC_OnDragStop();
+					</OnDragStop>
+					<OnMouseDown>
+						PCDC_Test();
+					</OnMouseDown>
+					<OnMouseUp>
+						PCDC_Click();
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="PCDC_Tex1">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Frame" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex2">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex1" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex3">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex2" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex4">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex3" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex5">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex4" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex6">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex5" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex7">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex6" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex8">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex7" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex9">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex8" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="PCDC_Tex10">
+					<Size>
+						<AbsDimension x="32" y="32"></AbsDimension>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PCDC_Tex9" relativePoint="RIGHT">
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString name="PCDC_CD1" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex1" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD2" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex2" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD3" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex3" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD4" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex4" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD5" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex5" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD6" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex6" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD7" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex7" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD8" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex8" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD9" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex9" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="PCDC_CD10" outline="Thick" inherits="NumberFontNormalYellow">
+					<Size>
+						<AbsDimension x="32" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="PCDC_Tex10" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="PCDC_Frame1" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex1" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(1)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame2" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex2" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(2)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame3" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex3" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(3)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame4" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex4" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(4)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame5" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex5" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(5)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame6" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex6" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(6)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame7" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex7" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(7)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame8" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex8" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(8)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame9" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex9" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(9)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="PCDC_Frame10" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="PCDC_Tex10" relativePoint="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnEnter>
+				PCDC_ToolTip(10)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+</Ui>
