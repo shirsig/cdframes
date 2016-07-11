@@ -217,7 +217,7 @@ function PCDC:UPDATE(elapsed)
 			for k, v in PCDC_UsedSkills do
 				local timeleft = ceil(v.countdown - (GetTime() - v.started))
 				--	  Only show CD for our target if there is time left on the CD      Loop through Stuff           Warrior enrage isnt a CD, Druid Enrage is!
-				if timeleft > 0 and timeleft <= 600 then
+				if timeleft > 0 and timeleft <= 900 then
 					tinsert(temp, v)
 
 					if i <= 10 then
