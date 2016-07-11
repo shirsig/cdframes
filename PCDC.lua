@@ -7,6 +7,21 @@ PCDC:SetScript('OnEvent', function()
 end)
 PCDC:RegisterEvent('ADDON_LOADED')
 
+function PCDC:Lock()
+	PCDC_Button:Hide()
+	for i=1,10 do
+		getglobal("PCDC_Tex"..i):Hide()
+	end
+end
+
+function PCDC:Unlock()
+	PCDC_Button:Show()
+	for i=1,10 do
+		getglobal("PCDC_Tex"..i):SetTexture([[Interface\Icons\temp]])
+		getglobal("PCDC_Tex"..i):Show()
+	end
+end
+
 function PCDC_ToggleStack(setPos)
 	if (setPos == "Verti") then
 		PCDC_Pos = "Verti";
@@ -36,26 +51,12 @@ function PCDC_ToggleStack(setPos)
 end
 
 function PCDC_Click()
-	if arg1 ~= 'LeftButton' then
-		return
-	end
-
 	if (PCDC_Pos == "Hori") then
 		PCDC_ToggleStack("Verti");
 	elseif (PCDC_Pos == "Verti") then
 		PCDC_ToggleStack("Hori");
 	else
 		PCDC_ToggleStack("Verti");
-	end
-end
-
-function PCDC_Test()
-	if arg1 ~= 'LeftButton' then
-		return
-	end
-
-	for i=1,10 do
-		PCDC:StartCooldown('test'..i, [[Interface\Icons\temp]], GetTime(), 7)
 	end
 end
 
@@ -78,9 +79,9 @@ SLASH_PCDC1 = '/pcdc'
 function SlashCmdList.PCDC()
 	PCDC_Locked = not PCDC_Locked
 	if PCDC_Locked then
-		PCDC_Button:Hide()
+		PCDC:Lock()
 	else
-		PCDC_Button:Show()
+		PCDC:Unlock()
 	end
 end
 
@@ -102,7 +103,7 @@ function PCDC:ADDON_LOADED()
 
 	PCDC_ToggleStack(PCDC_Pos)
 	if PCDC_Locked then
-		PCDC_Button:Hide()
+		PCDC:Lock()
 	end
 
 	self:DetectCooldowns()
@@ -188,41 +189,43 @@ function PCDC:UPDATE(elapsed)
 	if (PCDC_TimeSinceLastUpdate > PCDC_UpdateInterval) then
 		PCDC_TimeSinceLastUpdate = 0;
 		-- Spit out the infoz
-		local i = 1;
+		if PCDC_Locked then
+			local i = 1;
 
-		local temp = {}
-		sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.countdown - (GetTime() - a.started), b.countdown - (GetTime() - b.started) return tb < ta or tb == ta and a.skill < b.skill end)
-		for k, v in PCDC_UsedSkills do
-			local timeleft = ceil(v.countdown - (GetTime() - v.started))
-			--	  Only show CD for our target if there is time left on the CD      Loop through Stuff           Warrior enrage isnt a CD, Druid Enrage is!
-			if timeleft > 0 and timeleft <= 600 then
-				tinsert(temp, v)
+			local temp = {}
+			sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.countdown - (GetTime() - a.started), b.countdown - (GetTime() - b.started) return tb < ta or tb == ta and a.skill < b.skill end)
+			for k, v in PCDC_UsedSkills do
+				local timeleft = ceil(v.countdown - (GetTime() - v.started))
+				--	  Only show CD for our target if there is time left on the CD      Loop through Stuff           Warrior enrage isnt a CD, Druid Enrage is!
+				if timeleft > 0 and timeleft <= 600 then
+					tinsert(temp, v)
 
-				if i <= 10 then
-					PCDC_ToolTips[i] = v.skill;
-					PCDC_ToolTipDetails[i] = v.info;
-					if timeleft > 60 then
-						timeleft = floor((timeleft/60)*10)/10;
-						getglobal("PCDC_CD"..i):SetTextColor(0, 1, 0);
-					else
-						getglobal("PCDC_CD"..i):SetTextColor(1, 1, 0);
+					if i <= 10 then
+						PCDC_ToolTips[i] = v.skill;
+						PCDC_ToolTipDetails[i] = v.info;
+						if timeleft > 60 then
+							timeleft = floor((timeleft/60)*10)/10;
+							getglobal("PCDC_CD"..i):SetTextColor(0, 1, 0);
+						else
+							getglobal("PCDC_CD"..i):SetTextColor(1, 1, 0);
+						end
+						getglobal("PCDC_CD"..i):SetText(timeleft);
+						getglobal("PCDC_Tex"..i):SetTexture([[Interface\Icons\]]..v.texture);
+						getglobal("PCDC_Frame"..i):Show();
+						getglobal("PCDC_CD"..i):Show();
+						getglobal("PCDC_Tex"..i):Show();
+						i = i + 1;
 					end
-					getglobal("PCDC_CD"..i):SetText(timeleft);
-					getglobal("PCDC_Tex"..i):SetTexture([[Interface\Icons\]]..v.texture);
-					getglobal("PCDC_Frame"..i):Show();
-					getglobal("PCDC_CD"..i):Show();
-					getglobal("PCDC_Tex"..i):Show();
-					i = i + 1;
 				end
 			end
-		end
-		PCDC_UsedSkills = temp
+			PCDC_UsedSkills = temp
 
-		while i <= 10 do
-			getglobal("PCDC_Frame"..i):Hide();
-			getglobal("PCDC_CD"..i):Hide();
-			getglobal("PCDC_Tex"..i):Hide();
-			i = i + 1;
+			while i <= 10 do
+				getglobal("PCDC_Frame"..i):Hide();
+				getglobal("PCDC_CD"..i):Hide();
+				getglobal("PCDC_Tex"..i):Hide();
+				i = i + 1;
+			end
 		end
 	end
 end

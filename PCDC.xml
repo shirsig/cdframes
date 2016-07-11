@@ -30,12 +30,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<OnDragStop>
 						PCDC_OnDragStop();
 					</OnDragStop>
-					<OnMouseDown>
-						PCDC_Test();
-					</OnMouseDown>
-					<OnMouseUp>
+					<OnClick>
 						PCDC_Click();
-					</OnMouseUp>
+					</OnClick>
 				</Scripts>
 			</Button>
 		</Frames>

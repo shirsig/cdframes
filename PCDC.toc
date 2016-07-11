@@ -1,4 +1,4 @@
-## Interface: 11100
+## Interface: 11200
 ## Title: Player Cooldown Count
 ## Author: shirsig
 ## SavedVariables: PCDC_Pos, PCDC_Locked
