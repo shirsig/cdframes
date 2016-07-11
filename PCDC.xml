@@ -33,6 +33,14 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<OnClick>
 						PCDC_Click();
 					</OnClick>
+					<OnEnter>
+                		GameTooltip_SetDefaultAnchor(GameTooltip, this)
+                		GameTooltip:AddLine('PCDC', 1, 1, 1, true)
+                		GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
 				</Scripts>
 			</Button>
 		</Frames>

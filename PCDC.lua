@@ -7,6 +7,9 @@ PCDC:SetScript('OnEvent', function()
 end)
 PCDC:RegisterEvent('ADDON_LOADED')
 
+PCDC_Orientation = 1
+local R, D, L, U = 1, 2, 3, 4
+
 function PCDC:Lock()
 	PCDC_Button:Hide()
 	for i=1,10 do
@@ -22,42 +25,57 @@ function PCDC:Unlock()
 	end
 end
 
-function PCDC_ToggleStack(setPos)
-	if (setPos == "Verti") then
-		PCDC_Pos = "Verti";
-		PCDC_Tex1:ClearAllPoints(); PCDC_Tex1:SetPoint("TOP", "PCDC_Frame", "BOTTOM", 0, 3);
-		PCDC_Tex2:ClearAllPoints(); PCDC_Tex2:SetPoint("TOP", "PCDC_Tex1", "BOTTOM", 0, 0);
-		PCDC_Tex3:ClearAllPoints(); PCDC_Tex3:SetPoint("TOP", "PCDC_Tex2", "BOTTOM", 0, 0);
-		PCDC_Tex4:ClearAllPoints(); PCDC_Tex4:SetPoint("TOP", "PCDC_Tex3", "BOTTOM", 0, 0);
-		PCDC_Tex5:ClearAllPoints(); PCDC_Tex5:SetPoint("TOP", "PCDC_Tex4", "BOTTOM", 0, 0);
-		PCDC_Tex6:ClearAllPoints(); PCDC_Tex6:SetPoint("TOP", "PCDC_Tex5", "BOTTOM", 0, 0);
-		PCDC_Tex7:ClearAllPoints(); PCDC_Tex7:SetPoint("TOP", "PCDC_Tex6", "BOTTOM", 0, 0);
-		PCDC_Tex8:ClearAllPoints(); PCDC_Tex8:SetPoint("TOP", "PCDC_Tex7", "BOTTOM", 0, 0);
-		PCDC_Tex9:ClearAllPoints(); PCDC_Tex9:SetPoint("TOP", "PCDC_Tex8", "BOTTOM", 0, 0);
-		PCDC_Tex10:ClearAllPoints(); PCDC_Tex10:SetPoint("TOP", "PCDC_Tex9", "BOTTOM", 0, 0);
-	elseif (setPos == "Hori") then
-		PCDC_Pos = "Hori";
-		PCDC_Tex1:ClearAllPoints(); PCDC_Tex1:SetPoint("LEFT", "PCDC_Frame", "RIGHT", 0, 0);
-		PCDC_Tex2:ClearAllPoints(); PCDC_Tex2:SetPoint("LEFT", "PCDC_Tex1", "RIGHT", 0, 0);
-		PCDC_Tex3:ClearAllPoints(); PCDC_Tex3:SetPoint("LEFT", "PCDC_Tex2", "RIGHT", 0, 0);
-		PCDC_Tex4:ClearAllPoints(); PCDC_Tex4:SetPoint("LEFT", "PCDC_Tex3", "RIGHT", 0, 0);
-		PCDC_Tex5:ClearAllPoints(); PCDC_Tex5:SetPoint("LEFT", "PCDC_Tex4", "RIGHT", 0, 0);
-		PCDC_Tex6:ClearAllPoints(); PCDC_Tex6:SetPoint("LEFT", "PCDC_Tex5", "RIGHT", 0, 0);
-		PCDC_Tex7:ClearAllPoints(); PCDC_Tex7:SetPoint("LEFT", "PCDC_Tex6", "RIGHT", 0, 0);
-		PCDC_Tex8:ClearAllPoints(); PCDC_Tex8:SetPoint("LEFT", "PCDC_Tex7", "RIGHT", 0, 0);
-		PCDC_Tex9:ClearAllPoints(); PCDC_Tex9:SetPoint("LEFT", "PCDC_Tex8", "RIGHT", 0, 0);
-		PCDC_Tex10:ClearAllPoints(); PCDC_Tex10:SetPoint("LEFT", "PCDC_Tex9", "RIGHT", 0, 0);
+function PCDC_ToggleStack()
+	if PCDC_Orientation == U then
+		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('BOTTOM', 'PCDC_Frame', 'TOP', 0, -3)
+		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('BOTTOM', 'PCDC_Tex1', 'TOP', 0, 0)
+		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('BOTTOM', 'PCDC_Tex2', 'TOP', 0, 0)
+		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('BOTTOM', 'PCDC_Tex3', 'TOP', 0, 0)
+		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('BOTTOM', 'PCDC_Tex4', 'TOP', 0, 0)
+		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('BOTTOM', 'PCDC_Tex5', 'TOP', 0, 0)
+		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('BOTTOM', 'PCDC_Tex6', 'TOP', 0, 0)
+		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('BOTTOM', 'PCDC_Tex7', 'TOP', 0, 0)
+		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('BOTTOM', 'PCDC_Tex8', 'TOP', 0, 0)
+		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('BOTTOM', 'PCDC_Tex9', 'TOP', 0, 0)
+	elseif PCDC_Orientation == D then
+		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('TOP', 'PCDC_Frame', 'BOTTOM', 0, 3)
+		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('TOP', 'PCDC_Tex1', 'BOTTOM', 0, 0)
+		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('TOP', 'PCDC_Tex2', 'BOTTOM', 0, 0)
+		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('TOP', 'PCDC_Tex3', 'BOTTOM', 0, 0)
+		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('TOP', 'PCDC_Tex4', 'BOTTOM', 0, 0)
+		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('TOP', 'PCDC_Tex5', 'BOTTOM', 0, 0)
+		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('TOP', 'PCDC_Tex6', 'BOTTOM', 0, 0)
+		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('TOP', 'PCDC_Tex7', 'BOTTOM', 0, 0)
+		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('TOP', 'PCDC_Tex8', 'BOTTOM', 0, 0)
+		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('TOP', 'PCDC_Tex9', 'BOTTOM', 0, 0)
+	elseif PCDC_Orientation == L then
+		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('RIGHT', 'PCDC_Frame', 'LEFT', 0, 0)
+		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('RIGHT', 'PCDC_Tex1', 'LEFT', 0, 0)
+		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('RIGHT', 'PCDC_Tex2', 'LEFT', 0, 0)
+		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('RIGHT', 'PCDC_Tex3', 'LEFT', 0, 0)
+		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('RIGHT', 'PCDC_Tex4', 'LEFT', 0, 0)
+		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('RIGHT', 'PCDC_Tex5', 'LEFT', 0, 0)
+		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('RIGHT', 'PCDC_Tex6', 'LEFT', 0, 0)
+		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('RIGHT', 'PCDC_Tex7', 'LEFT', 0, 0)
+		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('RIGHT', 'PCDC_Tex8', 'LEFT', 0, 0)
+		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('RIGHT', 'PCDC_Tex9', 'LEFT', 0, 0)
+	elseif PCDC_Orientation == R then
+		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('LEFT', 'PCDC_Frame', 'RIGHT', 0, 0)
+		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('LEFT', 'PCDC_Tex1', 'RIGHT', 0, 0)
+		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('LEFT', 'PCDC_Tex2', 'RIGHT', 0, 0)
+		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('LEFT', 'PCDC_Tex3', 'RIGHT', 0, 0)
+		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('LEFT', 'PCDC_Tex4', 'RIGHT', 0, 0)
+		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('LEFT', 'PCDC_Tex5', 'RIGHT', 0, 0)
+		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('LEFT', 'PCDC_Tex6', 'RIGHT', 0, 0)
+		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('LEFT', 'PCDC_Tex7', 'RIGHT', 0, 0)
+		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('LEFT', 'PCDC_Tex8', 'RIGHT', 0, 0)
+		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('LEFT', 'PCDC_Tex9', 'RIGHT', 0, 0)
 	end
 end
 
 function PCDC_Click()
-	if (PCDC_Pos == "Hori") then
-		PCDC_ToggleStack("Verti");
-	elseif (PCDC_Pos == "Verti") then
-		PCDC_ToggleStack("Hori");
-	else
-		PCDC_ToggleStack("Verti");
-	end
+	PCDC_Orientation = mod(PCDC_Orientation, 4) + 1
+	PCDC_ToggleStack()
 end
 
 function PCDC_ToolTip(tooltipnum)
@@ -101,9 +119,11 @@ function PCDC:ADDON_LOADED()
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 
-	PCDC_ToggleStack(PCDC_Pos)
+	PCDC_ToggleStack()
 	if PCDC_Locked then
 		PCDC:Lock()
+	else
+		PCDC:Unlock()
 	end
 
 	self:DetectCooldowns()
