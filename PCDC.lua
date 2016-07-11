@@ -213,7 +213,7 @@ function PCDC:UPDATE(elapsed)
 			local i = 1;
 
 			local temp = {}
-			sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.countdown - (GetTime() - a.started), b.countdown - (GetTime() - b.started) return tb < ta or tb == ta and a.skill < b.skill end)
+			sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.countdown - (GetTime() - a.started), b.countdown - (GetTime() - b.started) return ta < tb or tb == ta and a.skill < b.skill end)
 			for k, v in PCDC_UsedSkills do
 				local timeleft = ceil(v.countdown - (GetTime() - v.started))
 				--	  Only show CD for our target if there is time left on the CD      Loop through Stuff           Warrior enrage isnt a CD, Druid Enrage is!
