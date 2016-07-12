@@ -224,7 +224,7 @@ function PCDC:UPDATE(elapsed)
 						PCDC_ToolTips[i] = v.skill;
 						PCDC_ToolTipDetails[i] = v.info;
 						if timeleft > 60 then
-							timeleft = floor((timeleft/60)*10)/10;
+							timeleft = ceil((timeleft/60)*10)/10;
 							getglobal("PCDC_CD"..i):SetTextColor(0, 1, 0);
 						else
 							getglobal("PCDC_CD"..i):SetTextColor(1, 1, 0);
