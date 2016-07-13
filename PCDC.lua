@@ -127,8 +127,6 @@ function PCDC:ADDON_LOADED()
 	PCDC_ToolTips = {}
 	PCDC_ToolTipDetails = {}
 	PCDC_UsedSkills = {}
-	PCDC_UpdateInterval = 0.1
-	PCDC_TimeSinceLastUpdate = 0
 
 	PCDC_Button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
 
