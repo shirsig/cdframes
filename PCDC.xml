@@ -26,13 +26,13 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnDragStart>
-						PCDC_OnDragStart();
+						PCDC_OnDragStart()
 					</OnDragStart>
 					<OnDragStop>
-						PCDC_OnDragStop();
+						PCDC_OnDragStop()
 					</OnDragStop>
 					<OnClick>
-						PCDC_Click();
+						PCDC_Click()
 					</OnClick>
 					<OnEnter>
                 		GameTooltip_SetDefaultAnchor(GameTooltip, this)
