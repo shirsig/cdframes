@@ -13,15 +13,19 @@ local R, D, L, U = 1, 2, 3, 4
 function PCDC:Lock()
 	PCDC_Button:Hide()
 	for i=1,10 do
-		getglobal("PCDC_Tex"..i):Hide()
+		getglobal('PCDC_Tex'..i):Hide()
 	end
 end
 
 function PCDC:Unlock()
 	PCDC_Button:Show()
 	for i=1,10 do
-		getglobal("PCDC_Tex"..i):SetTexture([[Interface\Icons\temp]])
-		getglobal("PCDC_Tex"..i):Show()
+		PCDC_ToolTips[i] = 'test'..i
+		PCDC_ToolTipDetails[i] = 'test'..i
+		getglobal('PCDC_Tex'..i):SetTexture([[Interface\Icons\temp]])
+		getglobal('PCDC_Frame'..i):Show()
+		getglobal('PCDC_Tex'..i):Show()
+		getglobal('PCDC_CD'..i):Hide()
 	end
 end
 
@@ -79,10 +83,10 @@ function PCDC_Click()
 end
 
 function PCDC_ToolTip(tooltipnum)
-	GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-	GameTooltip:AddLine(PCDC_ToolTips[tooltipnum]);
-	GameTooltip:AddLine(PCDC_ToolTipDetails[tooltipnum], .8, .8, .8, 1);
-	GameTooltip:Show();
+	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
+	GameTooltip:AddLine(PCDC_ToolTips[tooltipnum])
+	GameTooltip:AddLine(PCDC_ToolTipDetails[tooltipnum], .8, .8, .8, 1)
+	GameTooltip:Show()
 end
 
 function PCDC_OnDragStart()
@@ -114,7 +118,7 @@ function PCDC:ADDON_LOADED()
 	PCDC_UpdateInterval = 0.1
 	PCDC_TimeSinceLastUpdate = 0
 
-	PCDC_Button:SetNormalTexture("Interface\\Buttons\\UI-MicroButton-Abilities-Up.blp")
+	PCDC_Button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
 
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
@@ -130,12 +134,6 @@ function PCDC:ADDON_LOADED()
 end
 
 function PCDC:StartCooldown(name, texture, started, duration)
-	-- for _, ignored_name in ignored do
-	-- 	if strupper(name) == strupper(ignored_name) then
-	-- 		return
-	-- 	end
-	-- end
-
 	for i, skill in PCDC_UsedSkills do
 		if skill.skill == name then
 			tremove(PCDC_UsedSkills, i)
@@ -204,48 +202,50 @@ function PCDC:SPELL_UPDATE_COOLDOWN()
 	self:DetectCooldowns()
 end
 
-function PCDC:UPDATE(elapsed)
-	PCDC_TimeSinceLastUpdate = PCDC_TimeSinceLastUpdate + elapsed;
-	if (PCDC_TimeSinceLastUpdate > PCDC_UpdateInterval) then
-		PCDC_TimeSinceLastUpdate = 0;
-		-- Spit out the infoz
-		if PCDC_Locked then
-			local i = 1;
+function PCDC:UPDATE()
+	if PCDC_Locked then
+		local i = 1
 
-			local temp = {}
-			sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.countdown - (GetTime() - a.started), b.countdown - (GetTime() - b.started) return ta < tb or tb == ta and a.skill < b.skill end)
-			for k, v in PCDC_UsedSkills do
-				local timeleft = ceil(v.countdown - (GetTime() - v.started))
-				--	  Only show CD for our target if there is time left on the CD      Loop through Stuff           Warrior enrage isnt a CD, Druid Enrage is!
-				if timeleft > 0 and timeleft <= 900 then
-					tinsert(temp, v)
+		local temp = {}
+		sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.started + a.countdown - GetTime(), b.started + b.countdown - GetTime() return ta < tb or tb == ta and a.skill < b.skill end)
+		for k, v in PCDC_UsedSkills do
+			local timeleft = v.started + v.countdown - GetTime()
 
-					if i <= 10 then
-						PCDC_ToolTips[i] = v.skill;
-						PCDC_ToolTipDetails[i] = v.info;
-						if timeleft > 60 then
-							timeleft = ceil((timeleft/60)*10)/10;
-							getglobal("PCDC_CD"..i):SetTextColor(0, 1, 0);
-						else
-							getglobal("PCDC_CD"..i):SetTextColor(1, 1, 0);
-						end
-						getglobal("PCDC_CD"..i):SetText(timeleft);
-						getglobal("PCDC_Tex"..i):SetTexture([[Interface\Icons\]]..v.texture);
-						getglobal("PCDC_Frame"..i):Show();
-						getglobal("PCDC_CD"..i):Show();
-						getglobal("PCDC_Tex"..i):Show();
-						i = i + 1;
+			if timeleft > 0 and timeleft <= 900 then
+				tinsert(temp, v)
+
+				if i <= 10 then
+					if timeleft <= 5 then
+						getglobal('PCDC_Tex'..i):SetAlpha(1 - (math.sin(GetTime() * 1.3 * math.pi) + 1) / 2 * .7)
+					else
+						getglobal('PCDC_Tex'..i):SetAlpha(1)
 					end
+
+					PCDC_ToolTips[i] = v.skill
+					PCDC_ToolTipDetails[i] = v.info
+					timeleft = ceil(timeleft)
+					if timeleft >= 60 then
+						timeleft = ceil((timeleft/60)*10)/10
+						getglobal('PCDC_CD'..i):SetTextColor(0, 1, 0)
+					else
+						getglobal('PCDC_CD'..i):SetTextColor(1, 1, 0)
+					end
+					getglobal('PCDC_CD'..i):SetText(timeleft)
+					getglobal('PCDC_Tex'..i):SetTexture([[Interface\Icons\]]..v.texture)
+					getglobal('PCDC_Frame'..i):Show()
+					getglobal('PCDC_CD'..i):Show()
+					getglobal('PCDC_Tex'..i):Show()
+					i = i + 1
 				end
 			end
-			PCDC_UsedSkills = temp
+		end
+		PCDC_UsedSkills = temp
 
-			while i <= 10 do
-				getglobal("PCDC_Frame"..i):Hide();
-				getglobal("PCDC_CD"..i):Hide();
-				getglobal("PCDC_Tex"..i):Hide();
-				i = i + 1;
-			end
+		while i <= 10 do
+			getglobal('PCDC_Frame'..i):Hide()
+			getglobal('PCDC_CD'..i):Hide()
+			getglobal('PCDC_Tex'..i):Hide()
+			i = i + 1
 		end
 	end
 end
