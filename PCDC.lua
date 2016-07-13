@@ -159,7 +159,7 @@ function PCDC:DetectItemCooldowns()
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
 				if enabled == 1 then
 					local name = self:LinkName(GetContainerItemLink(bag, slot))
-					if duration == 0 or duration > 3 and duration <= 1200 then
+					if duration == 0 or duration > 3 and duration <= 1200 and GetItemInfo(6948) ~= name then
 						self:StartCooldown(
 							name,
 							GetContainerItemInfo(bag, slot),
