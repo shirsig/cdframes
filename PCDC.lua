@@ -138,7 +138,8 @@ function PCDC:ADDON_LOADED()
 		PCDC:Unlock()
 	end
 
-	self:DetectCooldowns()
+	self:DetectItemCooldowns()
+	self:DetectSpellCooldowns()
 end
 
 function PCDC:StartCooldown(name, texture, started, duration)
@@ -151,7 +152,7 @@ function PCDC:StartCooldown(name, texture, started, duration)
 	table.insert(PCDC_UsedSkills, {skill = name, info = '', texture = strsub(texture, 17), countdown = duration, started = started})
 end
 
-function PCDC:DetectCooldowns()	
+function PCDC:DetectItemCooldowns()	
     for bag=0,4 do
         if GetBagName(bag) then
             for slot = 1, GetContainerNumSlots(bag) do
@@ -170,7 +171,6 @@ function PCDC:DetectCooldowns()
             end
         end
     end
-	
 	for slot=0,19 do
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
@@ -185,7 +185,9 @@ function PCDC:DetectCooldowns()
 			end
 		end
 	end
-	
+end
+
+function PCDC:DetectSpellCooldowns()	
 	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
 	local totalSpells = offset + spellCount
 	for id=1,totalSpells do
@@ -203,11 +205,11 @@ function PCDC:DetectCooldowns()
 end
 
 function PCDC:BAG_UPDATE_COOLDOWN()
-	self:DetectCooldowns()
+	self:DetectItemCooldowns()
 end
 
 function PCDC:SPELL_UPDATE_COOLDOWN()
-	self:DetectCooldowns()
+	self:DetectSpellCooldowns()
 end
 
 function PCDC:UPDATE()
