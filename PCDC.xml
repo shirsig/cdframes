@@ -23,6 +23,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnLoad>
 						this:RegisterForDrag("LeftButton")
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnDragStart>
 						PCDC_OnDragStart();
@@ -35,7 +36,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnClick>
 					<OnEnter>
                 		GameTooltip_SetDefaultAnchor(GameTooltip, this)
-                		GameTooltip:AddLine('PCDC', 1, 1, 1, true)
+                		GameTooltip:AddLine("Player cooldowns")
+						GameTooltip:AddLine("Left-click/drag to position", .8, .8, .8)
+						GameTooltip:AddLine("Right-click to lock", .8, .8, .8)
                 		GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>

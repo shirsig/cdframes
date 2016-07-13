@@ -15,6 +15,7 @@ function PCDC:Lock()
 	for i=1,10 do
 		getglobal('PCDC_Tex'..i):Hide()
 	end
+	PCDC_Locked = true
 end
 
 function PCDC:Unlock()
@@ -27,6 +28,7 @@ function PCDC:Unlock()
 		getglobal('PCDC_Tex'..i):Show()
 		getglobal('PCDC_CD'..i):Hide()
 	end
+	PCDC_Locked = false
 end
 
 function PCDC_ToggleStack()
@@ -78,8 +80,12 @@ function PCDC_ToggleStack()
 end
 
 function PCDC_Click()
-	PCDC_Orientation = mod(PCDC_Orientation, 4) + 1
-	PCDC_ToggleStack()
+	if arg1 == 'LeftButton' then
+		PCDC_Orientation = mod(PCDC_Orientation, 4) + 1
+		PCDC_ToggleStack()
+	elseif arg1 == 'RightButton' then
+		PCDC:Lock()
+	end
 end
 
 function PCDC_ToolTip(tooltipnum)
@@ -99,11 +105,10 @@ end
 
 SLASH_PCDC1 = '/pcdc'
 function SlashCmdList.PCDC()
-	PCDC_Locked = not PCDC_Locked
 	if PCDC_Locked then
-		PCDC:Lock()
-	else
 		PCDC:Unlock()
+	else
+		PCDC:Lock()
 	end
 end
 
