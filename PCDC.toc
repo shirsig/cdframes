@@ -1,5 +1,5 @@
 ## Interface: 11200
 ## Title: Player Cooldown Count
 ## Author: shirsig
-## SavedVariables: PCDC_Orientation, PCDC_Locked
+## SavedVariables: PCDC_Position, PCDC_Orientation, PCDC_Locked
 PCDC.xml

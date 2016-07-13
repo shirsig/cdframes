@@ -7,7 +7,9 @@ PCDC:SetScript('OnEvent', function()
 end)
 PCDC:RegisterEvent('ADDON_LOADED')
 
+PCDC_Position = {0, 0}
 PCDC_Orientation = 1
+
 local R, D, L, U = 1, 2, 3, 4
 
 function PCDC:Lock()
@@ -101,6 +103,9 @@ end
 
 function PCDC_OnDragStop()
 	PCDC_Frame:StopMovingOrSizing()
+	local x, y = PCDC_Frame:GetCenter()
+	local ux, uy = UIParent:GetCenter()
+	PCDC_Position = {floor(x - ux + 0.5), floor(y - uy + .7)}
 end
 
 SLASH_PCDC1 = '/pcdc'
@@ -116,6 +121,8 @@ function PCDC:ADDON_LOADED()
 	if arg1 ~= 'PCDC' then
 		return
 	end
+
+	PCDC_Frame:SetPoint('CENTER', unpack(PCDC_Position))
 
 	PCDC_ToolTips = {}
 	PCDC_ToolTipDetails = {}
