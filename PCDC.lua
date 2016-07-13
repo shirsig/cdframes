@@ -162,7 +162,7 @@ function PCDC:DetectCooldowns()
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
 				if enabled == 1 then
 					local name = self:LinkName(GetContainerItemLink(bag, slot))
-					if duration == 0 or duration > 3 and duration <= 3600 then
+					if duration == 0 or duration > 3 and duration <= 1200 then
 						self:StartCooldown(
 							name,
 							GetContainerItemInfo(bag, slot),
@@ -179,7 +179,7 @@ function PCDC:DetectCooldowns()
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
 			local name = self:LinkName(GetInventoryItemLink('player', slot))
-			if duration == 0 or duration > 3 and duration <= 3600 then
+			if duration == 0 or duration > 3 and duration <= 1200 then
 				self:StartCooldown(
 					name,
 					GetInventoryItemTexture('player', slot),
@@ -223,7 +223,7 @@ function PCDC:UPDATE()
 		for k, v in PCDC_UsedSkills do
 			local timeleft = v.started + v.countdown - GetTime()
 
-			if timeleft > 0 and timeleft <= 900 then
+			if timeleft > 0 then
 				tinsert(temp, v)
 
 				if i <= 10 then
