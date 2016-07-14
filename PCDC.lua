@@ -7,6 +7,7 @@ PCDC:SetScript('OnEvent', function()
 end)
 PCDC:RegisterEvent('ADDON_LOADED')
 
+
 PCDC_Position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2}
 PCDC_Orientation = 1
 
@@ -142,6 +143,15 @@ function PCDC:ADDON_LOADED()
 	self:DetectSpellCooldowns()
 end
 
+function PCDC:ignored(item)
+	for id in string.gfind(ignored_items, '%d+') do
+		if GetItemInfo(id) == name then
+			return false
+		end
+	end
+	return true
+end
+
 function PCDC:StartCooldown(name, texture, started, duration)
 	for i, skill in PCDC_UsedSkills do
 		if skill.skill == name then
@@ -159,7 +169,7 @@ function PCDC:DetectItemCooldowns()
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
 				if enabled == 1 then
 					local name = self:LinkName(GetContainerItemLink(bag, slot))
-					if duration == 0 or duration > 3 and duration <= 1200 and GetItemInfo(6948) ~= name then
+					if duration == 0 or duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
 						self:StartCooldown(
 							name,
 							GetContainerItemInfo(bag, slot),
@@ -175,7 +185,7 @@ function PCDC:DetectItemCooldowns()
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
 			local name = self:LinkName(GetInventoryItemLink('player', slot))
-			if duration == 0 or duration > 3 and duration <= 1200 then
+			if duration == 0 or duration > 3 and duration <= 1800 then
 				self:StartCooldown(
 					name,
 					GetInventoryItemTexture('player', slot),
