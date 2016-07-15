@@ -7,6 +7,8 @@ PCDC:SetScript('OnEvent', function()
 end)
 PCDC:RegisterEvent('ADDON_LOADED')
 
+PCDC_IgnoreList = "ignoredcd1,ignoredcd2,ignoredcd3"
+PCDC_ClickThrough = false
 
 PCDC_Position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2}
 PCDC_Orientation = 1
@@ -139,20 +141,29 @@ function PCDC:ADDON_LOADED()
 		PCDC:Unlock()
 	end
 
+	if PCDC_ClickThrough then
+		for i=1,10 do
+			getglobal('PCDC_Frame'..i):EnableMouse(false)
+		end
+	end
+
 	self:DetectItemCooldowns()
 	self:DetectSpellCooldowns()
 end
 
-function PCDC:ignored(item)
-	for id in string.gfind(ignored_items, '%d+') do
-		if GetItemInfo(id) == name then
-			return false
+function PCDC:Ignored(name)
+	for entry in string.gfind(PCDC_IgnoreList, '[^,]+') do
+		if strupper(entry) == strupper(name) then
+			return true
 		end
 	end
-	return true
 end
 
 function PCDC:StartCooldown(name, texture, started, duration)
+	if PCDC:Ignored(name) then
+		return
+	end
+
 	for i, skill in PCDC_UsedSkills do
 		if skill.skill == name then
 			tremove(PCDC_UsedSkills, i)
