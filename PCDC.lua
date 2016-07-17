@@ -1,179 +1,238 @@
-local PCDC = CreateFrame('Frame')
-PCDC:SetScript('OnUpdate', function()
+local CDC = CreateFrame('Frame')
+CDC:SetScript('OnUpdate', function()
 	this:UPDATE(arg1)
 end)
-PCDC:SetScript('OnEvent', function()
+CDC:SetScript('OnEvent', function()
 	this[event](this)
 end)
-PCDC:RegisterEvent('ADDON_LOADED')
+CDC:RegisterEvent('ADDON_LOADED')
 
-PCDC_IgnoreList = "ignoredcd1,ignoredcd2,ignoredcd3"
-PCDC_ClickThrough = false
+CDC_Settings = nil
 
-PCDC_Position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2}
-PCDC_Orientation = 1
+CDC_IgnoreList = "ignoredcd1,ignoredcd2,ignoredcd3"
+CDC_ClickThrough = false
 
-local R, D, L, U = 1, 2, 3, 4
+CDC_Position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2}
+CDC_Orientation = 'U'
 
-function PCDC:Lock()
-	PCDC_Button:Hide()
-	for i=1,10 do
-		getglobal('PCDC_Tex'..i):Hide()
-	end
-	PCDC_Locked = true
-end
-
-function PCDC:Unlock()
-	PCDC_Button:Show()
-	for i=1,10 do
-		PCDC_ToolTips[i] = 'test'..i
-		PCDC_ToolTipDetails[i] = 'test'..i
-		getglobal('PCDC_Tex'..i):SetTexture([[Interface\Icons\temp]])
-		getglobal('PCDC_Frame'..i):Show()
-		getglobal('PCDC_Tex'..i):Show()
-		getglobal('PCDC_CD'..i):Hide()
-	end
-	PCDC_Locked = false
-end
-
-function PCDC_ToggleStack()
-	if PCDC_Orientation == U then
-		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('BOTTOM', 'PCDC_Frame', 'TOP', 0, -3)
-		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('BOTTOM', 'PCDC_Tex1', 'TOP', 0, 0)
-		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('BOTTOM', 'PCDC_Tex2', 'TOP', 0, 0)
-		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('BOTTOM', 'PCDC_Tex3', 'TOP', 0, 0)
-		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('BOTTOM', 'PCDC_Tex4', 'TOP', 0, 0)
-		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('BOTTOM', 'PCDC_Tex5', 'TOP', 0, 0)
-		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('BOTTOM', 'PCDC_Tex6', 'TOP', 0, 0)
-		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('BOTTOM', 'PCDC_Tex7', 'TOP', 0, 0)
-		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('BOTTOM', 'PCDC_Tex8', 'TOP', 0, 0)
-		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('BOTTOM', 'PCDC_Tex9', 'TOP', 0, 0)
-	elseif PCDC_Orientation == D then
-		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('TOP', 'PCDC_Frame', 'BOTTOM', 0, 3)
-		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('TOP', 'PCDC_Tex1', 'BOTTOM', 0, 0)
-		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('TOP', 'PCDC_Tex2', 'BOTTOM', 0, 0)
-		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('TOP', 'PCDC_Tex3', 'BOTTOM', 0, 0)
-		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('TOP', 'PCDC_Tex4', 'BOTTOM', 0, 0)
-		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('TOP', 'PCDC_Tex5', 'BOTTOM', 0, 0)
-		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('TOP', 'PCDC_Tex6', 'BOTTOM', 0, 0)
-		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('TOP', 'PCDC_Tex7', 'BOTTOM', 0, 0)
-		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('TOP', 'PCDC_Tex8', 'BOTTOM', 0, 0)
-		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('TOP', 'PCDC_Tex9', 'BOTTOM', 0, 0)
-	elseif PCDC_Orientation == L then
-		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('RIGHT', 'PCDC_Frame', 'LEFT', 0, 0)
-		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('RIGHT', 'PCDC_Tex1', 'LEFT', 0, 0)
-		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('RIGHT', 'PCDC_Tex2', 'LEFT', 0, 0)
-		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('RIGHT', 'PCDC_Tex3', 'LEFT', 0, 0)
-		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('RIGHT', 'PCDC_Tex4', 'LEFT', 0, 0)
-		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('RIGHT', 'PCDC_Tex5', 'LEFT', 0, 0)
-		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('RIGHT', 'PCDC_Tex6', 'LEFT', 0, 0)
-		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('RIGHT', 'PCDC_Tex7', 'LEFT', 0, 0)
-		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('RIGHT', 'PCDC_Tex8', 'LEFT', 0, 0)
-		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('RIGHT', 'PCDC_Tex9', 'LEFT', 0, 0)
-	elseif PCDC_Orientation == R then
-		PCDC_Tex1:ClearAllPoints() PCDC_Tex1:SetPoint('LEFT', 'PCDC_Frame', 'RIGHT', 0, 0)
-		PCDC_Tex2:ClearAllPoints() PCDC_Tex2:SetPoint('LEFT', 'PCDC_Tex1', 'RIGHT', 0, 0)
-		PCDC_Tex3:ClearAllPoints() PCDC_Tex3:SetPoint('LEFT', 'PCDC_Tex2', 'RIGHT', 0, 0)
-		PCDC_Tex4:ClearAllPoints() PCDC_Tex4:SetPoint('LEFT', 'PCDC_Tex3', 'RIGHT', 0, 0)
-		PCDC_Tex5:ClearAllPoints() PCDC_Tex5:SetPoint('LEFT', 'PCDC_Tex4', 'RIGHT', 0, 0)
-		PCDC_Tex6:ClearAllPoints() PCDC_Tex6:SetPoint('LEFT', 'PCDC_Tex5', 'RIGHT', 0, 0)
-		PCDC_Tex7:ClearAllPoints() PCDC_Tex7:SetPoint('LEFT', 'PCDC_Tex6', 'RIGHT', 0, 0)
-		PCDC_Tex8:ClearAllPoints() PCDC_Tex8:SetPoint('LEFT', 'PCDC_Tex7', 'RIGHT', 0, 0)
-		PCDC_Tex9:ClearAllPoints() PCDC_Tex9:SetPoint('LEFT', 'PCDC_Tex8', 'RIGHT', 0, 0)
-		PCDC_Tex10:ClearAllPoints() PCDC_Tex10:SetPoint('LEFT', 'PCDC_Tex9', 'RIGHT', 0, 0)
+function CDC:enum(...)
+	for i=1,arg.n do
+		self[arg[i]] = arg[i]
 	end
 end
 
-function PCDC_Click()
-	if arg1 == 'LeftButton' then
-		PCDC_Orientation = mod(PCDC_Orientation, 4) + 1
-		PCDC_ToggleStack()
-	elseif arg1 == 'RightButton' then
-		PCDC:Lock()
+function CDC.tokenize(str)
+	local tokens = {}
+	for token in string.gfind(str, '%S+') do
+		tinsert(tokens, token)
 	end
+	return tokens
 end
 
-function PCDC_ToolTip(tooltipnum)
-	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
-	GameTooltip:AddLine(PCDC_ToolTips[tooltipnum])
-	GameTooltip:AddLine(PCDC_ToolTipDetails[tooltipnum], .8, .8, .8, 1)
-	GameTooltip:Show()
-end
-
-function PCDC_OnDragStart()
-	PCDC_Frame:StartMoving()
-end
-
-function PCDC_OnDragStop()
-	PCDC_Frame:StopMovingOrSizing()
-	PCDC_Position = { PCDC_Frame:GetLeft(), PCDC_Frame:GetBottom() }
-end
-
-SLASH_PCDC1 = '/pcdc'
-function SlashCmdList.PCDC()
-	if PCDC_Locked then
-		PCDC:Unlock()
-	else
-		PCDC:Lock()
-	end
-end
-
-function PCDC:ADDON_LOADED()
-	if arg1 ~= 'PCDC' then
+function CDC:ADDON_LOADED()
+	if arg1 ~= 'CDC' then
 		return
 	end
 
-	PCDC_Frame:SetPoint('BOTTOMLEFT', unpack(PCDC_Position))
+	self:enum('R', 'D', 'L', 'U')
+	self:enum('PLAYER', 'ENEMY')
 
-	PCDC_ToolTips = {}
-	PCDC_ToolTipDetails = {}
-	PCDC_UsedSkills = {}
+	CDC_Settings = CDC_Settings or {
+		position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2},
+		orientation = self.R,
+		ignoreList = '',
+		clickThrough = false,
+	}
 
-	PCDC_Button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
+	for _, module in {self.PLAYER, self.ENEMY} do
+		local frame = CreateFrame('Frame', nil, UIParent)
+		frame:SetWidth(32)
+		frame:SetHeight(32)
+		frame:SetFrameStrata('HIGH')
+		frame:SetMovable(true)
+		frame:SetToplevel(true)
+
+		frame.button = CreateFrame('Button', nil, frame)
+		frame.button:SetWidth(32)
+		frame.button:SetHeight(40)
+		frame.button:SetPoint('CENTER', 0, 8)
+		frame.button:RegisterForDrag('LeftButton')
+		frame.button:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
+		frame.button:SetScript('OnDragStart', self.OnDragStart)
+		frame.button:SetScript('OnDragStop', self.OnDragStop)
+		frame.button:SetScript('OnClick', self.OnClick)
+		frame.button:SetScript('OnEnter', self.OnDragStop, function()
+    		GameTooltip_SetDefaultAnchor(GameTooltip, this)
+    		GameTooltip:AddLine('Player cooldowns')
+			GameTooltip:AddLine('Left-click/drag to position', .8, .8, .8)
+			GameTooltip:AddLine('Right-click to lock', .8, .8, .8)
+    		GameTooltip:Show()
+		end)
+		frame.button:SetScript('OnLeave', function()
+			GameTooltip:Hide()
+		end)
+
+		frame.CDs = {}
+		for i=1,10 do
+			tinsert(frame.CDs, CDC_CDFrame(frame, i))
+		end
+
+		self[module].frame = frame
+	end
+
+	self.frames = {PLAYER = {}, ENEMY = {}}
+	for i=1,10 do
+		for _, module in {self.PLAYER, self.ENEMY} do
+			tinsert(self.frames[module], CDC_CDFrame(i))
+		end
+	end
+
+	CDC_Frame:SetPoint('BOTTOMLEFT', unpack(CDC_Position))
+
+	CDC_ToolTips = {}
+	CDC_ToolTipDetails = {}
+	CDC_UsedSkills = {}
+
+	CDC_Button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
 
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 
-	PCDC_ToggleStack()
-	if PCDC_Locked then
-		PCDC:Lock()
+	CDC:ToggleStack(self.PLAYER)
+	if CDC_Locked then
+		CDC:Lock(self.PLAYER)
 	else
-		PCDC:Unlock()
+		CDC:Unlock(self.PLAYER)
 	end
 
-	if PCDC_ClickThrough then
-		for i=1,10 do
-			getglobal('PCDC_Frame'..i):EnableMouse(false)
-		end
+	for _, frame in self.frames.PLAYER do
+		frame:EnableMouse(not CDC_ClickThrough)
 	end
 
 	self:DetectItemCooldowns()
 	self:DetectSpellCooldowns()
 end
 
-function PCDC:Ignored(name)
-	for entry in string.gfind(PCDC_IgnoreList, '[^,]+') do
+function CDC:Lock(type)
+	CDC_Button:Hide()
+	for _, frame in self.frames[type] do
+		frame:Hide()
+	end
+	CDC_Locked = true
+end
+
+function CDC:Unlock(type)
+	CDC_Button:Show()
+	for i, frame in self.frames[type] do
+		CDC_ToolTips[i] = 'test'..i
+		CDC_ToolTipDetails[i] = 'test'..i
+		frame.texture:SetTexture([[Interface\Icons\temp]])
+		frame.count:SetText()
+		frame:Show()
+	end
+	CDC_Locked = false
+end
+
+function CDC_CDFrame(parent, i)
+	local frame = CreateFrame('Frame', nil, parent)
+	frame:SetWidth(32)
+	frame:SetHeight(32)
+	frame:EnableMouse(true)
+	frame:SetScript('OnEnter', function()
+		CDC_Tooltip(i)
+	end)
+	frame:SetScript('OnLeave', function()
+		GameTooltip:Hide()
+	end)
+	frame.texture = frame:CreateTexture()
+	frame.texture:SetAllPoints()
+	frame.count = frame:CreateFontString()
+	frame.count:SetFont([[Fonts\ARIALN.TTF]], 14, 'THICKOUTLINE')
+	frame.count:SetWidth(32)
+	frame.count:SetHeight(12)
+	frame.count:SetPoint('BOTTOM', 0, 10)
+	return frame
+end
+
+function CDC:ToggleStack(module)
+	for i, frame in self.frames[module] do
+		frame:ClearAllPoints()
+		local reference, offset = self[module].frame, (i-1)*32
+		if CDC_Orientation == self.U then
+			frame:SetPoint('BOTTOM', reference, 'TOP', 0, offset-3)
+		elseif CDC_Orientation == self.D then
+			frame:SetPoint('TOP', reference, 'BOTTOM', 0, 3-offset)
+		elseif CDC_Orientation == self.L then
+			frame:SetPoint('RIGHT', reference, 'LEFT', -offset, 0)
+		elseif CDC_Orientation == self.R then
+			frame:SetPoint('LEFT', reference, 'RIGHT', offset, 0)
+		end
+	end
+end
+
+function CDC_Click()
+	local succ = {
+		R = self.D,
+		D = self.L,
+		L = self.U,
+		U = self.R,
+	}
+	if arg1 == 'LeftButton' then
+		CDC_Orientation = succ(CDC_Orientation)
+		CDC:ToggleStack(self.PLAYER)
+	elseif arg1 == 'RightButton' then
+		CDC:Lock(self.PLAYER)
+	end
+end
+
+function CDC_ToolTip(tooltipnum)
+	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
+	GameTooltip:AddLine(CDC_ToolTips[tooltipnum])
+	GameTooltip:AddLine(CDC_ToolTipDetails[tooltipnum], .8, .8, .8, 1)
+	GameTooltip:Show()
+end
+
+function CDC:OnDragStart()
+	self.PLAYER.frame:StartMoving()
+end
+
+function CDC:OnDragStop()
+	self.PLAYER.frame:StopMovingOrSizing()
+	CDC_Position = { CDC_Frame:GetLeft(), CDC_Frame:GetBottom() }
+end
+
+SLASH_CDC1 = '/CDC'
+function SlashCmdList.CDC()
+	if CDC_Locked then
+		CDC:Unlock(self.PLAYER)
+	else
+		CDC:Lock(self.PLAYER)
+	end
+end
+
+function CDC:Ignored(name)
+	for entry in string.gfind(CDC_IgnoreList, '[^,]+') do
 		if strupper(entry) == strupper(name) then
 			return true
 		end
 	end
 end
 
-function PCDC:StartCooldown(name, texture, started, duration)
-	if PCDC:Ignored(name) then
+function CDC:StartCooldown(name, texture, started, duration)
+	if CDC:Ignored(name) then
 		return
 	end
 
-	for i, skill in PCDC_UsedSkills do
+	for i, skill in CDC_UsedSkills do
 		if skill.skill == name then
-			tremove(PCDC_UsedSkills, i)
+			tremove(CDC_UsedSkills, i)
 			break
 		end
 	end
-	table.insert(PCDC_UsedSkills, {skill = name, info = '', texture = strsub(texture, 17), countdown = duration, started = started})
+	table.insert(CDC_UsedSkills, {skill = name, info = '', texture = strsub(texture, 17), countdown = duration, started = started})
 end
 
-function PCDC:DetectItemCooldowns()	
+function CDC:DetectItemCooldowns()	
     for bag=0,4 do
         if GetBagName(bag) then
             for slot = 1, GetContainerNumSlots(bag) do
@@ -208,7 +267,7 @@ function PCDC:DetectItemCooldowns()
 	end
 end
 
-function PCDC:DetectSpellCooldowns()	
+function CDC:DetectSpellCooldowns()	
 	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
 	local totalSpells = offset + spellCount
 	for id=1,totalSpells do
@@ -225,63 +284,63 @@ function PCDC:DetectSpellCooldowns()
 	end
 end
 
-function PCDC:BAG_UPDATE_COOLDOWN()
+function CDC:BAG_UPDATE_COOLDOWN()
 	self:DetectItemCooldowns()
 end
 
-function PCDC:SPELL_UPDATE_COOLDOWN()
+function CDC:SPELL_UPDATE_COOLDOWN()
 	self:DetectSpellCooldowns()
 end
 
-function PCDC:UPDATE()
-	if PCDC_Locked then
+function CDC:UPDATE()
+	if CDC_Locked then
 		local i = 1
 
 		local temp = {}
-		sort(PCDC_UsedSkills, function(a, b) local ta, tb = a.started + a.countdown - GetTime(), b.started + b.countdown - GetTime() return ta < tb or tb == ta and a.skill < b.skill end)
-		for k, v in PCDC_UsedSkills do
+		sort(CDC_UsedSkills, function(a, b) local ta, tb = a.started + a.countdown - GetTime(), b.started + b.countdown - GetTime() return ta < tb or tb == ta and a.skill < b.skill end)
+		for k, v in CDC_UsedSkills do
 			local timeleft = v.started + v.countdown - GetTime()
 
 			if timeleft > 0 then
 				tinsert(temp, v)
 
 				if i <= 10 then
+					local CDFrame = self.frames.PLAYER[i]
 					if timeleft <= 5 then
-						getglobal('PCDC_Tex'..i):SetAlpha(1 - (math.sin(GetTime() * 1.3 * math.pi) + 1) / 2 * .7)
+						CDFrame.texture:SetAlpha(1 - (math.sin(GetTime() * 1.3 * math.pi) + 1) / 2 * .7)
 					else
-						getglobal('PCDC_Tex'..i):SetAlpha(1)
+						CDFrame.texture:SetAlpha(1)
 					end
 
-					PCDC_ToolTips[i] = v.skill
-					PCDC_ToolTipDetails[i] = v.info
 					timeleft = ceil(timeleft)
 					if timeleft >= 60 then
 						timeleft = ceil((timeleft/60)*10)/10
-						getglobal('PCDC_CD'..i):SetTextColor(0, 1, 0)
+						CDFrame.count:SetTextColor(0, 1, 0)
 					else
-						getglobal('PCDC_CD'..i):SetTextColor(1, 1, 0)
+						CDFrame.count:SetTextColor(1, 1, 0)
 					end
-					getglobal('PCDC_CD'..i):SetText(timeleft)
-					getglobal('PCDC_Tex'..i):SetTexture([[Interface\Icons\]]..v.texture)
-					getglobal('PCDC_Frame'..i):Show()
-					getglobal('PCDC_CD'..i):Show()
-					getglobal('PCDC_Tex'..i):Show()
+
+					CDFrame.texture:SetTexture([[Interface\Icons\]]..v.texture)
+					CDFrame.count:SetText(timeleft)
+					CDFrame:Show()
+
+					CDC_ToolTips[i] = v.skill
+					CDC_ToolTipDetails[i] = v.info
+
 					i = i + 1
 				end
 			end
 		end
-		PCDC_UsedSkills = temp
+		CDC_UsedSkills = temp
 
 		while i <= 10 do
-			getglobal('PCDC_Frame'..i):Hide()
-			getglobal('PCDC_CD'..i):Hide()
-			getglobal('PCDC_Tex'..i):Hide()
+			self.frames.PLAYER[i]:Hide()
 			i = i + 1
 		end
 	end
 end
 
-function PCDC:LinkName(link)
+function CDC:LinkName(link)
     local _, _, name = strfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h')
     return name
 end
