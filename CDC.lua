@@ -683,7 +683,7 @@ function CDC:StartEnemyCooldown(player, spell)
 	end
 end
 
-function CDC:StopEnemyCooldowns(module, player, ...)
+function CDC:StopEnemyCooldowns(player, ...)
 	local temp = {}
 	for _, CD in self[module].CDs do
 		local stop
