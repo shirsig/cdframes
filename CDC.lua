@@ -696,7 +696,7 @@ function CDC:StopEnemyCooldowns(player, ...)
 			tinsert(temp, CD)
 		end
 	end
-	self[module].CDs = temp
+	self.ENEMY.CDs = temp
 end
 
 function CDC:OnCombatLogEvent()
