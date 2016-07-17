@@ -2,4 +2,4 @@
 ## Title: Cooldown Count
 ## Author: shirsig
 ## SavedVariables: CDC_Settings
-CDC.xml
+CDC.lua

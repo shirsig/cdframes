@@ -9,19 +9,13 @@ CDC:RegisterEvent('ADDON_LOADED')
 
 CDC_Settings = nil
 
-CDC_IgnoreList = "ignoredcd1,ignoredcd2,ignoredcd3"
-CDC_ClickThrough = false
-
-CDC_Position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2}
-CDC_Orientation = 'U'
-
-function CDC:enum(...)
+function CDC:Enum(...)
 	for i=1,arg.n do
 		self[arg[i]] = arg[i]
 	end
 end
 
-function CDC.tokenize(str)
+function CDC.Tokenize(str)
 	local tokens = {}
 	for token in string.gfind(str, '%S+') do
 		tinsert(tokens, token)
@@ -34,20 +28,35 @@ function CDC:ADDON_LOADED()
 		return
 	end
 
-	self:enum('R', 'D', 'L', 'U')
-	self:enum('PLAYER', 'ENEMY')
+	SLASH_CDC1 = '/cdc'
+	function SlashCmdList.CDC()
+		if CDC_Settings[self.PLAYER].locked then
+			self:Unlock(self.PLAYER)
+		else
+			self:Lock(self.PLAYER)
+		end
+	end
 
-	CDC_Settings = CDC_Settings or {
-		position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2},
-		orientation = self.R,
-		ignoreList = '',
-		clickThrough = false,
-	}
+	self:Enum('R', 'D', 'L', 'U')
+	self:Enum('PLAYER', 'ENEMY')
 
-	for _, module in {self.PLAYER, self.ENEMY} do
+	CDC_Settings = CDC_Settings or {}
+
+	table.foreach({self.PLAYER, self.ENEMY}, function(_, module)
+
+		CDC_Settings[module] = CDC_Settings[module] or {
+			position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2},
+			orientation = self.R,
+			locked = false,
+			ignoreList = '',
+			clickThrough = false,
+		}
+
 		local frame = CreateFrame('Frame', nil, UIParent)
+		self[module].frame = frame
 		frame:SetWidth(32)
 		frame:SetHeight(32)
+		frame:SetPoint('BOTTOMLEFT', unpack(CDC_Settings[module].position))
 		frame:SetFrameStrata('HIGH')
 		frame:SetMovable(true)
 		frame:SetToplevel(true)
@@ -56,11 +65,18 @@ function CDC:ADDON_LOADED()
 		frame.button:SetWidth(32)
 		frame.button:SetHeight(40)
 		frame.button:SetPoint('CENTER', 0, 8)
+		frame.button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
 		frame.button:RegisterForDrag('LeftButton')
 		frame.button:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
-		frame.button:SetScript('OnDragStart', self.OnDragStart)
-		frame.button:SetScript('OnDragStop', self.OnDragStop)
-		frame.button:SetScript('OnClick', self.OnClick)
+		frame.button:SetScript('OnDragStart', function()
+			self.OnDragStart(module)
+		end)
+		frame.button:SetScript('OnDragStop', function()
+			self.OnDragStop(module)
+		end)
+		frame.button:SetScript('OnClick', function()
+			self.OnClick(module)
+		end)
 		frame.button:SetScript('OnEnter', self.OnDragStop, function()
     		GameTooltip_SetDefaultAnchor(GameTooltip, this)
     		GameTooltip:AddLine('Player cooldowns')
@@ -77,69 +93,57 @@ function CDC:ADDON_LOADED()
 			tinsert(frame.CDs, CDC_CDFrame(frame, i))
 		end
 
-		self[module].frame = frame
-	end
+		self:ToggleStack(module)
 
-	self.frames = {PLAYER = {}, ENEMY = {}}
-	for i=1,10 do
-		for _, module in {self.PLAYER, self.ENEMY} do
-			tinsert(self.frames[module], CDC_CDFrame(i))
+		if CDC_Settings[module].locked then
+			CDC:Lock(module)
+		else
+			CDC:Unlock(module)
 		end
-	end
 
-	CDC_Frame:SetPoint('BOTTOMLEFT', unpack(CDC_Position))
+		for _, frame in self[module].frame.CDs do
+			frame:EnableMouse(not CDC_Settings[module].clickThrough)
+		end
 
-	CDC_ToolTips = {}
-	CDC_ToolTipDetails = {}
-	CDC_UsedSkills = {}
+	end)
 
-	CDC_Button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
+	CDC_Tooltips = {}
+	CDC_TooltipDetails = {}
+	self.CDs = {}
 
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
-
-	CDC:ToggleStack(self.PLAYER)
-	if CDC_Locked then
-		CDC:Lock(self.PLAYER)
-	else
-		CDC:Unlock(self.PLAYER)
-	end
-
-	for _, frame in self.frames.PLAYER do
-		frame:EnableMouse(not CDC_ClickThrough)
-	end
 
 	self:DetectItemCooldowns()
 	self:DetectSpellCooldowns()
 end
 
-function CDC:Lock(type)
-	CDC_Button:Hide()
-	for _, frame in self.frames[type] do
+function CDC:Lock(module)
+	self[module].frame.button:Hide()
+	for _, frame in self[module].frame.CDs do
 		frame:Hide()
 	end
-	CDC_Locked = true
+	CDC_Settings[module].locked = true
 end
 
-function CDC:Unlock(type)
-	CDC_Button:Show()
-	for i, frame in self.frames[type] do
-		CDC_ToolTips[i] = 'test'..i
-		CDC_ToolTipDetails[i] = 'test'..i
+function CDC:Unlock(module)
+	self[module].frame.button:Show()
+	for i, frame in self[module].frame.CDs do
+		CDC_Tooltips[i] = 'test'..i
+		CDC_TooltipDetails[i] = 'test'..i
 		frame.texture:SetTexture([[Interface\Icons\temp]])
 		frame.count:SetText()
 		frame:Show()
 	end
-	CDC_Locked = false
+	CDC_Settings[module].locked = false
 end
 
-function CDC_CDFrame(parent, i)
+function CDC:CDFrame(parent, i)
 	local frame = CreateFrame('Frame', nil, parent)
 	frame:SetWidth(32)
 	frame:SetHeight(32)
-	frame:EnableMouse(true)
 	frame:SetScript('OnEnter', function()
-		CDC_Tooltip(i)
+		self:Tooltip(i)
 	end)
 	frame:SetScript('OnLeave', function()
 		GameTooltip:Hide()
@@ -155,22 +159,22 @@ function CDC_CDFrame(parent, i)
 end
 
 function CDC:ToggleStack(module)
-	for i, frame in self.frames[module] do
+	for i, frame in self[module].frame.CDs do
 		frame:ClearAllPoints()
-		local reference, offset = self[module].frame, (i-1)*32
-		if CDC_Orientation == self.U then
+		local orientation, reference, offset = CDC_Settings[module].orientation, self[module].frame, (i-1)*32
+		if orientation == self.U then
 			frame:SetPoint('BOTTOM', reference, 'TOP', 0, offset-3)
-		elseif CDC_Orientation == self.D then
+		elseif orientation == self.D then
 			frame:SetPoint('TOP', reference, 'BOTTOM', 0, 3-offset)
-		elseif CDC_Orientation == self.L then
+		elseif orientation == self.L then
 			frame:SetPoint('RIGHT', reference, 'LEFT', -offset, 0)
-		elseif CDC_Orientation == self.R then
+		elseif orientation == self.R then
 			frame:SetPoint('LEFT', reference, 'RIGHT', offset, 0)
 		end
 	end
 end
 
-function CDC_Click()
+function CDC:OnClick(module)
 	local succ = {
 		R = self.D,
 		D = self.L,
@@ -178,58 +182,49 @@ function CDC_Click()
 		U = self.R,
 	}
 	if arg1 == 'LeftButton' then
-		CDC_Orientation = succ(CDC_Orientation)
-		CDC:ToggleStack(self.PLAYER)
+		CDC_Settings[module].orientation = succ(CDC_Settings[module].orientation)
+		self:ToggleStack(module)
 	elseif arg1 == 'RightButton' then
-		CDC:Lock(self.PLAYER)
+		self:Lock(module)
 	end
 end
 
-function CDC_ToolTip(tooltipnum)
+function CDC:Tooltip(i)
 	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
-	GameTooltip:AddLine(CDC_ToolTips[tooltipnum])
-	GameTooltip:AddLine(CDC_ToolTipDetails[tooltipnum], .8, .8, .8, 1)
+	GameTooltip:AddLine(CDC_Tooltips[i])
+	GameTooltip:AddLine(CDC_TooltipDetails[i], .8, .8, .8, 1)
 	GameTooltip:Show()
 end
 
-function CDC:OnDragStart()
-	self.PLAYER.frame:StartMoving()
+function CDC:OnDragStart(module)
+	self[module].frame:StartMoving()
 end
 
-function CDC:OnDragStop()
-	self.PLAYER.frame:StopMovingOrSizing()
-	CDC_Position = { CDC_Frame:GetLeft(), CDC_Frame:GetBottom() }
+function CDC:OnDragStop(module)
+	self[module].frame:StopMovingOrSizing()
+	CDC_Settings[module].position = {self[module].frame:GetLeft(), self[module].frame:GetBottom()}
 end
 
-SLASH_CDC1 = '/CDC'
-function SlashCmdList.CDC()
-	if CDC_Locked then
-		CDC:Unlock(self.PLAYER)
-	else
-		CDC:Lock(self.PLAYER)
-	end
-end
-
-function CDC:Ignored(name)
-	for entry in string.gfind(CDC_IgnoreList, '[^,]+') do
+function CDC:Ignored(module, name)
+	for entry in string.gfind(CDC_Settings[module].ignoreList, '[^,]+') do
 		if strupper(entry) == strupper(name) then
 			return true
 		end
 	end
 end
 
-function CDC:StartCooldown(name, texture, started, duration)
+function CDC:StartCooldown(module, name, texture, started, duration)
 	if CDC:Ignored(name) then
 		return
 	end
 
-	for i, skill in CDC_UsedSkills do
+	for i, skill in self.CDs do
 		if skill.skill == name then
-			tremove(CDC_UsedSkills, i)
+			tremove(self.CDs, i)
 			break
 		end
 	end
-	table.insert(CDC_UsedSkills, {skill = name, info = '', texture = strsub(texture, 17), countdown = duration, started = started})
+	table.insert(self.CDs, {skill = name, info = '', texture = strsub(texture, 17), duration = duration, started = started})
 end
 
 function CDC:DetectItemCooldowns()	
@@ -241,6 +236,7 @@ function CDC:DetectItemCooldowns()
 					local name = self:LinkName(GetContainerItemLink(bag, slot))
 					if duration == 0 or duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
 						self:StartCooldown(
+							self.PLAYER,
 							name,
 							GetContainerItemInfo(bag, slot),
 							started,
@@ -257,6 +253,7 @@ function CDC:DetectItemCooldowns()
 			local name = self:LinkName(GetInventoryItemLink('player', slot))
 			if duration == 0 or duration > 3 and duration <= 1800 then
 				self:StartCooldown(
+					self.PLAYER
 					name,
 					GetInventoryItemTexture('player', slot),
 					started,
@@ -275,6 +272,7 @@ function CDC:DetectSpellCooldowns()
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
 		if duration == 0 or enabled == 1 and duration > 2.5 then
 			self:StartCooldown(
+				self.PLAYER,
 				name,
 				GetSpellTexture(id, BOOKTYPE_SPELL),
 				started,
@@ -293,19 +291,25 @@ function CDC:SPELL_UPDATE_COOLDOWN()
 end
 
 function CDC:UPDATE()
-	if CDC_Locked then
+	for _, module in {self.PLAYER, self.ENEMY} do
+		self:OnUpdate(module)
+	end
+end
+
+function CDC:OnUpdate(module)
+	if CDC_Settings[module].locked then
 		local i = 1
 
 		local temp = {}
-		sort(CDC_UsedSkills, function(a, b) local ta, tb = a.started + a.countdown - GetTime(), b.started + b.countdown - GetTime() return ta < tb or tb == ta and a.skill < b.skill end)
-		for k, v in CDC_UsedSkills do
-			local timeleft = v.started + v.countdown - GetTime()
+		sort(self.CDs, function(a, b) local ta, tb = a.started + a.duration - GetTime(), b.started + b.duration - GetTime() return ta < tb or tb == ta and a.skill < b.skill end)
+		for k, v in self.CDs do
+			local timeleft = v.started + v.duration - GetTime()
 
 			if timeleft > 0 then
 				tinsert(temp, v)
 
 				if i <= 10 then
-					local CDFrame = self.frames.PLAYER[i]
+					local CDFrame = self[module].frame.CDs[i]
 					if timeleft <= 5 then
 						CDFrame.texture:SetAlpha(1 - (math.sin(GetTime() * 1.3 * math.pi) + 1) / 2 * .7)
 					else
@@ -324,23 +328,24 @@ function CDC:UPDATE()
 					CDFrame.count:SetText(timeleft)
 					CDFrame:Show()
 
-					CDC_ToolTips[i] = v.skill
-					CDC_ToolTipDetails[i] = v.info
+					CDC_Tooltips[i] = v.skill
+					CDC_TooltipDetails[i] = v.info
 
 					i = i + 1
 				end
 			end
 		end
-		CDC_UsedSkills = temp
+		self.CDs = temp
 
 		while i <= 10 do
-			self.frames.PLAYER[i]:Hide()
+			self[module].frame.CDs[i]:Hide()
 			i = i + 1
 		end
-	end
+	end	
 end
 
 function CDC:LinkName(link)
-    local _, _, name = strfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h')
-    return name
+	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do
+		return name
+	end
 end
