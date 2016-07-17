@@ -350,27 +350,30 @@ function CDC:CDFrame(parent)
 end
 
 function CDC:SlashHandler(str)
+	str = strupper(str)
 	local parameters = self:Tokenize(str)
 
-	local module = strupper(parameters[1] or '')
+	local module = parameters[1]
 	if module ~= PLAYER and module ~= ENEMY then
 		return
 	end
 
-	local settings = CDC_Settings[module]
-
 	if parameters[2] == 'ON' then
-		settings.active = true
+		CDC_Settings[module].active = true
 	elseif parameters[2] == 'OFF' then
-		settings.active = false
+		CDC_Settings[module].active = false
 	elseif parameters[2] == 'LOCK' then
-		settings.locked = true
+		CDC_Settings[module].locked = true
 	elseif parameters[2] == 'UNLOCK' then
-		settings.locked = false
+		CDC_Settings[module].locked = false
 	elseif parameters[2] == 'CLICK' then
-		settings.clickThrough = not settings.clickThrough
+		CDC_Settings[module].clickThrough = not settings.clickThrough
 	elseif parameters[2] == 'IGNORE' then
-		settings.ignoreList = parameters[3] or ''
+		local _, _, ignoreList = strfind(str, '^%s*'..module..'%s+IGNORE%s+(.-)%s*$')
+		CDC_Settings[module].ignoreList = ignoreList or ''
+	elseif parameters[2] == 'RESET' then
+		CDC_Settings[module] = DEFAULT_SETTINGS
+		self:PlaceFrames(module)
 	else
 		return
 	end
@@ -379,23 +382,29 @@ function CDC:SlashHandler(str)
 end
 
 function CDC:ApplySettings(module)
-	local settings = CDC_Settings[module]
-
-	if settings.active then
+	if CDC_Settings[module].active then
 		self[module].frame:Show()
 	else
 		self[module].frame:Hide()
 	end
 
-	if settings.locked then
+	if CDC_Settings[module].locked then
 		self:Lock(module)
 	else
 		self:Unlock(module)
 	end
 
 	for _, frame in self[module].frame.CDs do
-		frame:EnableMouse(not settings.clickThrough)
+		frame:EnableMouse(not CDC_Settings[module].clickThrough)
 	end
+
+	local temp = {}
+	for _, CD in self[module].CDs do
+		if not self:Ignored(module, CD.skill) then
+			tinsert(temp, CD)
+		end
+	end
+	self[module].CDs = temp
 end
 
 function CDC:PlaceFrames(module)
@@ -450,7 +459,7 @@ end
 function CDC:Tokenize(str)
 	local tokens = {}
 	for token in string.gfind(str, '%S+') do
-		tinsert(tokens, strupper(token))
+		tinsert(tokens, token)
 	end
 	return tokens
 end
