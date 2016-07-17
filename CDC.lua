@@ -685,7 +685,7 @@ end
 
 function CDC:StopEnemyCooldowns(player, ...)
 	local temp = {}
-	for _, CD in self[module].CDs do
+	for _, CD in self.ENEMY.CDs do
 		local stop
 		for i=1,arg.n do
 			if CD.player == player and CD.skill == arg[i] then
