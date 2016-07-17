@@ -279,7 +279,9 @@ function CDC:ADDON_LOADED()
 	CDC_Settings = CDC_Settings or {}
 
 	for _, module in MODULES do
-		CDC_Settings[module] = CDC_Settings[module] or DEFAULT_SETTINGS
+		if not CDC_Settings[module] then
+			self:Reset(module)
+		end
 
 		self[module] = {CDs = {}}
 
@@ -372,13 +374,20 @@ function CDC:SlashHandler(str)
 		local _, _, ignoreList = strfind(str, '^%s*'..module..'%s+IGNORE%s+(.-)%s*$')
 		CDC_Settings[module].ignoreList = ignoreList or ''
 	elseif parameters[2] == 'RESET' then
-		CDC_Settings[module] = DEFAULT_SETTINGS
+		self:Reset(module)
 		self:PlaceFrames(module)
 	else
 		return
 	end
 
 	self:ApplySettings(module)
+end
+
+function CDC:Reset(module)
+	CDC_Settings[module] = {}
+	for k, v in DEFAULT_SETTINGS do
+		CDC_Settings[module][k] = v
+	end
 end
 
 function CDC:ApplySettings(module)
