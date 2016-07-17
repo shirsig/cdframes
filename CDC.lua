@@ -501,7 +501,9 @@ function CDC:OnUpdate(module)
 			if i <= 10 and self:CooldownShown(module, CD) then
 				local frame = self[module].frame.CDs[i]
 				if timeleft <= 10 then
-					frame.texture:SetAlpha((math.sin(GetTime()*(4/3)*math.pi)+1)/2*.7+.3)
+					local x = GetTime()*4/3
+					frame.texture:SetAlpha((mod(floor(x), 2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
+					-- frame.texture:SetAlpha((math.sin(GetTime()*(4/3)*math.pi)+1)/2*.7+.3)
 				else
 					frame.texture:SetAlpha(1)
 				end
