@@ -207,9 +207,9 @@ function method:Update()
 	local i = 1
 
 	local temp = {}
-	sort(self.CDs, function(a, b) local ta, tb = a.expiration - t, b.expiration - t return ta < tb or tb == ta and a.name < b.name end)
+	sort(self.CDs, function(a, b) local ta, tb = a.finish - t, b.finish - t return ta < tb or tb == ta and a.name < b.name end)
 	for _, CD in self.CDs do
-		local timeleft = CD.expiration - t
+		local timeleft = CD.finish - t
 
 		if timeleft > 0 then
 			tinsert(temp, CD)
@@ -355,20 +355,19 @@ do
 	function CDC:StartPlayerCD(name, texture, started, duration)
 		local t = GetTime()
 		local key = name
-		if t == latest[key] then
-			return
-		end
-		latest[key] = t
 
-		self.playerBar:StartCD{
-			name = name,
-			info = '',
-			texture = strsub(texture, 17),
-			expiration = started + duration,
-			predicate = function()
-				return t == latest[key]
-			end,
-		}
+		if t ~= latest[key] then
+			latest[key] = t
+			self.playerBar:StartCD{
+				name = name,
+				info = '',
+				texture = strsub(texture, 17),
+				finish = started + duration,
+				predicate = function()
+					return t == latest[key]
+				end,
+			}
+		end
 	end
 end
 
@@ -685,12 +684,9 @@ do
 	function CDC:StartEnemyCD(player, skill)
 		local t = GetTime()
 		local key = player..'|'..skill
-		if t == latest[key] then
-			return
-		end
-		latest[key] = t
 
-		if ENEMY_SKILLS[skill] then
+		if ENEMY_SKILLS[skill] and t ~= latest[key] then
+			latest[key] = t
 			local trigger = ENEMY_SKILLS[skill].trigger
 			if trigger then
 				trigger(player)
@@ -699,7 +695,7 @@ do
 				name = skill,
 				info = ENEMY_SKILLS[skill].desc,
 				texture = ENEMY_SKILLS[skill].icon,
-				expiration = t + ENEMY_SKILLS[skill].cooldown,
+				finish = t + ENEMY_SKILLS[skill].cooldown,
 				predicate = function()
 					return t == latest[key] and player == UnitName('target') and not (UnitClass('target') == 'Warrior' and skill == 'Enrage')
 				end,
