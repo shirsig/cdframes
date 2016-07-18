@@ -1,16 +1,15 @@
 local CDC = CreateFrame('Frame')
-CDC:SetScript('OnUpdate', function()
-	this:UPDATE()
-end)
 CDC:SetScript('OnEvent', function()
 	this[event](this)
 end)
 CDC:RegisterEvent('ADDON_LOADED')
 
+-- CDBAR
+
+CDC_Settings = {}
+
 local R, D, L, U = 'R', 'D', 'L', 'U'
 local ORIENTATIONS = {R, D, L, U}
-local PLAYER, ENEMY = 'PLAYER', 'ENEMY'
-local MODULES = {PLAYER, ENEMY}
 
 local DEFAULT_SETTINGS = {
 	active = true,
@@ -21,31 +20,417 @@ local DEFAULT_SETTINGS = {
 	clickThrough = false,
 }
 
--- ENEMY CONSTANTS
+local method = {}
 
-local ENEMY_GAINS = "(.+) gains (.+)."
-local ENEMY_ABILITY_HITS = "(.+)'s (.+) hits (.+) for (.+)"
-local ENEMY_ABILITY_CRITS = "(.+)'s (.+) crits (.+) for (.+)"
-local ENEMY_ABILITY_ABSORB = "(.+)'s (.+) is absorbed by (.+)."
-local ENEMY_ABILITY_PERFORM = "(.+) performs (.+)."
-local ENEMY_ABILITY_CHARGE = "(.+) gains (.+) Rage from (.+)'s Charge."
-local ENEMY_ABILITY_CAST = "(.+) casts (.+)."
+function method:LoadSettings()
+	if not CDC_Settings[self.key] then
+		self:CreateSettings()
+	end
+	self.settings = CDC_Settings[self.key]
+	self:ApplySettings()
+end
 
-local ENEMY_COMBAT_LOG_EVENTS = {
-	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
-	'CHAT_MSG_SPELL_PARTY_DAMAGE',
-	'CHAT_MSG_SPELL_PARTY_BUFF',
-}
+function method:CreateSettings()
+	CDC_Settings[self.key] = {}
+	for k, v in DEFAULT_SETTINGS do
+		CDC_Settings[self.key][k] = v
+	end
+end
+
+function method:CreateFrames()
+	local frame = CreateFrame('Frame', nil, UIParent)
+	self.frame = frame
+	frame:SetWidth(32)
+	frame:SetHeight(32)
+	frame:SetFrameStrata('HIGH')
+	frame:SetMovable(true)
+	frame:SetToplevel(true)
+
+	frame.button = CreateFrame('Button', nil, frame)
+	frame.button:SetWidth(32)
+	frame.button:SetHeight(40)
+	frame.button:SetPoint('CENTER', 0, 8)
+	frame.button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
+	frame.button:RegisterForDrag('LeftButton')
+	frame.button:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
+	frame.button:SetScript('OnDragStart', function()
+		self:OnDragStart()
+	end)
+	frame.button:SetScript('OnDragStop', function()
+		self:OnDragStop()
+	end)
+	frame.button:SetScript('OnClick', function()
+		self:OnClick()
+	end)
+	frame.button:SetScript('OnEnter', function()
+		self:ButtonTooltip()
+	end)
+	frame.button:SetScript('OnLeave', function()
+		GameTooltip:Hide()
+	end)
+
+	frame.CDFrames = {}
+	for i=1,10 do
+		tinsert(frame.CDFrames, self:CDFrame(frame))
+	end
+
+	frame:SetScript('OnUpdate', function()
+		if self.settings.locked then
+			self:Update()
+		end
+	end)
+end
+
+function method:CDFrame(parent)
+	local frame = CreateFrame('Frame', nil, parent)
+	frame:SetWidth(32)
+	frame:SetHeight(32)
+	frame:SetScript('OnEnter', function()
+		self:CDTooltip()
+	end)
+	frame:SetScript('OnLeave', function()
+		GameTooltip:Hide()
+	end)
+	frame.texture = frame:CreateTexture()
+	frame.texture:SetAllPoints()
+	frame.count = frame:CreateFontString()
+	frame.count:SetFont([[Fonts\ARIALN.TTF]], 14, 'THICKOUTLINE')
+	frame.count:SetWidth(32)
+	frame.count:SetHeight(12)
+	frame.count:SetPoint('BOTTOM', 0, 10)
+	return frame
+end
+
+function method:ApplySettings()
+	if self.settings.active then
+		self.frame:Show()
+	else
+		self.frame:Hide()
+	end
+
+	if self.settings.locked then
+		self:Lock()
+	else
+		self:Unlock()
+	end
+
+	for _, frame in self.frame.CDFrames do
+		frame:EnableMouse(not self.settings.clickThrough)
+	end
+
+	self:PlaceFrames()
+end
+
+function method:PlaceFrames()
+	self.frame:SetPoint('BOTTOMLEFT', unpack(self.settings.position))
+	for i, frame in self.frame.CDFrames do
+		frame:ClearAllPoints()
+		local orientation, offset = self.settings.orientation, (i-1)*32
+		if orientation == U then
+			frame:SetPoint('BOTTOM', self.frame, 'TOP', 0, offset-3)
+		elseif orientation == D then
+			frame:SetPoint('TOP', self.frame, 'BOTTOM', 0, 3-offset)
+		elseif orientation == L then
+			frame:SetPoint('RIGHT', self.frame, 'LEFT', -offset, 0)
+		elseif orientation == R then
+			frame:SetPoint('LEFT', self.frame, 'RIGHT', offset, 0)
+		end
+	end
+end
+
+function method:Lock()
+	self.frame.button:Hide()
+	for _, frame in self.frame.CDFrames do
+		frame:Hide()
+	end
+end
+
+function method:Unlock()
+	self.frame.button:Show()
+	for i, frame in self.frame.CDFrames do
+		frame.tooltip = {'test'..i, 'test'..i}
+		frame.texture:SetTexture([[Interface\Icons\temp]])
+		frame.count:SetText()
+		frame:Show()
+	end
+end
+
+function method:ButtonTooltip()
+	GameTooltip_SetDefaultAnchor(GameTooltip, this)
+	GameTooltip:AddLine(self.title)
+	GameTooltip:AddLine('Left-click/drag to position', .8, .8, .8)
+	GameTooltip:AddLine('Right-click to lock', .8, .8, .8)
+	GameTooltip:Show()
+end
+
+function method:CDTooltip()
+	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
+	GameTooltip:AddLine(this.tooltip[1])
+	GameTooltip:AddLine(this.tooltip[2], .8, .8, .8, 1)
+	GameTooltip:Show()
+end
+
+function method:OnClick()
+	if arg1 == 'LeftButton' then
+		for i, orientation in ORIENTATIONS do
+			if orientation == self.settings.orientation then
+				self.settings.orientation = ORIENTATIONS[mod(i,4)+1]
+				break
+			end
+		end
+		self:PlaceFrames()
+	elseif arg1 == 'RightButton' then
+		self.settings.locked = true
+		self:ApplySettings()
+	end
+end
+
+function method:OnDragStart()
+	self.frame:StartMoving()
+end
+
+function method:OnDragStop()
+	self.frame:StopMovingOrSizing()
+	self.settings.position = {self.frame:GetLeft(), self.frame:GetBottom()}
+end
+
+function method:Ignored(name)
+	for entry in string.gfind(self.settings.ignoreList, '[^,]+') do
+		if strupper(entry) == strupper(name) then
+			return true
+		end
+	end
+end
+
+function method:Update()
+	local i = 1
+
+	local temp = {}
+	sort(self.CDs, function(a, b) local ta, tb = a.started + a.duration - GetTime(), b.started + b.duration - GetTime() return ta < tb or tb == ta and a.name < b.name end)
+	for _, CD in self.CDs do
+		local timeleft = CD.started + CD.duration - GetTime()
+
+		if timeleft > 0 then
+			tinsert(temp, CD)
+			if i <= 10 and not self:Ignored(CD.name) and (not CD.predicate or CD:predicate()) then
+				local frame = self.frame.CDFrames[i]
+				if timeleft <= 10 then
+					local x = GetTime()*4/3
+					frame.texture:SetAlpha((mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
+					-- frame.texture:SetAlpha((math.sin(GetTime()*(4/3)*math.pi)+1)/2*.7+.3)
+				else
+					frame.texture:SetAlpha(1)
+				end
+
+				timeleft = ceil(timeleft)
+				if timeleft >= 60 then
+					timeleft = ceil((timeleft/60)*10)/10
+					frame.count:SetTextColor(0, 1, 0)
+				else
+					frame.count:SetTextColor(1, 1, 0)
+				end
+
+				frame.texture:SetTexture([[Interface\Icons\]]..CD.texture)
+				frame.count:SetText(timeleft)
+				frame:Show()
+
+				frame.tooltip = {CD.name, CD.info}
+
+				i = i + 1
+			end
+		end
+	end
+	self.CDs = temp
+
+	while i <= 10 do
+		self.frame.CDFrames[i]:Hide()
+		i = i + 1
+	end	
+end
+
+function method:StartCD(CD)
+	tinsert(self.CDs, CD)
+end
+
+function CDC:CDBar(key, title)
+	local bar = {}
+	for k, v in method do
+		bar[k] = v
+	end
+
+	bar.key = key
+	bar.title = title
+	bar.CDs = {}
+
+	bar:CreateFrames()
+	bar:LoadSettings()
+
+	return bar
+end
+
+-- CORE
+
+function CDC:ADDON_LOADED()
+	if arg1 ~= 'CDC' then
+		return
+	end
+
+	SLASH_CDC1 = '/cdc'
+	SlashCmdList.CDC = function(str) self:SlashHandler(str) end
+
+	self.playerBar = self:CDBar('PLAYER', 'Player Cooldowns')
+	self.enemyBar = self:CDBar('ENEMY', 'Enemy Cooldowns')
+
+	self:PlayerSetup()
+	self:EnemySetup()
+end
+
+function CDC:SlashHandler(str)
+	str = strupper(str)
+	local parameters = self:Tokenize(str)
+
+	local key = parameters[1]
+	local bar
+	if key == PLAYER then
+		bar = self.playerBar
+	elseif key == ENEMY then
+		bar = self.enemyBar
+	else
+		return
+	end
+
+	if parameters[2] == 'ON' then
+		bar.settings.active = true
+	elseif parameters[2] == 'OFF' then
+		bar.settings.active = false
+	elseif parameters[2] == 'LOCK' then
+		bar.settings.locked = true
+	elseif parameters[2] == 'UNLOCK' then
+		bar.settings.locked = false
+	elseif parameters[2] == 'CLICK' then
+		bar.settings.clickThrough = not bar.settings.clickThrough
+	elseif parameters[2] == 'IGNORE' then
+		local _, _, ignoreList = strfind(str, '^%s*'..key..'%s+IGNORE%s+(.-)%s*$')
+		bar.settings.ignoreList = ignoreList or ''
+	elseif parameters[2] == 'RESET' then
+		bar:Reset()
+		bar:PlaceFrames()
+	else
+		return
+	end
+
+	bar:ApplySettings()
+end
+
+function CDC:Tokenize(str)
+	local tokens = {}
+	for token in string.gfind(str, '%S+') do
+		tinsert(tokens, token)
+	end
+	return tokens
+end
+
+-- PLAYER
+
+function CDC:BAG_UPDATE_COOLDOWN()
+	self:DetectItemCooldowns()
+end
+
+function CDC:SPELL_UPDATE_COOLDOWN()
+	self:DetectSpellCooldowns()
+end
+
+function CDC:PlayerSetup()
+	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
+	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+
+	self:DetectItemCooldowns()
+	self:DetectSpellCooldowns()
+end
+
+do
+	latest = {}
+
+	function CDC:StartPlayerCD(name, texture, started, duration)
+		local t = GetTime()
+		local key = name
+		if t == latest[key] then
+			return
+		end
+		latest[key] = t
+
+		self.playerBar:StartCD{
+			name = name,
+			info = '',
+			texture = strsub(texture, 17),
+			started = started,
+			duration = duration,
+			predicate = function()
+				return t == latest[key]
+			end,
+		}
+	end
+end
+
+function CDC:LinkName(link)
+	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do
+		return name
+	end
+end
+
+function CDC:DetectItemCooldowns()	
+    for bag=0,4 do
+        if GetBagName(bag) then
+            for slot = 1, GetContainerNumSlots(bag) do
+				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
+				if enabled == 1 then
+					local name = self:LinkName(GetContainerItemLink(bag, slot))
+					if duration == 0 or duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
+						self:StartPlayerCD(
+							name,
+							GetContainerItemInfo(bag, slot),
+							started,
+							duration
+						)
+					end
+				end
+            end
+        end
+    end
+	for slot=0,19 do
+		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
+		if enabled == 1 then
+			local name = self:LinkName(GetInventoryItemLink('player', slot))
+			if duration == 0 or duration > 3 and duration <= 1800 then
+				self:StartPlayerCD(
+					name,
+					GetInventoryItemTexture('player', slot),
+					started,
+					duration
+				)
+			end
+		end
+	end
+end
+
+function CDC:DetectSpellCooldowns()	
+	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
+	local totalSpells = offset + spellCount
+	for id=1,totalSpells do
+		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
+		local name = GetSpellName(id, BOOKTYPE_SPELL)
+		if duration == 0 or enabled == 1 and duration > 2.5 then
+			self:StartPlayerCD(
+				name,
+				GetSpellTexture(id, BOOKTYPE_SPELL),
+				started,
+				duration
+			)
+		end
+	end
+end
+
+-- ENEMY
 
 local ENEMY_SKILLS = {
 
@@ -139,7 +524,7 @@ local ENEMY_SKILLS = {
 	["Presence of Mind"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_EnchantArmor"},
 	["Arcane Power"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_Lightning"},
 	["Combustion"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire"},
-	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", trigger = function(player) CDC:StopEnemyCooldowns(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova') end},
+	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", trigger = function(player) CDC:StopEnemyCDs(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova') end},
 	["Ice Block"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_Frost"},
 
 	-- Rogues
@@ -156,7 +541,7 @@ local ENEMY_SKILLS = {
 
 	["Blade Flurry"] = {cooldown = 2*60, desc = "Increases your attack speed by 20%. In addition, attacks strike an additional nearby opponent. Lasts 15 sec.", icon = "Ability_Warrior_PunishingBlow"},
 	["Adrenaline Rush"] = {cooldown = 6*60, desc = "Increases your Energy regeneration rate by 100% for 15 sec.", icon = "Spell_Shadow_ShadowWordDominate"},
-	["Preparation"] = {cooldown = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", trigger = function(player) CDC:StopEnemyCooldowns(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood') end},
+	["Preparation"] = {cooldown = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", trigger = function(player) CDC:StopEnemyCDs(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood') end},
 	["Ghostly Strike"] = {cooldown = 20, desc = "A strike that deals 125% of weapon damage and increases your chance to dodge by 15% for 7 sec. Awards 1 combo points.", icon = "Spell_Shadow_Curse"},
 	["Premeditation"] = {cooldown = 60, desc = "When used, adds two combo points to your target. You must add to or use those combo points within 10 sec or the combo points are lost.", icon = "Spell_Shadow_Possession"},
 	["Cold Blood"] = {cooldown = 3*60, desc = "When activated, increases the critical strike chance of your next Sinister Strike, Backstab, Ambush, or Eviscerate by 100%.", icon = "Spell_Ice_Lament"},
@@ -258,416 +643,29 @@ local ENEMY_SKILLS = {
 	["Swiftmend"] = {cooldown = 15, desc = "Unknown!", icon = "Inv_Relics_IdolOfRejuvenation"},
 }
 
--- COMMON
+local ENEMY_GAINS = "(.+) gains (.+)."
+local ENEMY_ABILITY_HITS = "(.+)'s (.+) hits (.+) for (.+)"
+local ENEMY_ABILITY_CRITS = "(.+)'s (.+) crits (.+) for (.+)"
+local ENEMY_ABILITY_ABSORB = "(.+)'s (.+) is absorbed by (.+)."
+local ENEMY_ABILITY_PERFORM = "(.+) performs (.+)."
+local ENEMY_ABILITY_CHARGE = "(.+) gains (.+) Rage from (.+)'s Charge."
+local ENEMY_ABILITY_CAST = "(.+) casts (.+)."
 
-function CDC:UPDATE()
-	for _, module in MODULES do
-		if CDC_Settings[module].active and CDC_Settings[module].locked then
-			self:OnUpdate(module)
-		end
-	end
-end
-
-function CDC:ADDON_LOADED()
-	if arg1 ~= 'CDC' then
-		return
-	end
-
-	SLASH_CDC1 = '/cdc'
-	SlashCmdList.CDC = function(str) self:SlashHandler(str) end
-
-	CDC_Settings = CDC_Settings or {}
-
-	for _, module in MODULES do
-		if not CDC_Settings[module] then
-			self:Reset(module)
-		end
-
-		self[module] = {CDs = {}}
-
-		self:CreateFrames(module)
-		self:PlaceFrames(module)
-		self:ApplySettings(module)
-	end
-
-	self:ModuleSetup()
-end
-
-function CDC:CreateFrames(module)
-	local frame = CreateFrame('Frame', nil, UIParent)
-	self[module].frame = frame
-	frame:SetWidth(32)
-	frame:SetHeight(32)
-	frame:SetFrameStrata('HIGH')
-	frame:SetMovable(true)
-	frame:SetToplevel(true)
-
-	frame.button = CreateFrame('Button', nil, frame)
-	frame.button:SetWidth(32)
-	frame.button:SetHeight(40)
-	frame.button:SetPoint('CENTER', 0, 8)
-	frame.button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
-	frame.button:RegisterForDrag('LeftButton')
-	frame.button:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
-	frame.button:SetScript('OnDragStart', function()
-		self:OnDragStart(module)
-	end)
-	frame.button:SetScript('OnDragStop', function()
-		self:OnDragStop(module)
-	end)
-	frame.button:SetScript('OnClick', function()
-		self:OnClick(module)
-	end)
-	frame.button:SetScript('OnEnter', function()
-		self:ButtonTooltip(module)
-	end)
-	frame.button:SetScript('OnLeave', function()
-		GameTooltip:Hide()
-	end)
-
-	frame.CDs = {}
-	for i=1,10 do
-		tinsert(frame.CDs, self:CDFrame(frame))
-	end
-end
-
-function CDC:CDFrame(parent)
-	local frame = CreateFrame('Frame', nil, parent)
-	frame:SetWidth(32)
-	frame:SetHeight(32)
-	frame:SetScript('OnEnter', function()
-		self:CDTooltip()
-	end)
-	frame:SetScript('OnLeave', function()
-		GameTooltip:Hide()
-	end)
-	frame.texture = frame:CreateTexture()
-	frame.texture:SetAllPoints()
-	frame.count = frame:CreateFontString()
-	frame.count:SetFont([[Fonts\ARIALN.TTF]], 14, 'THICKOUTLINE')
-	frame.count:SetWidth(32)
-	frame.count:SetHeight(12)
-	frame.count:SetPoint('BOTTOM', 0, 10)
-	return frame
-end
-
-function CDC:SlashHandler(str)
-	str = strupper(str)
-	local parameters = self:Tokenize(str)
-
-	local module = parameters[1]
-	if module ~= PLAYER and module ~= ENEMY then
-		return
-	end
-
-	if parameters[2] == 'ON' then
-		CDC_Settings[module].active = true
-	elseif parameters[2] == 'OFF' then
-		CDC_Settings[module].active = false
-	elseif parameters[2] == 'LOCK' then
-		CDC_Settings[module].locked = true
-	elseif parameters[2] == 'UNLOCK' then
-		CDC_Settings[module].locked = false
-	elseif parameters[2] == 'CLICK' then
-		CDC_Settings[module].clickThrough = not settings.clickThrough
-	elseif parameters[2] == 'IGNORE' then
-		local _, _, ignoreList = strfind(str, '^%s*'..module..'%s+IGNORE%s+(.-)%s*$')
-		CDC_Settings[module].ignoreList = ignoreList or ''
-	elseif parameters[2] == 'RESET' then
-		self:Reset(module)
-		self:PlaceFrames(module)
-	else
-		return
-	end
-
-	self:ApplySettings(module)
-end
-
-function CDC:Reset(module)
-	CDC_Settings[module] = {}
-	for k, v in DEFAULT_SETTINGS do
-		CDC_Settings[module][k] = v
-	end
-end
-
-function CDC:ApplySettings(module)
-	if CDC_Settings[module].active then
-		self[module].frame:Show()
-	else
-		self[module].frame:Hide()
-	end
-
-	if CDC_Settings[module].locked then
-		self:Lock(module)
-	else
-		self:Unlock(module)
-	end
-
-	for _, frame in self[module].frame.CDs do
-		frame:EnableMouse(not CDC_Settings[module].clickThrough)
-	end
-
-	local temp = {}
-	for _, CD in self[module].CDs do
-		if not self:Ignored(module, CD.skill) then
-			tinsert(temp, CD)
-		end
-	end
-	self[module].CDs = temp
-end
-
-function CDC:PlaceFrames(module)
-	self[module].frame:SetPoint('BOTTOMLEFT', unpack(CDC_Settings[module].position))
-	for i, frame in self[module].frame.CDs do
-		frame:ClearAllPoints()
-		local orientation, reference, offset = CDC_Settings[module].orientation, self[module].frame, (i-1)*32
-		if orientation == U then
-			frame:SetPoint('BOTTOM', reference, 'TOP', 0, offset-3)
-		elseif orientation == D then
-			frame:SetPoint('TOP', reference, 'BOTTOM', 0, 3-offset)
-		elseif orientation == L then
-			frame:SetPoint('RIGHT', reference, 'LEFT', -offset, 0)
-		elseif orientation == R then
-			frame:SetPoint('LEFT', reference, 'RIGHT', offset, 0)
-		end
-	end
-end
-
-function CDC:Lock(module)
-	self[module].frame.button:Hide()
-	for _, frame in self[module].frame.CDs do
-		frame:Hide()
-	end
-end
-
-function CDC:Unlock(module)
-	self[module].frame.button:Show()
-	for i, frame in self[module].frame.CDs do
-		frame.tooltip = {'test'..i, 'test'..i}
-		frame.texture:SetTexture([[Interface\Icons\temp]])
-		frame.count:SetText()
-		frame:Show()
-	end
-end
-
-function CDC:ButtonTooltip(module)
-	GameTooltip_SetDefaultAnchor(GameTooltip, this)
-	GameTooltip:AddLine(self[module].name)
-	GameTooltip:AddLine('Left-click/drag to position', .8, .8, .8)
-	GameTooltip:AddLine('Right-click to lock', .8, .8, .8)
-	GameTooltip:Show()
-end
-
-function CDC:CDTooltip()
-	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
-	GameTooltip:AddLine(this.tooltip[1])
-	GameTooltip:AddLine(this.tooltip[2], .8, .8, .8, 1)
-	GameTooltip:Show()
-end
-
-function CDC:Tokenize(str)
-	local tokens = {}
-	for token in string.gfind(str, '%S+') do
-		tinsert(tokens, token)
-	end
-	return tokens
-end
-
-function CDC:Ignored(module, name)
-	for entry in string.gfind(CDC_Settings[module].ignoreList, '[^,]+') do
-		if strupper(entry) == strupper(name) then
-			return true
-		end
-	end
-end
-
-function CDC:OnClick(module)
-	if arg1 == 'LeftButton' then
-		for i, orientation in ORIENTATIONS do
-			if orientation == CDC_Settings[module].orientation then
-				CDC_Settings[module].orientation = ORIENTATIONS[mod(i,4)+1]
-				break
-			end
-		end
-		self:PlaceFrames(module)
-	elseif arg1 == 'RightButton' then
-		CDC_Settings[module].locked = true
-		self:ApplySettings(module)
-	end
-end
-
-function CDC:OnDragStart(module)
-	self[module].frame:StartMoving()
-end
-
-function CDC:OnDragStop(module)
-	self[module].frame:StopMovingOrSizing()
-	CDC_Settings[module].position = {self[module].frame:GetLeft(), self[module].frame:GetBottom()}
-end
-
-function CDC:OnUpdate(module)
-	local i = 1
-
-	local temp = {}
-	sort(self[module].CDs, function(a, b) local ta, tb = a.started + a.duration - GetTime(), b.started + b.duration - GetTime() return ta < tb or tb == ta and a.skill < b.skill end)
-	for _, CD in self[module].CDs do
-		local timeleft = CD.started + CD.duration - GetTime()
-
-		if timeleft > 0 and self:CooldownValid(module, CD) then
-			tinsert(temp, CD)
-
-			if i <= 10 and self:CooldownShown(module, CD) then
-				local frame = self[module].frame.CDs[i]
-				if timeleft <= 10 then
-					local x = GetTime()*4/3
-					frame.texture:SetAlpha((mod(floor(x), 2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
-					-- frame.texture:SetAlpha((math.sin(GetTime()*(4/3)*math.pi)+1)/2*.7+.3)
-				else
-					frame.texture:SetAlpha(1)
-				end
-
-				timeleft = ceil(timeleft)
-				if timeleft >= 60 then
-					timeleft = ceil((timeleft/60)*10)/10
-					frame.count:SetTextColor(0, 1, 0)
-				else
-					frame.count:SetTextColor(1, 1, 0)
-				end
-
-				frame.texture:SetTexture([[Interface\Icons\]]..CD.texture)
-				frame.count:SetText(timeleft)
-				frame:Show()
-
-				frame.tooltip = {CD.skill, CD.info}
-
-				i = i + 1
-			end
-		end
-	end
-	self[module].CDs = temp
-
-	while i <= 10 do
-		self[module].frame.CDs[i]:Hide()
-		i = i + 1
-	end	
-end
-
--- DEPENDENT
-
-function CDC:ModuleSetup()
-	self:PlayerSetup()
-	self:EnemySetup()
-end
-
-function CDC:CooldownValid(module, CD)
-	if module == PLAYER then
-		return true
-	elseif module == ENEMY then
-		return not (UnitClass('target') == 'Warrior' and CD.skill == 'Enrage')
-	end
-end
-
-function CDC:CooldownShown(module, CD)
-	if module == PLAYER then
-		return true
-	elseif module == ENEMY then
-		return CD.player == UnitName('target')
-	end
-end
-
--- PLAYER
-
-function CDC:BAG_UPDATE_COOLDOWN()
-	self:DetectItemCooldowns()
-end
-
-function CDC:SPELL_UPDATE_COOLDOWN()
-	self:DetectSpellCooldowns()
-end
-
-function CDC:PlayerSetup()
-	self[PLAYER].name = 'Player cooldowns'
-
-	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
-	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
-
-	self:DetectItemCooldowns()
-	self:DetectSpellCooldowns()
-end
-
-function CDC:StartPlayerCooldown(name, texture, started, duration)
-	if CDC:Ignored(PLAYER, name) then
-		return
-	end
-
-	for i, CD in self.PLAYER.CDs do
-		if CD.skill == name then
-			tremove(self.PLAYER.CDs, i)
-			break
-		end
-	end
-	table.insert(self.PLAYER.CDs, {skill = name, info = '', texture = strsub(texture, 17), duration = duration, started = started})
-end
-
-function CDC:LinkName(link)
-	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do
-		return name
-	end
-end
-
-function CDC:DetectItemCooldowns()	
-    for bag=0,4 do
-        if GetBagName(bag) then
-            for slot = 1, GetContainerNumSlots(bag) do
-				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
-				if enabled == 1 then
-					local name = self:LinkName(GetContainerItemLink(bag, slot))
-					if duration == 0 or duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
-						self:StartPlayerCooldown(
-							name,
-							GetContainerItemInfo(bag, slot),
-							started,
-							duration
-						)
-					end
-				end
-            end
-        end
-    end
-	for slot=0,19 do
-		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
-		if enabled == 1 then
-			local name = self:LinkName(GetInventoryItemLink('player', slot))
-			if duration == 0 or duration > 3 and duration <= 1800 then
-				self:StartPlayerCooldown(
-					name,
-					GetInventoryItemTexture('player', slot),
-					started,
-					duration
-				)
-			end
-		end
-	end
-end
-
-function CDC:DetectSpellCooldowns()	
-	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
-	local totalSpells = offset + spellCount
-	for id=1,totalSpells do
-		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
-		local name = GetSpellName(id, BOOKTYPE_SPELL)
-		if duration == 0 or enabled == 1 and duration > 2.5 then
-			self:StartPlayerCooldown(
-				name,
-				GetSpellTexture(id, BOOKTYPE_SPELL),
-				started,
-				duration
-			)
-		end
-	end
-end
-
--- ENEMY
+local ENEMY_COMBAT_LOG_EVENTS = {
+	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
+	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
+	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
+	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
+	'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
+	'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
+	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
+	'CHAT_MSG_SPELL_PARTY_DAMAGE',
+	'CHAT_MSG_SPELL_PARTY_BUFF',
+}
 
 for _, event in ENEMY_COMBAT_LOG_EVENTS do
 	CDC[event] = function(self)
@@ -676,65 +674,75 @@ for _, event in ENEMY_COMBAT_LOG_EVENTS do
 end
 
 function CDC:EnemySetup()
-	self[ENEMY].name = 'Enemy cooldowns'
 	for _, event in ENEMY_COMBAT_LOG_EVENTS do
 		self:RegisterEvent(event)
 	end
 end
 
-function CDC:StartEnemyCooldown(player, spell)
-	if ENEMY_SKILLS[spell] and not CDC:Ignored(ENEMY, spell) then
-		local trigger = ENEMY_SKILLS[spell].trigger
-		if trigger then
-			trigger(player)
-		end
-		table.insert(self.ENEMY.CDs, {player = player, skill = spell, info = ENEMY_SKILLS[spell].desc, texture = ENEMY_SKILLS[spell].icon, duration = ENEMY_SKILLS[spell].cooldown, started = GetTime()})
-	end
-end
+do
+	local latest = {}
 
-function CDC:StopEnemyCooldowns(player, ...)
-	local temp = {}
-	for _, CD in self.ENEMY.CDs do
-		local stop
-		for i=1,arg.n do
-			if CD.player == player and CD.skill == arg[i] then
-				stop = true
-			end
+	function CDC:StartEnemyCD(player, skill)
+		local t = GetTime()
+		local key = player..'|'..skill
+		if t == latest[key] then
+			return
 		end
-		if not stop then
-			tinsert(temp, CD)
+		latest[key] = t
+
+		if ENEMY_SKILLS[skill] then
+			local trigger = ENEMY_SKILLS[skill].trigger
+			if trigger then
+				trigger(player)
+			end
+			self.enemyBar:StartCD{
+				name = skill,
+				info = ENEMY_SKILLS[skill].desc,
+				texture = ENEMY_SKILLS[skill].icon,
+				started = t,
+				duration = ENEMY_SKILLS[skill].cooldown,
+				predicate = function()
+					return t == latest[key] and player == UnitName('target') and not (UnitClass('target') == 'Warrior' and skill == 'Enrage')
+				end,
+			}
 		end
 	end
-	self.ENEMY.CDs = temp
+
+	function CDC:StopEnemyCDs(player, ...)
+		for i=1,arg.n do
+			local key = player..'|'..arg[i]
+			latest[key] = GetTime()
+		end
+	end
 end
 
 function CDC:OnCombatLogEvent()
 	-- For gains
 	for player, spell in string.gfind(arg1, ENEMY_GAINS) do
-		CDC:StartEnemyCooldown(player, spell)
+		CDC:StartEnemyCD(player, spell)
 	end
 	-- For performs
 	for player, spell in string.gfind(arg1, ENEMY_ABILITY_PERFORM) do
-		CDC:StartEnemyCooldown(player, spell)
+		CDC:StartEnemyCD(player, spell)
 	end
 	-- For hits
 	for player, spell, afflictee, damage in string.gfind(arg1, ENEMY_ABILITY_HITS) do
-		CDC:StartEnemyCooldown(player, spell)
+		CDC:StartEnemyCD(player, spell)
 	end
 	-- For crits
 	for player, spell, afflictee, damage in string.gfind(arg1, ENEMY_ABILITY_CRITS) do
-		CDC:StartEnemyCooldown(player, spell)
+		CDC:StartEnemyCD(player, spell)
 	end
 	-- For absorbs
 	for player, spell, afflictee in string.gfind(arg1, ENEMY_ABILITY_ABSORB) do
-		CDC:StartEnemyCooldown(player, spell)
+		CDC:StartEnemyCD(player, spell)
 	end
 	-- For charge (Warriors)
 	for player, rage, player in string.gfind(arg1, ENEMY_ABILITY_CHARGE) do
-		CDC:StartEnemyCooldown(player, 'Charge')
+		CDC:StartEnemyCD(player, 'Charge')
 	end
 	-- For casts
 	for player, spell in string.gfind(arg1, ENEMY_ABILITY_CAST) do
-		CDC:StartEnemyCooldown(player, spell)
+		CDC:StartEnemyCD(player, spell)
 	end
 end
