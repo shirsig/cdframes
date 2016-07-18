@@ -203,19 +203,20 @@ function method:Ignored(name)
 end
 
 function method:Update()
+	local t = GetTime()
 	local i = 1
 
 	local temp = {}
-	sort(self.CDs, function(a, b) local ta, tb = a.started + a.duration - GetTime(), b.started + b.duration - GetTime() return ta < tb or tb == ta and a.name < b.name end)
+	sort(self.CDs, function(a, b) local ta, tb = a.expiration - t, b.expiration - t return ta < tb or tb == ta and a.name < b.name end)
 	for _, CD in self.CDs do
-		local timeleft = CD.started + CD.duration - GetTime()
+		local timeleft = CD.expiration - t
 
 		if timeleft > 0 then
 			tinsert(temp, CD)
 			if i <= 10 and not self:Ignored(CD.name) and (not CD.predicate or CD:predicate()) then
 				local frame = self.frame.CDFrames[i]
 				if timeleft <= 10 then
-					local x = GetTime()*4/3
+					local x = t*4/3
 					frame.texture:SetAlpha((mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
 					-- frame.texture:SetAlpha((math.sin(GetTime()*(4/3)*math.pi)+1)/2*.7+.3)
 				else
@@ -363,8 +364,7 @@ do
 			name = name,
 			info = '',
 			texture = strsub(texture, 17),
-			started = started,
-			duration = duration,
+			expiration = started + duration,
 			predicate = function()
 				return t == latest[key]
 			end,
@@ -699,8 +699,7 @@ do
 				name = skill,
 				info = ENEMY_SKILLS[skill].desc,
 				texture = ENEMY_SKILLS[skill].icon,
-				started = t,
-				duration = ENEMY_SKILLS[skill].cooldown,
+				expiration = t + ENEMY_SKILLS[skill].cooldown,
 				predicate = function()
 					return t == latest[key] and player == UnitName('target') and not (UnitClass('target') == 'Warrior' and skill == 'Enrage')
 				end,
