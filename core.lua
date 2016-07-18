@@ -375,28 +375,41 @@ local ENEMY_SKILLS = {
 	["Swiftmend"] = {cooldown = 15, desc = "Unknown!", icon = "Inv_Relics_IdolOfRejuvenation"},
 }
 
-local ENEMY_GAINS = "(.+) gains (.+)."
-local ENEMY_ABILITY_HITS = "(.+)'s (.+) hits (.+) for (.+)"
-local ENEMY_ABILITY_CRITS = "(.+)'s (.+) crits (.+) for (.+)"
-local ENEMY_ABILITY_ABSORB = "(.+)'s (.+) is absorbed by (.+)."
-local ENEMY_ABILITY_PERFORM = "(.+) performs (.+)."
-local ENEMY_ABILITY_CHARGE = "(.+) gains (.+) Rage from (.+)'s Charge."
-local ENEMY_ABILITY_CAST = "(.+) casts (.+)."
-
 local ENEMY_COMBAT_LOG_EVENTS = {
-	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
 	'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
+	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
+	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
 	'CHAT_MSG_SPELL_PARTY_DAMAGE',
+	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
+	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
+	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
 	'CHAT_MSG_SPELL_PARTY_BUFF',
+	'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
+	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
+}
+
+local ENEMY_COMBAT_LOG_PATTERNS = {
+	"(.+) performs (.+)%.",
+	"(.+) performs (.+) on ",
+	"(.+) casts (.+)%.",
+	"(.+) casts (.+) on ",
+	"(.+) gains (.+)%.",
+	"(.+) gains .+ Rage from .+'s Charge%.",
+	"(.+)'s (.+) hits ",
+	"(.+)'s (.+) crits ",
+	"(.+)'s (.+) heals ",
+	"(.+)'s (.+) critically ",
+	"(.+)'s (.+) was ",
+	"(.+)'s (.+) misses ",
+	"(.+)'s (.+) missed ",
+	"(.+)'s (.+) is absorbed ",
+	" absorb (.+)'s (.+)%.",
+	" resists (.+)'s (.+)%.",
+	" resist (.+)'s (.+)%.",
+	" immune to (.+)'s (.+)%.",
 }
 
 function CDC:EnemySetup()
@@ -440,32 +453,9 @@ do
 end
 
 function CDC:OnCombatLogEvent()
-	-- For gains
-	for player, spell in string.gfind(arg1, ENEMY_GAINS) do
-		CDC:StartEnemyCD(player, spell)
-	end
-	-- For performs
-	for player, spell in string.gfind(arg1, ENEMY_ABILITY_PERFORM) do
-		CDC:StartEnemyCD(player, spell)
-	end
-	-- For hits
-	for player, spell, afflictee, damage in string.gfind(arg1, ENEMY_ABILITY_HITS) do
-		CDC:StartEnemyCD(player, spell)
-	end
-	-- For crits
-	for player, spell, afflictee, damage in string.gfind(arg1, ENEMY_ABILITY_CRITS) do
-		CDC:StartEnemyCD(player, spell)
-	end
-	-- For absorbs
-	for player, spell, afflictee in string.gfind(arg1, ENEMY_ABILITY_ABSORB) do
-		CDC:StartEnemyCD(player, spell)
-	end
-	-- For charge (Warriors)
-	for player, rage, player in string.gfind(arg1, ENEMY_ABILITY_CHARGE) do
-		CDC:StartEnemyCD(player, 'Charge')
-	end
-	-- For casts
-	for player, spell in string.gfind(arg1, ENEMY_ABILITY_CAST) do
-		CDC:StartEnemyCD(player, spell)
+	for _, pattern in ENEMY_COMBAT_LOG_PATTERNS do
+		for player, spell in string.gfind(arg1, pattern) do
+			CDC:StartEnemyCD(player, spell or 'Charge')
+		end
 	end
 end
