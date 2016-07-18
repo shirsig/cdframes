@@ -417,6 +417,19 @@ function CDC:OnCombatLogEvent()
 	end
 end
 
+function CDC:ShowEnemyCD(CD)
+	if not CD.ID then
+		CD.ID = self.enemyFrame:StartCD(CD.skill, ENEMY_SKILLS[CD.skill].desc, ENEMY_SKILLS[CD.skill].icon, CD.started + ENEMY_SKILLS[CD.skill].cooldown)
+	end
+end
+
+function CDC:HideEnemyCD(CD)
+	if CD.ID then
+		self.enemyFrame:CancelCD(CD.ID)
+		CD.ID = nil
+	end
+end
+
 do
 	local active = {}
 
@@ -428,17 +441,16 @@ do
 			end
 
 			local key = player..'|'..skill
-			if active[key] and active[key].ID then
-				self.enemyFrame:CancelCD(active[key].ID)
+			if active[key] then
+				self:HideEnemyCD(active[key])
 			end
 			active[key] = {
 				skill = skill,
 				player = player,
 				started = started,
 			}
-
 			if player == UnitName('target') then
-				active[key].ID = self.enemyFrame:StartCD(skill, ENEMY_SKILLS[skill].desc, ENEMY_SKILLS[skill].icon, started + ENEMY_SKILLS[skill].cooldown)
+				self:ShowEnemyCD(active[key])
 			end
 		end
 	end
@@ -465,11 +477,11 @@ do
 			elseif UnitName('target') == CD.player then
 				if UnitClass('target') == 'Warrior' and CD.skill == 'Enrage' then
 					self:StopEnemyCDs(CD.player, CD.skill)
-				else
-					self:StartEnemyCD(CD.player, CD.skill, CD.started)
+				elseif not CD.ID then
+					self:ShowEnemyCD(CD)
 				end
 			elseif CD.ID then
-				self.enemyFrame:CancelCD(CD.ID)
+				self:HideEnemyCD(CD)
 			end
 		end
 	end
