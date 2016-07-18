@@ -1,13 +1,12 @@
 CDC_Settings = {}
 
-local R, D, L, U = 'R', 'D', 'L', 'U'
-local ORIENTATIONS = {R, D, L, U}
+local ORIENTATIONS = {'R', 'D', 'L', 'U'}
 
 local DEFAULT_SETTINGS = {
 	active = true,
 	locked = false,
 	position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2},
-	orientation = R,
+	orientation = 'R',
 	ignoreList = '',
 	clickThrough = false,
 }
@@ -118,13 +117,13 @@ function method:PlaceFrames()
 	for i, frame in self.frame.CDFrames do
 		frame:ClearAllPoints()
 		local orientation, offset = self.settings.orientation, (i-1)*32
-		if orientation == U then
+		if orientation == 'U' then
 			frame:SetPoint('BOTTOM', self.frame, 'TOP', 0, offset-3)
-		elseif orientation == D then
+		elseif orientation == 'D' then
 			frame:SetPoint('TOP', self.frame, 'BOTTOM', 0, 3-offset)
-		elseif orientation == L then
+		elseif orientation == 'L' then
 			frame:SetPoint('RIGHT', self.frame, 'LEFT', -offset, 0)
-		elseif orientation == R then
+		elseif orientation == 'R' then
 			frame:SetPoint('LEFT', self.frame, 'RIGHT', offset, 0)
 		end
 	end
