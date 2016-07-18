@@ -33,7 +33,6 @@ function method:CreateFrames()
 	self.frame = frame
 	frame:SetWidth(32)
 	frame:SetHeight(32)
-	frame:SetFrameStrata('HIGH')
 	frame:SetMovable(true)
 	frame:SetToplevel(true)
 
