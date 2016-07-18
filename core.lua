@@ -83,24 +83,13 @@ function CDC:PlayerSetup()
 end
 
 do
-	latest = {}
+	active = {}
 
 	function CDC:StartPlayerCD(name, texture, started, duration)
-		local t = GetTime()
-		local key = name
-
-		if t ~= latest[key] then
-			latest[key] = t
-			self.playerFrame:StartCD{
-				name = name,
-				info = '',
-				texture = strsub(texture, 17),
-				finish = started + duration,
-				predicate = function()
-					return t == latest[key]
-				end,
-			}
+		if active[name] then
+			self.playerFrame:CancelCD(active[name])
 		end
+		active[name] = self.playerFrame:StartCD(name, '', strsub(texture, 17), started + duration)
 	end
 end
 
@@ -321,21 +310,21 @@ local ENEMY_SKILLS = {
 	["Scattershot"] = {cooldown = 30, desc = "Unknown!", icon = "Ability_GolemStormBolt"},
 
 	-- Warlocks
-	["Charge"] = {cooldown = 60, desc = "Curses the target with impending doom, causing 3200 Shadow damage after 1 min. If the target dies from this damage, there is a chance that a Doomguard will be summoned. Cannot be cast on players.", icon = "Spell_Shadow_AuraOfDarkness"},
-	["Charge"] = {cooldown = 2*60, desc = "Causes the enemy target to run in horror for 3 sec and causes 470 Shadow damage. The caster gains 100% of the damage caused in health.", icon = "Spell_Shadow_DeathCoil"},
-	["Charge"] = {cooldown = 40, desc = "Howl, causing 5 enemies within 10 yds to flee in terror for 15 sec. Damage caused may interrupt the effect.", icon = "Spell_Shadow_DeathScream"},
-	["Charge"] = {cooldown = 60*60, desc = "Summons a meteor from the Twisting Nether, causing 200 Fire damage and stunning all enemy targets in the area for 2 sec. An Infernal rises from the crater, under the command of the caster for 5 min. Once control is lost, the Infernal must be Enslaved to maintain control. Can only be used outdoors.", icon = "Spell_Shadow_SummonInfernal"},
-	["Charge"] = {cooldown = 60*60, desc = "Begins a ritual that sacrifices a random participant to summon a doomguard. The doomguard must be immediately enslaved or it will attack the ritual participants. Requires the caster and 4 additional party members to complete the ritual. In order to participate, all players must right-click the portal and not move until the ritual is complete.", icon = "Spell_Shadow_AntiMagicShell"},
-	["Charge"] = {cooldown = 30, desc = "Absorbs 920 shadow damage. Lasts 30 sec.", icon = "Spell_Shadow_AntiShadow"},
-	["Charge"] = {cooldown = 10, desc = "Ignites a target that is already afflicted by Immolate, dealing 447 to 557 Fire damage and consuming the Immolate spell.", icon = "Spell_Fire_Fireball"},
-	["Charge"] = {cooldown = 15, desc = "Instantly blasts the target for 450 to 502 Shadow damage. If the target dies within 5 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.", icon = "Spell_Shadow_ScourgeBuild"},
-	["Charge"] = {cooldown = 60, desc = "Burn the enemy's soul, causing 703 to 881 Fire damage.", icon = "Spell_Fire_Fireball02"},
-	["Charge"] = {cooldown = 8, desc = "Purges 1 harmful magic effect from a friend or 1 beneficial magic effect from an enemy. If an effect is devoured, the Felhunter will be healed for 579.", icon = "Spell_Nature_Purge"},
-	["Charge"] = {cooldown = 30, desc = "Silences the enemy for 3 sec. If used on a casting target, it will counter the enemy's spellcast, preventing any spell from that school of magic from being cast for 8 sec.", icon = "Spell_Shadow_MindRot"},
-	["Charge"] = {cooldown = 12, desc = "An instant attack that lashes the target, causing 99 Shadow damage.", icon = "Spell_Shadow_Curse"},
-	["Charge"] = {cooldown = 4, desc = "Soothes the target, increasing the chance that it will attack something else. More effective than Soothing Kiss (Rank 3).", icon = "Spell_Shadow_SoothingKiss"},
+	["Curse of Doom"] = {cooldown = 60, desc = "Curses the target with impending doom, causing 3200 Shadow damage after 1 min. If the target dies from this damage, there is a chance that a Doomguard will be summoned. Cannot be cast on players.", icon = "Spell_Shadow_AuraOfDarkness"},
+	["Death Coil"] = {cooldown = 2*60, desc = "Causes the enemy target to run in horror for 3 sec and causes 470 Shadow damage. The caster gains 100% of the damage caused in health.", icon = "Spell_Shadow_DeathCoil"},
+	["Howl of Terror"] = {cooldown = 40, desc = "Howl, causing 5 enemies within 10 yds to flee in terror for 15 sec. Damage caused may interrupt the effect.", icon = "Spell_Shadow_DeathScream"},
+	["Inferno"] = {cooldown = 60*60, desc = "Summons a meteor from the Twisting Nether, causing 200 Fire damage and stunning all enemy targets in the area for 2 sec. An Infernal rises from the crater, under the command of the caster for 5 min. Once control is lost, the Infernal must be Enslaved to maintain control. Can only be used outdoors.", icon = "Spell_Shadow_SummonInfernal"},
+	["Ritual of Doom"] = {cooldown = 60*60, desc = "Begins a ritual that sacrifices a random participant to summon a doomguard. The doomguard must be immediately enslaved or it will attack the ritual participants. Requires the caster and 4 additional party members to complete the ritual. In order to participate, all players must right-click the portal and not move until the ritual is complete.", icon = "Spell_Shadow_AntiMagicShell"},
+	["Shadow Ward"] = {cooldown = 30, desc = "Absorbs 920 shadow damage. Lasts 30 sec.", icon = "Spell_Shadow_AntiShadow"},
+	["Conflagrate"] = {cooldown = 10, desc = "Ignites a target that is already afflicted by Immolate, dealing 447 to 557 Fire damage and consuming the Immolate spell.", icon = "Spell_Fire_Fireball"},
+	["Shadowburn"] = {cooldown = 15, desc = "Instantly blasts the target for 450 to 502 Shadow damage. If the target dies within 5 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.", icon = "Spell_Shadow_ScourgeBuild"},
+	["Soul Fire"] = {cooldown = 60, desc = "Burn the enemy's soul, causing 703 to 881 Fire damage.", icon = "Spell_Fire_Fireball02"},
+	["Devour Magic"] = {cooldown = 8, desc = "Purges 1 harmful magic effect from a friend or 1 beneficial magic effect from an enemy. If an effect is devoured, the Felhunter will be healed for 579.", icon = "Spell_Nature_Purge"},
+	["Spell Loc"] = {cooldown = 30, desc = "Silences the enemy for 3 sec. If used on a casting target, it will counter the enemy's spellcast, preventing any spell from that school of magic from being cast for 8 sec.", icon = "Spell_Shadow_MindRot"},
+	["Lash of Pain"] = {cooldown = 12, desc = "An instant attack that lashes the target, causing 99 Shadow damage.", icon = "Spell_Shadow_Curse"},
+	["Soothing Kiss"] = {cooldown = 4, desc = "Soothes the target, increasing the chance that it will attack something else. More effective than Soothing Kiss (Rank 3).", icon = "Spell_Shadow_SoothingKiss"},
 
-	["Charge"] = {cooldown = 15*60, desc = "Unknown!", icon = "Spell_Nature_RemoveCurse"},
+	["Fel Domination"] = {cooldown = 15*60, desc = "Unknown!", icon = "Spell_Nature_RemoveCurse"},
 
 	-- Priest
 	["Elune's Grace"] = {cooldown = 5*60, desc = "Reduces ranged damage taken by 95 and increases chance to dodge by 10% for 15 sec.", icon = "Spell_Holy_ElunesGrace"},
@@ -417,45 +406,71 @@ function CDC:EnemySetup()
 		self[event] = self.OnCombatLogEvent
 		self:RegisterEvent(event)
 	end
+	self:RegisterEvent('PLAYER_TARGET_CHANGED')
+end
+
+function CDC:OnCombatLogEvent()
+	for _, pattern in ENEMY_COMBAT_LOG_PATTERNS do
+		for player, spell in string.gfind(arg1, pattern) do
+			CDC:StartEnemyCD(player, spell or 'Charge', GetTime())
+		end
+	end
 end
 
 do
-	local latest = {}
+	local active = {}
 
-	function CDC:StartEnemyCD(player, skill)
-		local t = GetTime()
-		local key = player..'|'..skill
-
-		if ENEMY_SKILLS[skill] and t ~= latest[key] then
-			latest[key] = t
+	function CDC:StartEnemyCD(player, skill, started)
+		if ENEMY_SKILLS[skill] then
 			local trigger = ENEMY_SKILLS[skill].trigger
 			if trigger then
 				trigger(player)
 			end
-			self.enemyFrame:StartCD{
-				name = skill,
-				info = ENEMY_SKILLS[skill].desc,
-				texture = ENEMY_SKILLS[skill].icon,
-				finish = t + ENEMY_SKILLS[skill].cooldown,
-				predicate = function()
-					return t == latest[key] and player == UnitName('target') and not (UnitClass('target') == 'Warrior' and skill == 'Enrage')
-				end,
+
+			local key = player..'|'..skill
+			if active[key] and active[key].ID then
+				self.enemyFrame:CancelCD(active[key].ID)
+			end
+			active[key] = {
+				skill = skill,
+				player = player,
+				started = started,
 			}
+
+			if player == UnitName('target') then
+				active[key].ID = self.enemyFrame:StartCD(skill, ENEMY_SKILLS[skill].desc, ENEMY_SKILLS[skill].icon, started + ENEMY_SKILLS[skill].cooldown)
+			end
 		end
 	end
 
 	function CDC:StopEnemyCDs(player, ...)
 		for i=1,arg.n do
 			local key = player..'|'..arg[i]
-			latest[key] = GetTime()
+			if active[key] and active[key].ID then
+				self.enemyFrame:CancelCD(active[key].ID)
+			end
+			active[key] = nil
 		end
 	end
-end
 
-function CDC:OnCombatLogEvent()
-	for _, pattern in ENEMY_COMBAT_LOG_PATTERNS do
-		for player, spell in string.gfind(arg1, pattern) do
-			CDC:StartEnemyCD(player, spell or 'Charge')
+	function CDC:PLAYER_TARGET_CHANGED()
+		local CDs = {}
+		for _, CD in active do
+			tinsert(CDs, CD)
+		end
+
+		for _, CD in CDs do
+			if CD.started + ENEMY_SKILLS[CD.skill].cooldown <= GetTime() then
+				active[CD.player..'|'..CD.skill] = nil
+			elseif UnitName('target') == CD.player then
+				if UnitClass('target') == 'Warrior' and CD.skill == 'Enrage' then
+					self:StopEnemyCDs(CD.player, CD.skill)
+				else
+					self:StartEnemyCD(CD.player, CD.skill, CD.started)
+				end
+			elseif CD.ID then
+				self.enemyFrame:CancelCD(CD.ID)
+			end
 		end
 	end
 end

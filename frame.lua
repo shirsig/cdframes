@@ -193,18 +193,24 @@ function method:Ignored(name)
 	end
 end
 
+function method:CDID(CD)
+	return tostring(CD)
+end
+
 function method:Update()
 	local t = GetTime()
 	local i = 1
 
-	local temp = {}
-	sort(self.CDs, function(a, b) local ta, tb = a.finish - t, b.finish - t return ta < tb or tb == ta and a.name < b.name end)
+	local CDList = {}
 	for _, CD in self.CDs do
-		local timeleft = CD.finish - t
+		tinsert(CDList, CD)
+	end
+	sort(CDList, function(a, b) local ta, tb = a.expiration - t, b.expiration - t return ta < tb or tb == ta and a.name < b.name end)
+	for _, CD in CDList do
+		local timeleft = CD.expiration - t
 
 		if timeleft > 0 then
-			tinsert(temp, CD)
-			if i <= 10 and not self:Ignored(CD.name) and (not CD.predicate or CD:predicate()) then
+			if i <= 10 and not self:Ignored(CD.name) then
 				local frame = self.frame.CDFrames[i]
 				if timeleft <= 10 then
 					local x = t*4/3
@@ -230,9 +236,10 @@ function method:Update()
 
 				i = i + 1
 			end
+		else
+			self.CDs[self:CDID(CD)] = nil
 		end
 	end
-	self.CDs = temp
 
 	while i <= 10 do
 		self.frame.CDFrames[i]:Hide()
@@ -240,8 +247,19 @@ function method:Update()
 	end	
 end
 
-function method:StartCD(CD)
-	tinsert(self.CDs, CD)
+function method:StartCD(name, info, texture, expiration)
+	local CD = {
+		name = name,
+		info = info,
+		texture = texture,
+		expiration = expiration,
+	}
+	self.CDs[self:CDID(CD)] = CD
+	return self:CDID(CD)
+end
+
+function method:CancelCD(CDID)
+	self.CDs[CDID] = nil
 end
 
 function CDC_Frame(key, title)
