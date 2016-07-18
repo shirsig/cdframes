@@ -399,14 +399,9 @@ local ENEMY_COMBAT_LOG_EVENTS = {
 	'CHAT_MSG_SPELL_PARTY_BUFF',
 }
 
-for _, event in ENEMY_COMBAT_LOG_EVENTS do
-	CDC[event] = function(self)
-		self:OnCombatLogEvent()
-	end
-end
-
 function CDC:EnemySetup()
 	for _, event in ENEMY_COMBAT_LOG_EVENTS do
+		self[event] = self.OnCombatLogEvent
 		self:RegisterEvent(event)
 	end
 end
