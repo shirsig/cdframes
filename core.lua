@@ -167,6 +167,7 @@ local ENEMY_SKILLS = {
 	["Will of the Forsaken"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Shadow_RaiseDead"},
 	["Perception"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_Sleep"},
 	["War Stomp"] = {cooldown = 2*60, desc = "Unknown!", icon = "Ability_WarStomp"},
+	["Escape Artist"] = {cooldown = 60, desc = "Unknown!", icon = "Ability_Rogue_Trip"},
 	["Stoneform"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Shadow_UnholyStrength"},
 
 	["Brittle Armor"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Shadow_GrimWard"},
