@@ -85,6 +85,10 @@ function method:IconFrame(parent)
 	end)
 
 	frame.texture = frame:CreateTexture()
+	frame.texture:SetPoint('BOTTOM', 0, 1)
+	frame.texture:SetPoint('LEFT', 1, 0)
+	frame.texture:SetPoint('TOP', 0, -1)
+	frame.texture:SetPoint('RIGHT', -1, 0)
 
 	frame.border = frame:CreateTexture(nil, 'OVERLAY')
 	frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
@@ -240,18 +244,6 @@ function method:Update()
 				frame.texture:SetTexture([[Interface\Icons\]]..CD.texture)
 				frame.count:SetText(timeleft)
 				frame:Show()
-
-				if CDFrames:Contains(BORDERLESS_ICONS, CD.texture) then
-					frame.texture:SetPoint('BOTTOM', 0, 1)
-					frame.texture:SetPoint('LEFT', 1, 0)
-					frame.texture:SetPoint('TOP', 0, -1)
-					frame.texture:SetPoint('RIGHT', -1, 0)
-				else
-					frame.texture:SetPoint('BOTTOM', 0, 0)
-					frame.texture:SetPoint('LEFT', 0, 0)
-					frame.texture:SetPoint('TOP', 0, 0)
-					frame.texture:SetPoint('RIGHT', 0, 0)
-				end
 
 				frame.tooltip = {CD.name, CD.info}
 
