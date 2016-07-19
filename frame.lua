@@ -1,4 +1,4 @@
-CDC_Settings = {}
+CDFrames_Settings = {}
 
 local ORIENTATIONS = {'R', 'D', 'L', 'U'}
 
@@ -14,17 +14,17 @@ local DEFAULT_SETTINGS = {
 local method = {}
 
 function method:LoadSettings()
-	if not CDC_Settings[self.key] then
+	if not CDFrames_Settings[self.key] then
 		self:CreateSettings()
 	end
-	self.settings = CDC_Settings[self.key]
+	self.settings = CDFrames_Settings[self.key]
 	self:ApplySettings()
 end
 
 function method:CreateSettings()
-	CDC_Settings[self.key] = {}
+	CDFrames_Settings[self.key] = {}
 	for k, v in DEFAULT_SETTINGS do
-		CDC_Settings[self.key][k] = v
+		CDFrames_Settings[self.key][k] = v
 	end
 end
 
@@ -261,7 +261,7 @@ function method:CancelCD(CDID)
 	self.CDs[CDID] = nil
 end
 
-function CDC_Frame(key, title)
+function CDFrames_Frame(key, title)
 	local self = {}
 	for k, v in method do
 		self[k] = v

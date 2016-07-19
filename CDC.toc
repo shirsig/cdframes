@@ -1,6 +1,0 @@
-## Interface: 11200
-## Title: Cooldown Count
-## Author: shirsig
-## SavedVariables: CDC_Settings
-core.lua
-frame.lua

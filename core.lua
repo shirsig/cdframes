@@ -1,25 +1,25 @@
-local CDC = CreateFrame('Frame')
-CDC:SetScript('OnEvent', function()
+local CDFrames = CreateFrame('Frame')
+CDFrames:SetScript('OnEvent', function()
 	this[event](this)
 end)
-CDC:RegisterEvent('ADDON_LOADED')
+CDFrames:RegisterEvent('ADDON_LOADED')
 
-function CDC:ADDON_LOADED()
-	if arg1 ~= 'CDC' then
+function CDFrames:ADDON_LOADED()
+	if arg1 ~= 'CDFrames' then
 		return
 	end
 
 	SLASH_CDC1 = '/cdc'
-	SlashCmdList.CDC = function(str) self:SlashHandler(str) end
+	SlashCmdList.CDFrames = function(str) self:SlashHandler(str) end
 
-	self.playerFrame = CDC_Frame('PLAYER', 'Player Cooldowns')
-	self.enemyFrame = CDC_Frame('ENEMY', 'Enemy Cooldowns')
+	self.playerFrame = CDFrames_Frame('PLAYER', 'Player Cooldowns')
+	self.enemyFrame = CDFrames_Frame('ENEMY', 'Enemy Cooldowns')
 
 	self:PlayerSetup()
 	self:EnemySetup()
 end
 
-function CDC:SlashHandler(str)
+function CDFrames:SlashHandler(str)
 	str = strupper(str)
 	local parameters = self:Tokenize(str)
 
@@ -56,7 +56,7 @@ function CDC:SlashHandler(str)
 	frame:ApplySettings()
 end
 
-function CDC:Contains(list, str)
+function CDFrames:Contains(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then
 			return true
@@ -64,7 +64,7 @@ function CDC:Contains(list, str)
 	end
 end
 
-function CDC:Tokenize(str)
+function CDFrames:Tokenize(str)
 	local tokens = {}
 	for token in string.gfind(str, '%S+') do
 		tinsert(tokens, token)
@@ -74,15 +74,15 @@ end
 
 -- PLAYER
 
-function CDC:BAG_UPDATE_COOLDOWN()
+function CDFrames:BAG_UPDATE_COOLDOWN()
 	self:DetectItemCooldowns()
 end
 
-function CDC:SPELL_UPDATE_COOLDOWN()
+function CDFrames:SPELL_UPDATE_COOLDOWN()
 	self:DetectSpellCooldowns()
 end
 
-function CDC:PlayerSetup()
+function CDFrames:PlayerSetup()
 	self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	self:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 
@@ -93,7 +93,7 @@ end
 do
 	active = {}
 
-	function CDC:StartPlayerCD(name, texture, started, duration)
+	function CDFrames:StartPlayerCD(name, texture, started, duration)
 		if active[name] then
 			self.playerFrame:CancelCD(active[name])
 		end
@@ -101,13 +101,13 @@ do
 	end
 end
 
-function CDC:LinkName(link)
+function CDFrames:LinkName(link)
 	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do
 		return name
 	end
 end
 
-function CDC:DetectItemCooldowns()	
+function CDFrames:DetectItemCooldowns()	
     for bag=0,4 do
         if GetBagName(bag) then
             for slot = 1, GetContainerNumSlots(bag) do
@@ -142,7 +142,7 @@ function CDC:DetectItemCooldowns()
 	end
 end
 
-function CDC:DetectSpellCooldowns()	
+function CDFrames:DetectSpellCooldowns()	
 	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
 	local totalSpells = offset + spellCount
 	for id=1,totalSpells do
@@ -256,7 +256,7 @@ local ENEMY_SKILLS = {
 	["Presence of Mind"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_EnchantArmor", classes = 'Mage'},
 	["Arcane Power"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_Lightning", classes = 'Mage'},
 	["Combustion"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire", classes = 'Mage'},
-	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", classes = 'Mage', trigger = function(player) CDC:StopEnemyCDs(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova') end},
+	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", classes = 'Mage', trigger = function(player) CDFrames:StopEnemyCDs(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova') end},
 	["Ice Block"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_Frost", classes = 'Mage'},
 
 	-- Rogue
@@ -273,7 +273,7 @@ local ENEMY_SKILLS = {
 
 	["Blade Flurry"] = {cooldown = 2*60, desc = "Increases your attack speed by 20%. In addition, attacks strike an additional nearby opponent. Lasts 15 sec.", icon = "Ability_Warrior_PunishingBlow", classes = 'Rogue'},
 	["Adrenaline Rush"] = {cooldown = 6*60, desc = "Increases your Energy regeneration rate by 100% for 15 sec.", icon = "Spell_Shadow_ShadowWordDominate", classes = 'Rogue'},
-	["Preparation"] = {cooldown = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", classes = 'Rogue', trigger = function(player) CDC:StopEnemyCDs(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood') end},
+	["Preparation"] = {cooldown = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", classes = 'Rogue', trigger = function(player) CDFrames:StopEnemyCDs(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood') end},
 	["Ghostly Strike"] = {cooldown = 20, desc = "A strike that deals 125% of weapon damage and increases your chance to dodge by 15% for 7 sec. Awards 1 combo points.", icon = "Spell_Shadow_Curse", classes = 'Rogue'},
 	["Premeditation"] = {cooldown = 60, desc = "When used, adds two combo points to your target. You must add to or use those combo points within 10 sec or the combo points are lost.", icon = "Spell_Shadow_Possession", classes = 'Rogue'},
 	["Cold Blood"] = {cooldown = 3*60, desc = "When activated, increases the critical strike chance of your next Sinister Strike, Backstab, Ambush, or Eviscerate by 100%.", icon = "Spell_Ice_Lament", classes = 'Rogue'},
@@ -412,7 +412,7 @@ local ENEMY_COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
-function CDC:EnemySetup()
+function CDFrames:EnemySetup()
 	for _, event in ENEMY_COMBAT_LOG_EVENTS do
 		self[event] = self.OnCombatLogEvent
 		self:RegisterEvent(event)
@@ -421,11 +421,11 @@ function CDC:EnemySetup()
 	self.targeted_enemies = {}
 end
 
-function CDC:OnCombatLogEvent()
+function CDFrames:OnCombatLogEvent()
 	for skill in string.gfind(arg1, 'You are afflicted by (.+) %-') do
 		for _, enemy in self.targeted_enemies do
 			if ENEMY_SKILLS[skill] and (not ENEMY_SKILLS[skill].classes or self:Contains(ENEMY_SKILLS[skill].classes, enemy.class)) then
-				CDC:StartEnemyCD(enemy.name, skill, GetTime())
+				CDFrames:StartEnemyCD(enemy.name, skill, GetTime())
 			end
 		end
 	end
@@ -433,19 +433,19 @@ function CDC:OnCombatLogEvent()
 	for _, pattern in ENEMY_COMBAT_LOG_PATTERNS do
 		for player, skill in string.gfind(arg1, pattern) do
 			if ENEMY_SKILLS[skill] then
-				CDC:StartEnemyCD(player, skill, GetTime())
+				CDFrames:StartEnemyCD(player, skill, GetTime())
 			end
 		end
 	end
 end
 
-function CDC:ShowEnemyCD(CD)
+function CDFrames:ShowEnemyCD(CD)
 	if not CD.ID then
 		CD.ID = self.enemyFrame:StartCD(CD.skill, ENEMY_SKILLS[CD.skill].desc, ENEMY_SKILLS[CD.skill].icon, CD.started + ENEMY_SKILLS[CD.skill].cooldown)
 	end
 end
 
-function CDC:HideEnemyCD(CD)
+function CDFrames:HideEnemyCD(CD)
 	if CD.ID then
 		self.enemyFrame:CancelCD(CD.ID)
 		CD.ID = nil
@@ -455,7 +455,7 @@ end
 do
 	local active = {}
 
-	function CDC:StartEnemyCD(player, skill, started)
+	function CDFrames:StartEnemyCD(player, skill, started)
 		if ENEMY_SKILLS[skill] then
 			local trigger = ENEMY_SKILLS[skill].trigger
 			if trigger then
@@ -477,7 +477,7 @@ do
 		end
 	end
 
-	function CDC:StopEnemyCDs(player, ...)
+	function CDFrames:StopEnemyCDs(player, ...)
 		for i=1,arg.n do
 			local key = player..'|'..arg[i]
 			if active[key] and active[key].ID then
@@ -487,7 +487,7 @@ do
 		end
 	end
 
-	function CDC:PLAYER_TARGET_CHANGED()
+	function CDFrames:PLAYER_TARGET_CHANGED()
 		if UnitIsEnemy('target', 'player') then
 			tinsert(self.targeted_enemies, 1, {name = UnitName('target'), class = UnitClass('target')})
 			if getn(self.targeted_enemies) > 100 then
