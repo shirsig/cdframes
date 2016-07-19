@@ -83,6 +83,7 @@ function method:IconFrame(parent)
 	end)
 
 	frame.texture = frame:CreateTexture()
+	frame.texture:SetTexCoord(0.06,0.94,0.06,0.94)
 	frame.texture:SetPoint('BOTTOM', 0, 1)
 	frame.texture:SetPoint('LEFT', 1, 0)
 	frame.texture:SetPoint('TOP', 0, -1)
