@@ -4,6 +4,8 @@ CDFrames:SetScript('OnEvent', function()
 end)
 CDFrames:RegisterEvent('ADDON_LOADED')
 
+local BORDERLESS_ICONS = ''
+
 function CDFrames:ADDON_LOADED()
 	if arg1 ~= 'CDFrames' then
 		return
@@ -186,8 +188,8 @@ local ENEMY_SKILLS = {
 	["Frost Recleftor"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_FrostWard"},
 	["Shadow Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Shadow_AntiShadow"},
 	["Fire Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire"},
-	["Tidal Charm"] = {cooldown = 15*60, desc = "Unknown!", icon = "inv_misc_rune_01"},
-	["Aura of Protection"] = {cooldown = 30*60, desc = "Unknown!", icon = "inv_misc_armorkit_04"},
+	["Tidal Charm"] = {cooldown = 15*60, desc = "Unknown!", icon = "inv_Misc_Rune_01"},
+	["Aura of Protection"] = {cooldown = 30*60, desc = "Unknown!", icon = "inv_Misc_Armorkit_04"},
 
 	["First Aid"] = {cooldown = 60, desc = "Unknown!", icon = "Spell_Holy_Heal"},
 

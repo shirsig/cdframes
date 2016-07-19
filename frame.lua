@@ -84,7 +84,7 @@ function method:IconFrame(parent)
 
 	frame.texture = frame:CreateTexture()
 
-	frame.border = frame:CreateTexture()
+	frame.border = frame:CreateTexture(nil, 'OVERLAY')
 	frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
 	frame.border:SetWidth(53)
 	frame.border:SetHeight(53)
@@ -240,10 +240,10 @@ function method:Update()
 				frame:Show()
 
 				if strsub(CD.texture, 1, 3) == 'INV' then
-					frame.texture:SetPoint('BOTTOM', 0, 2)
-					frame.texture:SetPoint('LEFT', 2, 0)
-					frame.texture:SetPoint('TOP', 0, -2)
-					frame.texture:SetPoint('RIGHT', -2, 0)
+					frame.texture:SetPoint('BOTTOM', 0, 1)
+					frame.texture:SetPoint('LEFT', 1, 0)
+					frame.texture:SetPoint('TOP', 0, -1)
+					frame.texture:SetPoint('RIGHT', -1, 0)
 				else
 					frame.texture:SetPoint('BOTTOM', 0, 0)
 					frame.texture:SetPoint('LEFT', 0, 0)
