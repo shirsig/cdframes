@@ -1,7 +1,5 @@
 CDFrames_Settings = {}
 
-local BORDERLESS_ICONS = 'INV_Misc_ArmorKit_04'
-
 local ORIENTATIONS = {'R', 'D', 'L', 'U'}
 
 local DEFAULT_SETTINGS = {
