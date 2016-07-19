@@ -186,7 +186,7 @@ local ENEMY_SKILLS = {
 	["Shadow Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Shadow_AntiShadow"},
 	["Fire Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire"},
 	["Tidal Charm"] = {cooldown = 15*60, desc = "Unknown!", icon = "inv_misc_rune_01"},
-	["Arena Grand Master"] = {cooldown = 30*60, desc = "Unknown!", icon = "inv_misc_armorkit_04"},
+	["Aura of Protection"] = {cooldown = 30*60, desc = "Unknown!", icon = "inv_misc_armorkit_04"},
 
 	["First Aid"] = {cooldown = 60, desc = "Unknown!", icon = "Spell_Holy_Heal"},
 
