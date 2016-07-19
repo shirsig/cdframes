@@ -1,4 +1,4 @@
-local m, pub = CDFrames.enemy
+local m, public, private = CDFrames.module'enemy'
 
 local SKILLS = {
 
@@ -252,17 +252,19 @@ local COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
-function pub.Setup()
+function public.Setup()
+	public.frame = CDFrames.frame.Frame('ENEMY', 'Enemy Cooldowns')
+
 	for _, event in COMBAT_LOG_EVENTS do
 		CDFrames.events[event] = m.OnCombatLogEvent
 		CDFrames.events:RegisterEvent(event)
 	end
 	CDFrames.events:RegisterEvent('PLAYER_TARGET_CHANGED')
-	m.targeted_enemies = {}
-	m.active = {}
+	private.targeted_enemies = {}
+	private.active = {}
 end
 
-function m.OnCombatLogEvent()
+function private.OnCombatLogEvent()
 	for skill in string.gfind(arg1, 'You are afflicted by (.+) %-') do
 		for _, enemy in m.targeted_enemies do
 			if SKILLS[skill] and not m.Active(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.Contains(SKILLS[skill].classes, enemy.class)) then
@@ -281,27 +283,27 @@ function m.OnCombatLogEvent()
 	end
 end
 
-function m.ShowCD(CD)
+function private.ShowCD(CD)
 	if not CD.ID then
 		CD.ID = m.frame:StartCD(CD.skill, SKILLS[CD.skill].desc, SKILLS[CD.skill].icon, CD.started + SKILLS[CD.skill].cooldown)
 	end
 end
 
-function m.HideCD(CD)
+function private.HideCD(CD)
 	if CD.ID then
 		m.frame:CancelCD(CD.ID)
 		CD.ID = nil
 	end
 end
 
-function m:Active(player, skill)
+function private:Active(player, skill)
 	local key = player..'|'..skill
 	if m.active[key] and m.active[key].started + SKILLS[skill].cooldown > GetTime() then
 		return m.active[key]
 	end
 end
 
-function m.StartCD(player, skill, started)
+function private.StartCD(player, skill, started)
 	local trigger = SKILLS[skill].trigger
 	if trigger then
 		trigger(player)
@@ -321,7 +323,7 @@ function m.StartCD(player, skill, started)
 	end
 end
 
-function m.StopCDs(player, ...)
+function private.StopCDs(player, ...)
 	for i=1,arg.n do
 		local key = player..'|'..arg[i]
 		if m.active[key] and m.active[key].ID then

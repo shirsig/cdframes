@@ -1,4 +1,4 @@
-local m, pub = CDFrames.player
+local m, public, private = CDFrames.module'player'
 
 function CDFrames.events.BAG_UPDATE_COOLDOWN()
 	m.DetectItemCooldowns()
@@ -8,9 +8,11 @@ function CDFrames.events.SPELL_UPDATE_COOLDOWN()
 	m.DetectSpellCooldowns()
 end
 
-function pub.Setup()
-	CDFrames.events.RegisterEvent('BAG_UPDATE_COOLDOWN')
-	CDFrames.events.RegisterEvent('SPELL_UPDATE_COOLDOWN')
+function public.Setup()
+	public.frame = CDFrames.frame.Frame('PLAYER', 'Player Cooldowns')
+
+	CDFrames.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
+	CDFrames.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 
 	m.DetectItemCooldowns()
 	m.DetectSpellCooldowns()
@@ -19,7 +21,7 @@ end
 do
 	active = {}
 
-	function m.StartCD(name, texture, started, duration)
+	function private.StartCD(name, texture, started, duration)
 		if active[name] then
 			m.frame:CancelCD(active[name])
 		end
@@ -27,13 +29,13 @@ do
 	end
 end
 
-function m.LinkName(link)
+function private.LinkName(link)
 	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do
 		return name
 	end
 end
 
-function m.DetectItemCooldowns()	
+function private.DetectItemCooldowns()	
     for bag=0,4 do
         if GetBagName(bag) then
             for slot = 1, GetContainerNumSlots(bag) do
@@ -68,7 +70,7 @@ function m.DetectItemCooldowns()
 	end
 end
 
-function m.DetectSpellCooldowns()	
+function private.DetectSpellCooldowns()	
 	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
 	local totalSpells = offset + spellCount
 	for id=1,totalSpells do

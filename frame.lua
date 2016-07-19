@@ -1,4 +1,4 @@
-local m, pub = CDFrames.frame
+local m, public, private = CDFrames.module'frame'
 
 CDFrames_Settings = {}
 
@@ -13,7 +13,23 @@ local DEFAULT_SETTINGS = {
 	clickThrough = false,
 }
 
-local m.method = {}
+function public.Frame(key, title)
+	local self = {}
+	for k, v in m.method do
+		self[k] = v
+	end
+
+	self.key = key
+	self.title = title
+	self.CDs = {}
+
+	self:CreateFrames()
+	self:LoadSettings()
+
+	return self
+end
+
+private.method = {}
 
 function m.method:LoadSettings()
 	if not CDFrames_Settings[self.key] then
@@ -270,20 +286,4 @@ end
 
 function m.method:CancelCD(CDID)
 	self.CDs[CDID] = nil
-end
-
-function pub.Frame(key, title)
-	local self = {}
-	for k, v in m.method do
-		self[k] = v
-	end
-
-	self.key = key
-	self.title = title
-	self.CDs = {}
-
-	self:CreateFrames()
-	self:LoadSettings()
-
-	return self
 end

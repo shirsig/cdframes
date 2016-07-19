@@ -1,9 +1,23 @@
-local interface, m, pub = CDFrames_Module()
+local interface, m, public, private = unpack(CDFrames_Module('core'))
 CDFrames = interface
 
-pub.events = CreateFrame('Frame')
+function public.module(name)
+	local module = CDFrames_Module(name)
+	public[name] = tremove(module, 1)
+	return unpack(module)
+end
+
+public.events = CreateFrame('Frame')
 m.events:SetScript('OnEvent', function() this[event]() end)
 m.events:RegisterEvent('ADDON_LOADED')
+
+function public.Contains(list, str)
+	for element in string.gfind(list, '[^,]+') do
+		if element == str then
+			return true
+		end
+	end
+end
 
 function m.events.ADDON_LOADED()
 	if arg1 ~= 'CDFrames' then
@@ -13,14 +27,11 @@ function m.events.ADDON_LOADED()
 	SLASH_CDFrames1 = '/cdframes'
 	SlashCmdList.CDFrames = m.SlashHandler
 
-	m.player.frame = m.Frame('PLAYER', 'Player Cooldowns')
-	m.enemy.frame = m.Frame('ENEMY', 'Enemy Cooldowns')
-
 	m.player.Setup()
 	m.enemy.Setup()
 end
 
-function m.SlashHandler(str)
+function private.SlashHandler(str)
 	str = strupper(str)
 	local parameters = m.Tokenize(str)
 
@@ -57,15 +68,7 @@ function m.SlashHandler(str)
 	frame:ApplySettings()
 end
 
-function m.Contains(list, str)
-	for element in string.gfind(list, '[^,]+') do
-		if element == str then
-			return true
-		end
-	end
-end
-
-function m.Tokenize(str)
+function private.Tokenize(str)
 	local tokens = {}
 	for token in string.gfind(str, '%S+') do
 		tinsert(tokens, token)
