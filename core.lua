@@ -9,7 +9,7 @@ function CDFrames:ADDON_LOADED()
 		return
 	end
 
-	SLASH_CDC1 = '/cdc'
+	SLASH_CDFrames1 = '/cdframes'
 	SlashCmdList.CDFrames = function(str) self:SlashHandler(str) end
 
 	self.playerFrame = CDFrames_Frame('PLAYER', 'Player Cooldowns')
