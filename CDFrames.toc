@@ -2,5 +2,8 @@
 ## Title: CDFrames
 ## Author: shirsig
 ## SavedVariables: CDFrames_Settings
+module.lua
 core.lua
 frame.lua
+player.lua
+enemy.lua

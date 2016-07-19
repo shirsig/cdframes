@@ -1,3 +1,5 @@
+local m, pub = CDFrames.frame
+
 CDFrames_Settings = {}
 
 local ORIENTATIONS = {'R', 'D', 'L', 'U'}
@@ -11,9 +13,9 @@ local DEFAULT_SETTINGS = {
 	clickThrough = false,
 }
 
-local method = {}
+local m.method = {}
 
-function method:LoadSettings()
+function m.method:LoadSettings()
 	if not CDFrames_Settings[self.key] then
 		self:CreateSettings()
 	end
@@ -21,14 +23,14 @@ function method:LoadSettings()
 	self:ApplySettings()
 end
 
-function method:CreateSettings()
+function m.method:CreateSettings()
 	CDFrames_Settings[self.key] = {}
 	for k, v in DEFAULT_SETTINGS do
 		CDFrames_Settings[self.key][k] = v
 	end
 end
 
-function method:CreateFrames()
+function m.method:CreateFrames()
 	local frame = CreateFrame('Frame', nil, UIParent)
 	self.frame = frame
 	frame:SetWidth(32)
@@ -71,7 +73,7 @@ function method:CreateFrames()
 	end)
 end
 
-function method:IconFrame(parent)
+function m.method:IconFrame(parent)
 	local frame = CreateFrame('Frame', nil, parent)
 	frame:SetWidth(32)
 	frame:SetHeight(32)
@@ -104,7 +106,7 @@ function method:IconFrame(parent)
 	return frame
 end
 
-function method:ApplySettings()
+function m.method:ApplySettings()
 	if self.settings.active then
 		self.frame:Show()
 	else
@@ -124,7 +126,7 @@ function method:ApplySettings()
 	self:PlaceFrames()
 end
 
-function method:PlaceFrames()
+function m.method:PlaceFrames()
 	self.frame:SetPoint('BOTTOMLEFT', unpack(self.settings.position))
 	for i, frame in self.frame.iconFrames do
 		frame:ClearAllPoints()
@@ -141,14 +143,14 @@ function method:PlaceFrames()
 	end
 end
 
-function method:Lock()
+function m.method:Lock()
 	self.frame.button:Hide()
 	for _, frame in self.frame.iconFrames do
 		frame:Hide()
 	end
 end
 
-function method:Unlock()
+function m.method:Unlock()
 	self.frame.button:Show()
 	for i, frame in self.frame.iconFrames do
 		frame.tooltip = {'test'..i, 'test'..i}
@@ -158,7 +160,7 @@ function method:Unlock()
 	end
 end
 
-function method:ButtonTooltip()
+function m.method:ButtonTooltip()
 	GameTooltip_SetDefaultAnchor(GameTooltip, this)
 	GameTooltip:AddLine(self.title)
 	GameTooltip:AddLine('Left-click/drag to position', .8, .8, .8)
@@ -166,14 +168,14 @@ function method:ButtonTooltip()
 	GameTooltip:Show()
 end
 
-function method:CDTooltip()
+function m.method:CDTooltip()
 	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
 	GameTooltip:AddLine(this.tooltip[1])
 	GameTooltip:AddLine(this.tooltip[2], .8, .8, .8, 1)
 	GameTooltip:Show()
 end
 
-function method:OnClick()
+function m.method:OnClick()
 	if arg1 == 'LeftButton' then
 		for i, orientation in ORIENTATIONS do
 			if orientation == self.settings.orientation then
@@ -188,28 +190,24 @@ function method:OnClick()
 	end
 end
 
-function method:OnDragStart()
+function m.method:OnDragStart()
 	self.frame:StartMoving()
 end
 
-function method:OnDragStop()
+function m.method:OnDragStop()
 	self.frame:StopMovingOrSizing()
 	self.settings.position = {self.frame:GetLeft(), self.frame:GetBottom()}
 end
 
-function method:Ignored(name)
-	for entry in string.gfind(self.settings.ignoreList, '[^,]+') do
-		if strupper(entry) == strupper(name) then
-			return true
-		end
-	end
+function m.method:Ignored(name)
+	return CDFrames.Contains(strupper(self.settings.ignoreList), strupper(name))
 end
 
-function method:CDID(CD)
+function m.method:CDID(CD)
 	return tostring(CD)
 end
 
-function method:Update()
+function m.method:Update()
 	local t = GetTime()
 	local i = 1
 
@@ -259,7 +257,7 @@ function method:Update()
 	end	
 end
 
-function method:StartCD(name, info, texture, expiration)
+function m.method:StartCD(name, info, texture, expiration)
 	local CD = {
 		name = name,
 		info = info,
@@ -270,22 +268,22 @@ function method:StartCD(name, info, texture, expiration)
 	return self:CDID(CD)
 end
 
-function method:CancelCD(CDID)
+function m.method:CancelCD(CDID)
 	self.CDs[CDID] = nil
 end
 
-function CDFrames:Frame(key, title)
-	local frame = {}
-	for k, v in method do
-		frame[k] = v
+function pub.Frame(key, title)
+	local self = {}
+	for k, v in m.method do
+		self[k] = v
 	end
 
-	frame.key = key
-	frame.title = title
-	frame.CDs = {}
+	self.key = key
+	self.title = title
+	self.CDs = {}
 
-	frame:CreateFrames()
-	frame:LoadSettings()
+	self:CreateFrames()
+	self:LoadSettings()
 
-	return frame
+	return self
 end
