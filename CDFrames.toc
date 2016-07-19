@@ -1,0 +1,6 @@
+## Interface: 11200
+## Title: CDFrames
+## Author: shirsig
+## SavedVariables: CDFrames_Settings
+core.lua
+frame.lua
