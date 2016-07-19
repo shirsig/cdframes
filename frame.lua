@@ -59,9 +59,9 @@ function method:CreateFrames()
 		GameTooltip:Hide()
 	end)
 
-	frame.CDFrames = {}
+	frame.iconFrames = {}
 	for i=1,10 do
-		tinsert(frame.CDFrames, self:CDFrame(frame))
+		tinsert(frame.iconFrames, self:IconFrame(frame))
 	end
 
 	frame:SetScript('OnUpdate', function()
@@ -71,7 +71,7 @@ function method:CreateFrames()
 	end)
 end
 
-function method:CDFrame(parent)
+function method:IconFrame(parent)
 	local frame = CreateFrame('Frame', nil, parent)
 	frame:SetWidth(32)
 	frame:SetHeight(32)
@@ -81,13 +81,21 @@ function method:CDFrame(parent)
 	frame:SetScript('OnLeave', function()
 		GameTooltip:Hide()
 	end)
+
 	frame.texture = frame:CreateTexture()
-	frame.texture:SetAllPoints()
+
+	frame.border = frame:CreateTexture()
+	frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
+	frame.border:SetWidth(53)
+	frame.border:SetHeight(53)
+	frame.border:SetPoint('CENTER', 0, 0)
+
 	frame.count = frame:CreateFontString()
 	frame.count:SetFont([[Fonts\ARIALN.TTF]], 14, 'THICKOUTLINE')
 	frame.count:SetWidth(32)
 	frame.count:SetHeight(12)
 	frame.count:SetPoint('BOTTOM', 0, 10)
+
 	return frame
 end
 
@@ -104,7 +112,7 @@ function method:ApplySettings()
 		self:Unlock()
 	end
 
-	for _, frame in self.frame.CDFrames do
+	for _, frame in self.frame.iconFrames do
 		frame:EnableMouse(not self.settings.clickThrough)
 	end
 
@@ -113,7 +121,7 @@ end
 
 function method:PlaceFrames()
 	self.frame:SetPoint('BOTTOMLEFT', unpack(self.settings.position))
-	for i, frame in self.frame.CDFrames do
+	for i, frame in self.frame.iconFrames do
 		frame:ClearAllPoints()
 		local orientation, offset = self.settings.orientation, (i-1)*32
 		if orientation == 'U' then
@@ -130,14 +138,14 @@ end
 
 function method:Lock()
 	self.frame.button:Hide()
-	for _, frame in self.frame.CDFrames do
+	for _, frame in self.frame.iconFrames do
 		frame:Hide()
 	end
 end
 
 function method:Unlock()
 	self.frame.button:Show()
-	for i, frame in self.frame.CDFrames do
+	for i, frame in self.frame.iconFrames do
 		frame.tooltip = {'test'..i, 'test'..i}
 		frame.texture:SetTexture([[Interface\Icons\temp]])
 		frame.count:SetText()
@@ -210,7 +218,7 @@ function method:Update()
 
 		if timeleft > 0 then
 			if i <= 10 and not self:Ignored(CD.name) then
-				local frame = self.frame.CDFrames[i]
+				local frame = self.frame.iconFrames[i]
 				if timeleft <= 10 then
 					local x = t*4/3
 					frame.texture:SetAlpha((mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
@@ -231,6 +239,18 @@ function method:Update()
 				frame.count:SetText(timeleft)
 				frame:Show()
 
+				if strsub(CD.texture, 1, 3) == 'INV' then
+					frame.texture:SetPoint('BOTTOM', 0, 2)
+					frame.texture:SetPoint('LEFT', 2, 0)
+					frame.texture:SetPoint('TOP', 0, -2)
+					frame.texture:SetPoint('RIGHT', -2, 0)
+				else
+					frame.texture:SetPoint('BOTTOM', 0, 0)
+					frame.texture:SetPoint('LEFT', 0, 0)
+					frame.texture:SetPoint('TOP', 0, 0)
+					frame.texture:SetPoint('RIGHT', 0, 0)
+				end
+
 				frame.tooltip = {CD.name, CD.info}
 
 				i = i + 1
@@ -241,7 +261,7 @@ function method:Update()
 	end
 
 	while i <= 10 do
-		self.frame.CDFrames[i]:Hide()
+		self.frame.iconFrames[i]:Hide()
 		i = i + 1
 	end	
 end
