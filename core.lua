@@ -386,7 +386,7 @@ local ENEMY_COMBAT_LOG_PATTERNS = {
 	"(.+) casts (.+)%.",
 	"(.+) casts (.+) on ",
 	"(.+) gains (.+)%.",
-	"(.+) gains .+ Rage from .+'s Charge%.",
+	"(.+) gains .+ Rage from .+'s (Charge)%.",
 	"(.+)'s (.+) hits ",
 	"(.+)'s (.+) crits ",
 	"(.+)'s (.+) heals ",
@@ -412,7 +412,7 @@ end
 function CDC:OnCombatLogEvent()
 	for _, pattern in ENEMY_COMBAT_LOG_PATTERNS do
 		for player, spell in string.gfind(arg1, pattern) do
-			CDC:StartEnemyCD(player, spell or 'Charge', GetTime())
+			CDC:StartEnemyCD(player, spell, GetTime())
 		end
 	end
 end
