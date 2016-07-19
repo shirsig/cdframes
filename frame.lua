@@ -1,5 +1,7 @@
 CDFrames_Settings = {}
 
+local BORDERLESS_ICONS = 'INV_Misc_ArmorKit_04'
+
 local ORIENTATIONS = {'R', 'D', 'L', 'U'}
 
 local DEFAULT_SETTINGS = {
@@ -239,7 +241,7 @@ function method:Update()
 				frame.count:SetText(timeleft)
 				frame:Show()
 
-				if strsub(CD.texture, 1, 3) == 'INV' then
+				if CDFrames:Contains(BORDERLESS_ICONS, CD.texture) then
 					frame.texture:SetPoint('BOTTOM', 0, 1)
 					frame.texture:SetPoint('LEFT', 1, 0)
 					frame.texture:SetPoint('TOP', 0, -1)
@@ -281,18 +283,18 @@ function method:CancelCD(CDID)
 	self.CDs[CDID] = nil
 end
 
-function CDFrames_Frame(key, title)
-	local self = {}
+function CDFrames:Frame(key, title)
+	local frame = {}
 	for k, v in method do
-		self[k] = v
+		frame[k] = v
 	end
 
-	self.key = key
-	self.title = title
-	self.CDs = {}
+	frame.key = key
+	frame.title = title
+	frame.CDs = {}
 
-	self:CreateFrames()
-	self:LoadSettings()
+	frame:CreateFrames()
+	frame:LoadSettings()
 
-	return self
+	return frame
 end

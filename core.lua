@@ -1,10 +1,8 @@
-local CDFrames = CreateFrame('Frame')
+CDFrames = CreateFrame('Frame')
 CDFrames:SetScript('OnEvent', function()
 	this[event](this)
 end)
 CDFrames:RegisterEvent('ADDON_LOADED')
-
-local BORDERLESS_ICONS = ''
 
 function CDFrames:ADDON_LOADED()
 	if arg1 ~= 'CDFrames' then
@@ -14,8 +12,8 @@ function CDFrames:ADDON_LOADED()
 	SLASH_CDFrames1 = '/cdframes'
 	SlashCmdList.CDFrames = function(str) self:SlashHandler(str) end
 
-	self.playerFrame = CDFrames_Frame('PLAYER', 'Player Cooldowns')
-	self.enemyFrame = CDFrames_Frame('ENEMY', 'Enemy Cooldowns')
+	self.playerFrame = CDFrames:Frame('PLAYER', 'Player Cooldowns')
+	self.enemyFrame = CDFrames:Frame('ENEMY', 'Enemy Cooldowns')
 
 	self:PlayerSetup()
 	self:EnemySetup()
@@ -188,8 +186,8 @@ local ENEMY_SKILLS = {
 	["Frost Recleftor"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_FrostWard"},
 	["Shadow Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Shadow_AntiShadow"},
 	["Fire Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire"},
-	["Tidal Charm"] = {cooldown = 15*60, desc = "Unknown!", icon = "inv_Misc_Rune_01"},
-	["Aura of Protection"] = {cooldown = 30*60, desc = "Unknown!", icon = "inv_Misc_Armorkit_04"},
+	["Tidal Charm"] = {cooldown = 15*60, desc = "Unknown!", icon = "INV_Misc_Rune_01"},
+	["Aura of Protection"] = {cooldown = 30*60, desc = "Unknown!", icon = "INV_Misc_ArmorKit_04"},
 
 	["First Aid"] = {cooldown = 60, desc = "Unknown!", icon = "Spell_Holy_Heal"},
 
