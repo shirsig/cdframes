@@ -300,7 +300,7 @@ function private.Key(player, skill)
 end
 
 do
-	local active
+	local active = {}
 
 	function private.CD(player, skill)
 		local key = m.Key(player, skill)
