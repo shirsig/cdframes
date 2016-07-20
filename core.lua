@@ -1,8 +1,8 @@
-local interface, m, public, private = unpack(CDFrames_Module('core'))
+local interface, m, public, private = unpack(CDFrames_Module())
 CDFrames = interface
 
 function public.module(name)
-	local module = CDFrames_Module(name)
+	local module = CDFrames_Module()
 	public[name] = tremove(module, 1)
 	return unpack(module)
 end
