@@ -313,6 +313,14 @@ do
 		end
 	end
 
+	function private.CDs()
+		local CDs = {}
+		for _, CD in active do
+			tinsert(CDs, CD)
+		end
+		return CDs
+	end
+
 	function private.Activate(player, skill, started)
 		active[m.Key(player, skill)] = {
 			skill = skill,
@@ -359,12 +367,7 @@ function CDFrames.events.PLAYER_TARGET_CHANGED()
 		end
 	end
 
-	local CDs = {}
-	for _, CD in m.active do
-		tinsert(CDs, CD)
-	end
-
-	for _, CD in CDs do
+	for _, CD in m.CDs() do
 		if m.CD(CD.player, CD.skill) then
 			if UnitName('target') == CD.player then
 				if UnitClass('target') == 'Warrior' and CD.skill == 'Enrage' then
