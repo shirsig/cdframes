@@ -103,7 +103,7 @@ local SKILLS = {
 	["Kidney Shot"] = {cooldown = 20, desc = "Finishing move that stuns the target. Lasts longer per combo point.", icon = "Ability_Rogue_KidneyShot", classes = 'Rogue'},
 	["Evasion"] = {cooldown = 5*60, desc = "The rogue's dodge chance will increase by 50% for 15 sec.", icon = "Spell_Shadow_ShadowWard", classes = 'Rogue'},
 	["Feint"] = {cooldown = 10, desc = "Performs a feint, causing no damage but lowering your threat by a large amount, making the enemy less likely to attack you.", icon = "Ability_Rogue_Feint", classes = 'Rogue'},
-	["Gouge"] = {cooldown = 6, desc = "Causes 75 damage, incapacitating the opponent for 4 sec, and turns off your attack. Target must be facing you. Any damage caused will revive the target. Awards 1 combo point.", icon = "Ability_Gouge", classes = 'Rogue'},
+	["Gouge"] = {cooldown = 10, desc = "Causes 75 damage, incapacitating the opponent for 4 sec, and turns off your attack. Target must be facing you. Any damage caused will revive the target. Awards 1 combo point.", icon = "Ability_Gouge", classes = 'Rogue'},
 	["Kick"] = {cooldown = 10, desc = "A quick kick that injures a single foe for 80 damage. It also interrupts spellcasting and prevents any spell in that school from being cast for 5 sec.", icon = "Ability_Kick", classes = 'Rogue'},
 	["Sprint"] = {cooldown = 5*60, desc = "Increases the rogue's movement speed by 70% for 15 sec. Does not break stealth.", icon = "Ability_Rogue_Sprint", classes = 'Rogue'},
 	["Blind"] = {cooldown = 5*60, desc = "Blinds the target, causing it to wander disoriented for up to 10 sec. Any damage caused will remove the effect.", icon = "Spell_Shadow_MindSteal", classes = 'Rogue'},
