@@ -261,6 +261,7 @@ function public.Setup()
 	end
 	CDFrames.events:RegisterEvent('PLAYER_TARGET_CHANGED')
 	private.targeted_enemies = {}
+	private.active = {}
 end
 
 function private.OnCombatLogEvent()
@@ -282,55 +283,47 @@ function private.OnCombatLogEvent()
 	end
 end
 
-function private.ShowCD(CD)
+function private.Key(player, skill)
+	return player..'|'..skill
+end
+
+function private.expired(CD)
+	return CD.started + SKILLS[CD.skill].cooldown <= GetTime()
+end
+
+function private.CD(player, skill)
+	local key = m.Key(player, skill)
+	if m.active[key] and m.expired(m.active[key]) then
+		m.active[key] = nil
+	end
+	return m.active[key]
+end
+
+function private.CDs()
+	local CDs = {}
+	for _, CD in m.active do
+		tinsert(CDs, CD)
+	end
+	for _, CD in CDs do
+		if m.expired(CD) then
+			m.active[m.Key(CD.player, CD.skill)] = nil
+		end
+	end
+	return m.active
+end
+
+function private.ShowCD(key)
+	local CD = m.active[key]
 	if not CD.ID then
 		CD.ID = m.frame:StartCD(CD.skill, SKILLS[CD.skill].desc, SKILLS[CD.skill].icon, CD.started + SKILLS[CD.skill].cooldown)
 	end
 end
 
-function private.HideCD(CD)
+function private.HideCD(key)
+	local CD = m.active[key]
 	if CD.ID then
 		m.frame:CancelCD(CD.ID)
 		CD.ID = nil
-	end
-end
-
-function private.Key(player, skill)
-	return player..'|'..skill
-end
-
-do
-	local active = {}
-
-	function private.CD(player, skill)
-		local key = m.Key(player, skill)
-		if active[key] then
-			if active[key].started + SKILLS[skill].cooldown > GetTime() then
-				return active[key]
-			else
-				active[key] = nil
-			end
-		end
-	end
-
-	function private.CDs()
-		local CDs = {}
-		for _, CD in active do
-			tinsert(CDs, CD)
-		end
-		return CDs
-	end
-
-	function private.Activate(player, skill, started)
-		active[m.Key(player, skill)] = {
-			skill = skill,
-			player = player,
-			started = started,
-		}
-	end
-
-	function private.Deactivate(player, skill)
-		active[m.Key(player, skill)] = nil
 	end
 end
 
@@ -340,22 +333,27 @@ function private.StartCD(player, skill, started)
 		trigger(player)
 	end
 
-	if m.CD(player, skill) then
-		m.HideCD(m.CD(player, skill))
+	local key = m.Key(player, skill)
+	if m.active[key] then
+		m.HideCD(key)
 	end
-	m.Activate(player, skill, started)
+	m.active[key] = {
+		skill = skill,
+		player = player,
+		started = started,
+	}
 	if player == UnitName('target') then
-		m.ShowCD(m.CD(player, skill))
+		m.ShowCD(key)
 	end
 end
 
 function private.StopCDs(player, ...)
 	for i=1,arg.n do
-		local CD = m.CD(player, arg[i])
-		if CD then
-			m.HideCD(CD)
+		local key = m.Key(player, arg[i])
+		if m.active[key] then
+			m.HideCD(key)
+			m.active[key] = nil
 		end
-		m.Deactivate(player, arg[i])
 	end
 end
 
@@ -367,17 +365,15 @@ function CDFrames.events.PLAYER_TARGET_CHANGED()
 		end
 	end
 
-	for _, CD in m.CDs() do
-		if m.CD(CD.player, CD.skill) then
-			if UnitName('target') == CD.player then
-				if SKILLS[CD.skill].classes and not CDFrames.Contains(SKILLS[CD.skill].classes, UnitClass('target')) then
-					m.StopCDs(CD.player, CD.skill)
-				else
-					m.ShowCD(CD)
-				end
+	for key, CD in m.CDs() do
+		if UnitName('target') == CD.player then
+			if SKILLS[CD.skill].classes and not CDFrames.Contains(SKILLS[CD.skill].classes, UnitClass('target')) then
+				m.StopCDs(CD.player, CD.skill)
 			else
-				m.HideCD(CD)
+				m.ShowCD(key)
 			end
+		else
+			m.HideCD(key)
 		end
 	end
 end
