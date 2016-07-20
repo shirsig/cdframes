@@ -243,7 +243,7 @@ function m.method:Update()
 					frame:SetAlpha((mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
 					-- frame:SetAlpha((math.sin(t*4/3*math.pi)+1)/2*0.7+0.3)
 				else
-					frame.texture:SetAlpha(1)
+					frame:SetAlpha(1)
 				end
 
 				timeleft = ceil(timeleft)
