@@ -132,7 +132,7 @@ local SKILLS = {
 
 	["Elemental Mastery"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_WispHeal", classes = 'Shaman'},
 	["Stormstrike"] = {cooldown = 20, desc = "Unknown!", icon = "Spell_Holy_SealOfMight", classes = 'Shaman'},
-	["Nature's Swiftness"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_RavenForm", classes = 'Shaman'},
+	["Nature's Swiftness"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_RavenForm", classes = 'Shaman,Druid'},
 
 	-- Hunter
 	["Scare Beast"] = {cooldown = 30, desc = "Scares a beast, causing it to run in fear for up to 20 sec. Damage caused may interrupt the effect. Only one beast can be feared at a time.", icon = "Ability_Druid_Cower", classes = 'Hunter'},
@@ -266,7 +266,7 @@ end
 function private.OnCombatLogEvent()
 	for skill in string.gfind(arg1, 'You are afflicted by (.+) %-') do
 		for _, enemy in m.targeted_enemies do
-			if SKILLS[skill] and not m.Active(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.Contains(SKILLS[skill].classes, enemy.class)) then
+			if SKILLS[skill] and not m.CD(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.Contains(SKILLS[skill].classes, enemy.class)) then
 				m.StartCD(enemy.name, skill, GetTime())
 				break
 			end
@@ -370,7 +370,7 @@ function CDFrames.events.PLAYER_TARGET_CHANGED()
 	for _, CD in m.CDs() do
 		if m.CD(CD.player, CD.skill) then
 			if UnitName('target') == CD.player then
-				if UnitClass('target') == 'Warrior' and CD.skill == 'Enrage' then
+				if SKILLS[CD.skill].classes and not CDFrames.Contains(SKILLS[CD.skill].classes, UnitClass('target')) then
 					m.StopCDs(CD.player, CD.skill)
 				else
 					m.ShowCD(CD)
