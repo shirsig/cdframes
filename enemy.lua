@@ -261,7 +261,6 @@ function public.Setup()
 	end
 	CDFrames.events:RegisterEvent('PLAYER_TARGET_CHANGED')
 	private.targeted_enemies = {}
-	private.active = {}
 end
 
 function private.OnCombatLogEvent()
@@ -296,10 +295,34 @@ function private.HideCD(CD)
 	end
 end
 
-function private:Active(player, skill)
-	local key = player..'|'..skill
-	if m.active[key] and m.active[key].started + SKILLS[skill].cooldown > GetTime() then
-		return m.active[key]
+function private.Key(player, skill)
+	return player..'|'..skill
+end
+
+do
+	local active
+
+	function private.CD(player, skill)
+		local key = m.Key(player, skill)
+		if active[key] then
+			if active[key].started + SKILLS[skill].cooldown > GetTime() then
+				return active[key]
+			else
+				active[key] = nil
+			end
+		end
+	end
+
+	function private.Activate(player, skill, started)
+		active[m.Key(player, skill)] = {
+			skill = skill,
+			player = player,
+			started = started,
+		}
+	end
+
+	function private.Deactivate(player, skill)
+		active[m.Key(player, skill)] = nil
 	end
 end
 
@@ -309,27 +332,22 @@ function private.StartCD(player, skill, started)
 		trigger(player)
 	end
 
-	local key = player..'|'..skill
-	if m.active[key] then
-		m.HideCD(m.active[key])
+	if m.CD(player, skill) then
+		m.HideCD(m.CD(player, skill))
 	end
-	m.active[key] = {
-		skill = skill,
-		player = player,
-		started = started,
-	}
+	m.Activate(player, skill, started)
 	if player == UnitName('target') then
-		m.ShowCD(m.active[key])
+		m.ShowCD(m.CD(player, skill))
 	end
 end
 
 function private.StopCDs(player, ...)
 	for i=1,arg.n do
-		local key = player..'|'..arg[i]
-		if m.active[key] and m.active[key].ID then
-			m.HideCD(m.active[key].ID)
+		local CD = m.CD(player, arg[i])
+		if CD then
+			m.HideCD(CD)
 		end
-		m.active[key] = nil
+		m.Deactivate(player, arg[i])
 	end
 end
 
@@ -347,16 +365,16 @@ function CDFrames.events.PLAYER_TARGET_CHANGED()
 	end
 
 	for _, CD in CDs do
-		if CD.started + SKILLS[CD.skill].cooldown <= GetTime() then
-			m.active[CD.player..'|'..CD.skill] = nil
-		elseif UnitName('target') == CD.player then
-			if UnitClass('target') == 'Warrior' and CD.skill == 'Enrage' then
-				m.StopCDs(CD.player, CD.skill)
-			elseif not CD.ID then
-				m.ShowCD(CD)
+		if m.CD(CD.player, CD.skill) then
+			if UnitName('target') == CD.player then
+				if UnitClass('target') == 'Warrior' and CD.skill == 'Enrage' then
+					m.StopCDs(CD.player, CD.skill)
+				else
+					m.ShowCD(CD)
+				end
+			else
+				m.HideCD(CD)
 			end
-		elseif CD.ID then
-			m.HideCD(CD)
 		end
 	end
 end
