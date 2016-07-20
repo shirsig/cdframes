@@ -169,6 +169,7 @@ end
 function m.method:Unlock()
 	self.frame.button:Show()
 	for i, frame in self.frame.iconFrames do
+		frame:SetAlpha(1)
 		frame.tooltip = {'test'..i, 'test'..i}
 		frame.texture:SetTexture([[Interface\Icons\temp]])
 		frame.count:SetText()
