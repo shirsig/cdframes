@@ -11,6 +11,15 @@ public.events = CreateFrame('Frame')
 m.events:SetScript('OnEvent', function() this[event]() end)
 m.events:RegisterEvent('ADDON_LOADED')
 
+do
+	local x = 0
+
+	function public.ID()
+		x = x + 1
+		return 'CDFrames_Frame'..x
+	end
+end
+
 function public.Contains(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then
@@ -53,6 +62,10 @@ function private.SlashHandler(str)
 		frame.settings.locked = true
 	elseif parameters[2] == 'UNLOCK' then
 		frame.settings.locked = false
+	elseif parameters[2] == 'SIZE' then
+		frame.settings.size = min(20, max(1, tonumber(parameters[3]) or 10))
+	elseif parameters[2] == 'SCALE' then
+		frame.settings.scale = min(2, max(0.8, tonumber(parameters[3]) or 1))
 	elseif parameters[2] == 'CLICK' then
 		frame.settings.clickThrough = not frame.settings.clickThrough
 	elseif parameters[2] == 'IGNORE' then
@@ -65,7 +78,7 @@ function private.SlashHandler(str)
 		return
 	end
 
-	frame:ApplySettings()
+	frame:Initialize()
 end
 
 function private.Tokenize(str)

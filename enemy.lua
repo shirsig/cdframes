@@ -253,7 +253,7 @@ local COMBAT_LOG_PATTERNS = {
 }
 
 function public.Setup()
-	public.frame = CDFrames.frame.Frame('ENEMY', 'Enemy Cooldowns')
+	public.frame = CDFrames.frame.Frame('ENEMY', 'Enemy Cooldowns', {RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b})
 
 	for _, event in COMBAT_LOG_EVENTS do
 		CDFrames.events[event] = m.OnCombatLogEvent

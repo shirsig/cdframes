@@ -9,11 +9,13 @@ local DEFAULT_SETTINGS = {
 	locked = false,
 	position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2},
 	orientation = 'R',
+	size = 10,
+	scale = 1,
 	ignoreList = '',
 	clickThrough = false,
 }
 
-function public.Frame(key, title)
+function public.Frame(key, title, color)
 	local self = {}
 	for k, v in m.method do
 		self[k] = v
@@ -21,10 +23,11 @@ function public.Frame(key, title)
 
 	self.key = key
 	self.title = title
+	self.color = color
 	self.CDs = {}
 
-	self:CreateFrames()
 	self:LoadSettings()
+	self:Initialize()
 
 	return self
 end
@@ -36,7 +39,6 @@ function m.method:LoadSettings()
 		self:CreateSettings()
 	end
 	self.settings = CDFrames_Settings[self.key]
-	self:ApplySettings()
 end
 
 function m.method:CreateSettings()
@@ -47,52 +49,45 @@ function m.method:CreateSettings()
 end
 
 function m.method:CreateFrames()
-	local frame = CreateFrame('Frame', nil, UIParent)
-	self.frame = frame
-	frame:SetWidth(32)
-	frame:SetHeight(32)
-	frame:SetMovable(true)
-	frame:SetToplevel(true)
-
-	frame.button = CreateFrame('Button', nil, frame)
-	frame.button:SetWidth(32)
-	frame.button:SetHeight(40)
-	frame.button:SetPoint('CENTER', 0, 8)
-	frame.button:SetNormalTexture([[Interface\Buttons\UI-MicroButton-Abilities-Up.blp]])
-	frame.button:RegisterForDrag('LeftButton')
-	frame.button:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
-	frame.button:SetScript('OnDragStart', function()
-		self:OnDragStart()
-	end)
-	frame.button:SetScript('OnDragStop', function()
-		self:OnDragStop()
-	end)
-	frame.button:SetScript('OnClick', function()
-		self:OnClick()
-	end)
-	frame.button:SetScript('OnEnter', function()
-		self:ButtonTooltip()
-	end)
-	frame.button:SetScript('OnLeave', function()
-		GameTooltip:Hide()
-	end)
-
-	frame.iconFrames = {}
-	for i=1,10 do
-		tinsert(frame.iconFrames, self:IconFrame(frame))
+	if not self.frame then
+		local frame = CreateFrame('Button', tostring({}), UIParent)
+		frame:SetMovable(true)
+		frame:SetToplevel(true)
+		frame:SetClampedToScreen(true)
+		frame:RegisterForDrag('LeftButton')
+		frame:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
+		frame:SetScript('OnDragStart', function()
+			self:OnDragStart()
+		end)
+		frame:SetScript('OnDragStop', function()
+			self:OnDragStop()
+		end)
+		frame:SetScript('OnClick', function()
+			self:OnClick()
+		end)
+		frame:SetScript('OnEnter', function()
+			self:ButtonTooltip()
+		end)
+		frame:SetScript('OnLeave', function()
+			GameTooltip:Hide()
+		end)
+		frame:SetScript('OnUpdate', function()
+			if self.settings.locked then
+				self:Update()
+			end
+		end)
+		frame.iconFrames = {}
+		self.frame = frame
 	end
 
-	frame:SetScript('OnUpdate', function()
-		if self.settings.locked then
-			self:Update()
-		end
-	end)
+	for i=getn(self.frame.iconFrames)+1,self.settings.size do
+		tinsert(self.frame.iconFrames, self:IconFrame(self.frame))
+	end
 end
 
 function m.method:IconFrame(parent)
-	local frame = CreateFrame('Frame', nil, parent)
-	frame:SetWidth(32)
-	frame:SetHeight(32)
+	local frame = CreateFrame('CheckButton', CDFrames.ID(), parent, 'ActionButtonTemplate')
+	frame:RegisterForClicks()
 	frame:SetScript('OnEnter', function()
 		self:CDTooltip()
 	end)
@@ -100,29 +95,24 @@ function m.method:IconFrame(parent)
 		GameTooltip:Hide()
 	end)
 
-	frame.texture = frame:CreateTexture()
+	frame.texture = getglobal(frame:GetName()..'Icon')
 	frame.texture:SetTexCoord(0.06,0.94,0.06,0.94)
-	frame.texture:SetPoint('BOTTOM', 0, 1)
-	frame.texture:SetPoint('LEFT', 1, 0)
-	frame.texture:SetPoint('TOP', 0, -1)
-	frame.texture:SetPoint('RIGHT', -1, 0)
 
-	frame.border = frame:CreateTexture(nil, 'OVERLAY')
-	frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
-	frame.border:SetWidth(53)
-	frame.border:SetHeight(53)
-	frame.border:SetPoint('CENTER', 0, 0)
+	frame.border = frame:GetNormalTexture()
 
 	frame.count = frame:CreateFontString()
-	frame.count:SetFont([[Fonts\ARIALN.TTF]], 14, 'THICKOUTLINE')
+	frame.count:SetFont([[Fonts\ARIALN.TTF]], 18, 'THICKOUTLINE')
+	frame.count:SetJustifyH('CENTER')
 	frame.count:SetWidth(32)
 	frame.count:SetHeight(12)
-	frame.count:SetPoint('BOTTOM', 0, 10)
+	frame.count:SetPoint('CENTER', 0, -1)
 
 	return frame
 end
 
-function m.method:ApplySettings()
+function m.method:Initialize()
+	self:CreateFrames()
+
 	if self.settings.active then
 		self.frame:Show()
 	else
@@ -135,45 +125,64 @@ function m.method:ApplySettings()
 		self:Unlock()
 	end
 
-	for _, frame in self.frame.iconFrames do
-		frame:EnableMouse(not self.settings.clickThrough)
-	end
-
 	self:PlaceFrames()
 end
 
 function m.method:PlaceFrames()
-	self.frame:SetPoint('BOTTOMLEFT', unpack(self.settings.position))
+	self.frame:SetScale(self.settings.scale)
+
+	local orientation = self.settings.orientation
+
+	if CDFrames.Contains('U,D', orientation) then
+		self.frame:SetWidth(40)
+		self.frame:SetHeight(self.settings.size*40)
+	elseif CDFrames.Contains('L,R', orientation) then
+		self.frame:SetWidth(self.settings.size*40)
+		self.frame:SetHeight(40)
+	end
+
+	self.frame:ClearAllPoints()
+	self.frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', unpack(self.settings.position))
+
 	for i, frame in self.frame.iconFrames do
 		frame:ClearAllPoints()
-		local orientation, offset = self.settings.orientation, (i-1)*32
+		local offset = 2+(i-1)*(40)
 		if orientation == 'U' then
-			frame:SetPoint('BOTTOM', self.frame, 'TOP', 0, offset-3)
+			frame:SetPoint('BOTTOM', self.frame, 'BOTTOM', 0, offset-3)
 		elseif orientation == 'D' then
-			frame:SetPoint('TOP', self.frame, 'BOTTOM', 0, 3-offset)
+			frame:SetPoint('TOP', self.frame, 'TOP', 0, 3-offset)
 		elseif orientation == 'L' then
-			frame:SetPoint('RIGHT', self.frame, 'LEFT', -offset, 0)
+			frame:SetPoint('RIGHT', self.frame, 'RIGHT', -offset, 0)
 		elseif orientation == 'R' then
-			frame:SetPoint('LEFT', self.frame, 'RIGHT', offset, 0)
+			frame:SetPoint('LEFT', self.frame, 'LEFT', offset, 0)
 		end
 	end
 end
 
 function m.method:Lock()
-	self.frame.button:Hide()
+	self.frame:EnableMouse(false)
 	for _, frame in self.frame.iconFrames do
+		frame:EnableMouse(not self.settings.clickThrough)
+		frame.border:SetVertexColor(1, 1, 1)
 		frame:Hide()
 	end
 end
 
 function m.method:Unlock()
-	self.frame.button:Show()
+	self.frame:EnableMouse(true)
 	for i, frame in self.frame.iconFrames do
-		frame:SetAlpha(1)
-		frame.tooltip = {'test'..i, 'test'..i}
-		frame.texture:SetTexture([[Interface\Icons\temp]])
-		frame.count:SetText()
-		frame:Show()
+		if i > self.settings.size then
+			frame:Hide()
+		else
+			frame:EnableMouse(false)
+			frame.texture:SetAlpha(1)
+			frame.border:SetAlpha(1)
+			frame.texture:SetTexture(unpack(self.color))
+			frame.border:SetVertexColor(unpack(self.color))
+			frame.count:SetText(i)
+			frame.count:SetTextColor(1, 1, 1)
+			frame:Show()
+		end
 	end
 end
 
@@ -203,7 +212,7 @@ function m.method:OnClick()
 		self:PlaceFrames()
 	elseif arg1 == 'RightButton' then
 		self.settings.locked = true
-		self:ApplySettings()
+		self:Initialize()
 	end
 end
 
@@ -213,7 +222,7 @@ end
 
 function m.method:OnDragStop()
 	self.frame:StopMovingOrSizing()
-	self.settings.position = {self.frame:GetLeft(), self.frame:GetBottom()}
+	self.settings.position = { self.frame:GetCenter() }
 end
 
 function m.method:Ignored(name)
@@ -237,14 +246,17 @@ function m.method:Update()
 		local timeleft = CD.expiration - t
 
 		if timeleft > 0 then
-			if i <= 10 and not self:Ignored(CD.name) then
+			if i <= self.settings.size and not self:Ignored(CD.name) then
 				local frame = self.frame.iconFrames[i]
 				if timeleft <= 10 then
 					local x = t*4/3
-					frame:SetAlpha((mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3)
+					local a = (mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3
+					frame.texture:SetAlpha(a)
+					frame.border:SetAlpha(a)
 					-- frame:SetAlpha((math.sin(t*4/3*math.pi)+1)/2*0.7+0.3)
 				else
-					frame:SetAlpha(1)
+					frame.texture:SetAlpha(1)
+					frame.border:SetAlpha(1)
 				end
 
 				timeleft = ceil(timeleft)
@@ -268,7 +280,7 @@ function m.method:Update()
 		end
 	end
 
-	while i <= 10 do
+	while i <= getn(self.frame.iconFrames) do
 		self.frame.iconFrames[i]:Hide()
 		i = i + 1
 	end	
