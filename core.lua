@@ -56,7 +56,7 @@ function private.SlashHandler(str)
 	elseif parameters[2] == 'SIZE' then
 		frame.settings.size = min(20, max(1, tonumber(parameters[3]) or 10))
 	elseif parameters[2] == 'SCALE' then
-		frame.settings.scale = min(2, max(0.8, tonumber(parameters[3]) or 1))
+		frame.settings.scale = min(2, max(0.5, tonumber(parameters[3]) or 1))
 	elseif parameters[2] == 'CLICK' then
 		frame.settings.clickThrough = not frame.settings.clickThrough
 	elseif parameters[2] == 'IGNORE' then
