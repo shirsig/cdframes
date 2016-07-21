@@ -105,7 +105,7 @@ function m.method:IconFrame(parent)
 	frame.count:SetJustifyH('CENTER')
 	frame.count:SetWidth(38)
 	frame.count:SetHeight(12)
-	frame.count:SetPoint('CENTER', 0, -1)
+	frame.count:SetPoint('CENTER', 0, 0)
 
 	return frame
 end
