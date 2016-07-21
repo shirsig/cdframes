@@ -32,6 +32,15 @@ function public.Frame(key, title, color)
 	return self
 end
 
+do
+	local x = 0
+
+	function private.ID()
+		x = x + 1
+		return 'CDFrames_Frame'..x
+	end
+end
+
 private.method = {}
 
 function m.method:LoadSettings()
@@ -86,7 +95,7 @@ function m.method:CreateFrames()
 end
 
 function m.method:IconFrame(parent)
-	local frame = CreateFrame('CheckButton', CDFrames.ID(), parent, 'ActionButtonTemplate')
+	local frame = CreateFrame('CheckButton', m.ID(), parent, 'ActionButtonTemplate')
 	frame:RegisterForClicks()
 	frame:SetScript('OnEnter', function()
 		self:CDTooltip()
@@ -133,29 +142,34 @@ function m.method:PlaceFrames()
 
 	local orientation = self.settings.orientation
 
-	if CDFrames.Contains('U,D', orientation) then
+	if CDFrames.In('U,D', orientation) then
 		self.frame:SetWidth(40)
 		self.frame:SetHeight(self.settings.size*40)
-	elseif CDFrames.Contains('L,R', orientation) then
+	elseif CDFrames.In('L,R', orientation) then
 		self.frame:SetWidth(self.settings.size*40)
 		self.frame:SetHeight(40)
 	end
-
-	self.frame:ClearAllPoints()
-	self.frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', unpack(self.settings.position))
-
+	
 	for i, frame in self.frame.iconFrames do
 		frame:ClearAllPoints()
 		local offset = 2+(i-1)*(40)
 		if orientation == 'U' then
-			frame:SetPoint('BOTTOM', self.frame, 'BOTTOM', 0, offset-3)
+			frame:SetPoint('BOTTOM', self.frame, 'BOTTOM', 0, offset)
 		elseif orientation == 'D' then
-			frame:SetPoint('TOP', self.frame, 'TOP', 0, 3-offset)
+			frame:SetPoint('TOP', self.frame, 'TOP', 0, -offset)
 		elseif orientation == 'L' then
 			frame:SetPoint('RIGHT', self.frame, 'RIGHT', -offset, 0)
 		elseif orientation == 'R' then
 			frame:SetPoint('LEFT', self.frame, 'LEFT', offset, 0)
 		end
+	end
+
+	local x, y = unpack(self.settings.position)
+	self.frame:ClearAllPoints()
+	if CDFrames.In('U,R', orientation) then
+		self.frame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', x - 20, y - 20)
+	elseif CDFrames.In('D,L', orientation) then
+		self.frame:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x + 20, y + 20)
 	end
 end
 
@@ -222,11 +236,15 @@ end
 
 function m.method:OnDragStop()
 	self.frame:StopMovingOrSizing()
-	self.settings.position = { self.frame:GetCenter() }
+	if CDFrames.In('U,R', self.settings.orientation) then
+		self.settings.position = { self.frame:GetLeft() + 20, self.frame:GetBottom() + 20 }
+	elseif CDFrames.In('D,L', self.settings.orientation) then
+		self.settings.position = { self.frame:GetRight() - 20, self.frame:GetTop() - 20 }
+	end
 end
 
 function m.method:Ignored(name)
-	return CDFrames.Contains(strupper(self.settings.ignoreList), strupper(name))
+	return CDFrames.In(strupper(self.settings.ignoreList), strupper(name))
 end
 
 function m.method:CDID(CD)

@@ -20,7 +20,7 @@ do
 	end
 end
 
-function public.Contains(list, str)
+function public.In(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then
 			return true

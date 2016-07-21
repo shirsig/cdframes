@@ -267,7 +267,7 @@ end
 function private.OnCombatLogEvent()
 	for skill in string.gfind(arg1, 'You are afflicted by (.+) %-') do
 		for _, enemy in m.targeted_enemies do
-			if SKILLS[skill] and not m.CD(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.Contains(SKILLS[skill].classes, enemy.class)) then
+			if SKILLS[skill] and not m.CD(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.In(SKILLS[skill].classes, enemy.class)) then
 				m.StartCD(enemy.name, skill, GetTime())
 				break
 			end
@@ -367,7 +367,7 @@ function CDFrames.events.PLAYER_TARGET_CHANGED()
 
 	for key, CD in m.CDs() do
 		if UnitName('target') == CD.player then
-			if SKILLS[CD.skill].classes and not CDFrames.Contains(SKILLS[CD.skill].classes, UnitClass('target')) then
+			if SKILLS[CD.skill].classes and not CDFrames.In(SKILLS[CD.skill].classes, UnitClass('target')) then
 				m.StopCDs(CD.player, CD.skill)
 			else
 				m.ShowCD(key)
