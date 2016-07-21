@@ -114,7 +114,6 @@ function m.method:IconFrame(parent)
 	frame.count:SetJustifyH('CENTER')
 	frame.count:SetWidth(38)
 	frame.count:SetHeight(12)
-	frame.count:SetPoint('CENTER', 0, 0)
 
 	return frame
 end
@@ -181,6 +180,7 @@ function m.method:Lock()
 		frame.texture:SetBlendMode('BLEND')
 		frame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
 		frame.count:SetShadowOffset(0, 0)
+		frame.count:SetPoint('CENTER', 0, 0)
 		frame:Hide()
 	end
 end
@@ -201,6 +201,7 @@ function m.method:Unlock()
 			frame.count:SetShadowOffset(1, -1)
 			frame.count:SetTextColor(1, 1, 1)
 			frame.count:SetText(i)
+			frame.count:SetPoint('CENTER', -1, 0)
 			frame:Show()
 		end
 	end
