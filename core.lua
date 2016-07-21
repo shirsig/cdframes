@@ -11,15 +11,6 @@ public.events = CreateFrame('Frame')
 m.events:SetScript('OnEvent', function() this[event]() end)
 m.events:RegisterEvent('ADDON_LOADED')
 
-do
-	local x = 0
-
-	function public.ID()
-		x = x + 1
-		return 'CDFrames_Frame'..x
-	end
-end
-
 function public.In(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then
