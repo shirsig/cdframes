@@ -9,7 +9,7 @@ function CDFrames.events.SPELL_UPDATE_COOLDOWN()
 end
 
 function public.Setup()
-	public.frame = CDFrames.frame.Frame('PLAYER', 'Player Cooldowns', {GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b})
+	public.frame = CDFrames.frame.Frame('PLAYER', 'Player Cooldowns', {0.2, 0.8, 0.2, 0.8})
 
 	CDFrames.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	CDFrames.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
