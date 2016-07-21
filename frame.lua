@@ -103,7 +103,7 @@ function m.method:IconFrame(parent)
 	frame.count = frame:CreateFontString()
 	frame.count:SetFont([[Fonts\ARIALN.TTF]], 16, 'THICKOUTLINE')
 	frame.count:SetJustifyH('CENTER')
-	frame.count:SetWidth(36)
+	frame.count:SetWidth(38)
 	frame.count:SetHeight(12)
 	frame.count:SetPoint('CENTER', 0, -1)
 
