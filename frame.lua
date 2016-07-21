@@ -96,6 +96,7 @@ end
 
 function m.method:IconFrame(parent)
 	local frame = CreateFrame('CheckButton', m.ID(), parent, 'ActionButtonTemplate')
+	frame:SetHighlightTexture(nil)
 	frame:RegisterForClicks()
 	frame:SetScript('OnEnter', function()
 		self:CDTooltip()
