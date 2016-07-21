@@ -138,7 +138,7 @@ function m.method:Initialize()
 end
 
 function m.method:PlaceFrames()
-	self.frame:SetScale(self.settings.scale)
+	self.frame:SetScale(self.settings.scale * 0.85)
 
 	local orientation = self.settings.orientation
 
