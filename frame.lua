@@ -179,7 +179,8 @@ function m.method:Lock()
 		frame:EnableMouse(not self.settings.clickThrough)
 		frame.border:SetVertexColor(1, 1, 1)
 		frame.texture:SetBlendMode('BLEND')
-		frame.count:SetFont([[Fonts\ARIALN.TTF]], 16, 'THICKOUTLINE')
+		frame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
+		frame.count:SetShadowOffset(0, 0)
 		frame:Hide()
 	end
 end
@@ -195,10 +196,12 @@ function m.method:Unlock()
 			frame.border:SetAlpha(1)
 			frame.texture:SetTexture(unpack(self.color))
 			frame.border:SetVertexColor(unpack(self.color))
-			frame.texture:SetBlendMode('ADD')
-			frame.count:SetFont([[Fonts\FRIZQT__.ttf]], 16, 'OUTLINE')
-			frame.count:SetTextColor(1, 1, 1)
 			frame.count:SetText(i)
+
+			frame.texture:SetBlendMode('ADD')
+			frame.count:SetFont([[Fonts\FRIZQT__.ttf]], 16)
+			frame.count:SetShadowOffset(1, -1)
+			frame.count:SetTextColor(1, 1, 1)
 			frame:Show()
 		end
 	end
