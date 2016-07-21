@@ -196,12 +196,11 @@ function m.method:Unlock()
 			frame.border:SetAlpha(1)
 			frame.texture:SetTexture(unpack(self.color))
 			frame.border:SetVertexColor(unpack(self.color))
-			frame.count:SetText(i)
-
 			frame.texture:SetBlendMode('ADD')
 			frame.count:SetFont([[Fonts\FRIZQT__.ttf]], 16)
 			frame.count:SetShadowOffset(1, -1)
 			frame.count:SetTextColor(1, 1, 1)
+			frame.count:SetText(i)
 			frame:Show()
 		end
 	end
