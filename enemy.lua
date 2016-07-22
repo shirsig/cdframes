@@ -252,6 +252,11 @@ local COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
+local COMBAT_LOG_PATTERNS_PARTIAL = {
+	"You are afflicted by (.+)%.",
+	"You are afflicted by (.+) %-",
+}
+
 function public.Setup()
 	public.frame = CDFrames.frame.Frame('ENEMY', 'Enemy Cooldowns', {0.8, 0.2, 0.2, 0.8})
 
@@ -265,11 +270,13 @@ function public.Setup()
 end
 
 function private.OnCombatLogEvent()
-	for skill in string.gfind(arg1, 'You are afflicted by (.+) %-') do
-		for _, enemy in m.targeted_enemies do
-			if SKILLS[skill] and not m.CD(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.In(SKILLS[skill].classes, enemy.class)) then
-				m.StartCD(enemy.name, skill, GetTime())
-				break
+	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
+		for skill in string.gfind(arg1, pattern) do
+			for _, enemy in m.targeted_enemies do
+				if SKILLS[skill] and not m.CD(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.In(SKILLS[skill].classes, enemy.class)) then
+					m.StartCD(enemy.name, skill, GetTime())
+					break
+				end
 			end
 		end
 	end
