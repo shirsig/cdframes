@@ -210,8 +210,9 @@ end
 function m.method:ButtonTooltip()
 	GameTooltip_SetDefaultAnchor(GameTooltip, this)
 	GameTooltip:AddLine(self.title)
-	GameTooltip:AddLine('Left-click/drag to position', .8, .8, .8)
-	GameTooltip:AddLine('Right-click to lock', .8, .8, .8)
+	GameTooltip:AddLine('<Left Drag> move', 1, 1, 1)
+	GameTooltip:AddLine('<Left Click> rotate', 1, 1, 1)
+	GameTooltip:AddLine('<Right Click> lock', 1, 1, 1)
 	GameTooltip:Show()
 end
 
