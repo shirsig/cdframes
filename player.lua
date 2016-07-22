@@ -22,10 +22,16 @@ do
 	active = {}
 
 	function private.StartCD(name, texture, started, duration)
-		if active[name] then
-			m.frame:CancelCD(active[name])
+		if active[started] then
+			m.frame:CancelCD(active[started])
 		end
-		active[name] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
+		active[started] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
+	end
+
+	function private.StopCD(started)
+		if active[started] then
+			m.frame:CancelCD(active[started])
+		end
 	end
 end
 
@@ -42,13 +48,15 @@ function private.DetectItemCooldowns()
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
 				if enabled == 1 then
 					local name = m.LinkName(GetContainerItemLink(bag, slot))
-					if duration == 0 or duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
+					if duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
 						m.StartCD(
 							name,
 							GetContainerItemInfo(bag, slot),
 							started,
 							duration
 						)
+					elseif duration == 0 then
+						m.StopCD(started)
 					end
 				end
             end
@@ -58,13 +66,15 @@ function private.DetectItemCooldowns()
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
 			local name = m.LinkName(GetInventoryItemLink('player', slot))
-			if duration == 0 or duration > 3 and duration <= 1800 then
+			if duration > 3 and duration <= 1800 then
 				m.StartCD(
 					name,
 					GetInventoryItemTexture('player', slot),
 					started,
 					duration
 				)
+			elseif duration == 0 then
+				m.StopCD(started)
 			end
 		end
 	end
@@ -76,13 +86,15 @@ function private.DetectSpellCooldowns()
 	for id=1,totalSpells do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
-		if duration == 0 or enabled == 1 and duration > 2.5 then
+		if enabled == 1 and duration > 2.5 then
 			m.StartCD(
 				name,
 				GetSpellTexture(id, BOOKTYPE_SPELL),
 				started,
 				duration
 			)
+		elseif duration == 0 then
+			m.StopCD(started)
 		end
 	end
 end
