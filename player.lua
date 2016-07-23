@@ -22,15 +22,15 @@ do
 	active = {}
 
 	function private.StartCD(name, texture, started, duration)
-		if active[started] then
-			m.frame:CancelCD(active[started])
+		if active[name] then
+			m.frame:CancelCD(active[name])
 		end
-		active[started] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
+		active[name] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
 	end
 
-	function private.StopCD(started)
-		if active[started] then
-			m.frame:CancelCD(active[started])
+	function private.StopCD(name)
+		if active[name] then
+			m.frame:CancelCD(active[name])
 		end
 	end
 end
@@ -94,7 +94,7 @@ function private.DetectSpellCooldowns()
 				duration
 			)
 		elseif duration == 0 then
-			m.StopCD(started)
+			m.StopCD(name)
 		end
 	end
 end
