@@ -31,6 +31,17 @@ function m.events.ADDON_LOADED()
 	m.enemy.Setup()
 end
 
+function private.parseNumber(arg)
+	local number = tonumber(arg.input) or arg.default
+	if arg.min then
+		number = max(arg.min, number)
+	end
+	if arg.max then
+		number = min(arg.max, number)
+	end
+	return arg.integer and floor(number+0.5) or number
+end
+
 function private.SlashHandler(str)
 	str = strupper(str)
 	local parameters = m.Tokenize(str)
@@ -56,11 +67,13 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = min(20, max(1, tonumber(parameters[2]) or 10))
+			frame.settings.size = {m.parseNumber{input=parameters[2], min=1, max=20, default=10, integer=true}, m.parseNumber{input=parameters[3], min=1, max=20, default=1, integer=true}}
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = min(2, max(0.5, tonumber(parameters[2]) or 1))
+			frame.settings.scale = m.parseNumber{input=parameters[2], min=0.5, max=2, default=1}
 		elseif parameters[1] == 'CLICK' then
 			frame.settings.clickThrough = not frame.settings.clickThrough
+		elseif parameters[1] == 'BLINK' then
+			frame.settings.blink = m.parseNumber{input=parameters[2], min=0, default=10, integer=true}
 		elseif parameters[1] == 'IGNORE' then
 			local _, _, ignoreList = strfind(str, '^%s*'..frame.key..'%s+IGNORE%s+(.-)%s*$')
 			frame.settings.ignoreList = ignoreList or ''

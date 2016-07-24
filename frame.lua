@@ -2,16 +2,18 @@ local m, public, private = CDFrames.module'frame'
 
 CDFrames_Settings = {}
 
-local ORIENTATIONS = {'R', 'D', 'L', 'U'}
+local BASE_SCALE = 0.85
+local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 local DEFAULT_SETTINGS = {
 	active = true,
 	locked = false,
-	position = {UIParent:GetWidth()/2, UIParent:GetHeight()/2},
-	orientation = 'R',
-	size = 10,
+	position = {UIParent:GetWidth()/2/BASE_SCALE, UIParent:GetHeight()/2/BASE_SCALE},
 	scale = 1,
+	size = {5, 3},
+	orientation = 'RU',
 	ignoreList = '',
+	blink = 10,
 	clickThrough = false,
 }
 
@@ -25,6 +27,7 @@ function public.Frame(key, title, color)
 	self.title = title
 	self.color = color
 	self.CDs = {}
+	self.iconFramePool = {}
 
 	self:LoadSettings()
 	self:Initialize()
@@ -75,7 +78,7 @@ function m.method:CreateFrames()
 			self:OnClick()
 		end)
 		frame:SetScript('OnEnter', function()
-			self:ButtonTooltip()
+			self:Tooltip()
 		end)
 		frame:SetScript('OnLeave', function()
 			GameTooltip:Hide()
@@ -89,13 +92,24 @@ function m.method:CreateFrames()
 		self.frame = frame
 	end
 
-	for i=getn(self.frame.iconFrames)+1,self.settings.size do
-		tinsert(self.frame.iconFrames, self:IconFrame(self.frame))
+	local count = self.settings.size[1]*self.settings.size[2]
+
+	while getn(self.frame.iconFrames) > count do
+		local frame = tremove(self.frame.iconFrames)
+		frame:Hide()
+		tinsert(self.iconFramePool, frame)
+	end
+	for i=getn(self.frame.iconFrames)+1,count do
+		tinsert(self.frame.iconFrames, self:IconFrame())
 	end
 end
 
-function m.method:IconFrame(parent)
-	local frame = CreateFrame('CheckButton', m.ID(), parent, 'ActionButtonTemplate')
+function m.method:IconFrame()
+	if getn(self.iconFramePool) > 0 then
+		return tremove(self.iconFramePool)
+	end
+
+	local frame = CreateFrame('CheckButton', m.ID(), self.frame, 'ActionButtonTemplate')
 	frame:SetHighlightTexture(nil)
 	frame:RegisterForClicks()
 	frame:SetScript('OnEnter', function()
@@ -137,38 +151,53 @@ function m.method:Initialize()
 end
 
 function m.method:PlaceFrames()
-	self.frame:SetScale(self.settings.scale * 0.85)
+	self.frame:SetScale(self.settings.scale * BASE_SCALE)
 
 	local orientation = self.settings.orientation
+	local primarySize, secondarySize = unpack(self.settings.size)
 
-	if CDFrames.In('U,D', orientation) then
-		self.frame:SetWidth(40)
-		self.frame:SetHeight(self.settings.size*40)
-	elseif CDFrames.In('L,R', orientation) then
-		self.frame:SetWidth(self.settings.size*40)
-		self.frame:SetHeight(40)
+	if CDFrames.In('UL,UR,DL,DR', orientation) then
+		self.frame:SetWidth(secondarySize*40)
+		self.frame:SetHeight(primarySize*40)
+	elseif CDFrames.In('LU,LD,RU,RD', orientation) then
+		self.frame:SetWidth(primarySize*40)
+		self.frame:SetHeight(secondarySize*40)
 	end
 	
 	for i, frame in self.frame.iconFrames do
 		frame:ClearAllPoints()
-		local offset = 2+(i-1)*(40)
-		if orientation == 'U' then
-			frame:SetPoint('BOTTOM', self.frame, 'BOTTOM', 0, offset)
-		elseif orientation == 'D' then
-			frame:SetPoint('TOP', self.frame, 'TOP', 0, -offset)
-		elseif orientation == 'L' then
-			frame:SetPoint('RIGHT', self.frame, 'RIGHT', -offset, 0)
-		elseif orientation == 'R' then
-			frame:SetPoint('LEFT', self.frame, 'LEFT', offset, 0)
+		local primaryOffset = 2+mod(i-1, primarySize)*40
+		local secondaryOffset = 2+floor((i-1)/primarySize)*40
+
+		if orientation == 'UL' then
+			frame:SetPoint('BOTTOMRIGHT', -secondaryOffset, primaryOffset)
+		elseif orientation == 'UR' then
+			frame:SetPoint('BOTTOMLEFT', secondaryOffset, primaryOffset)
+		elseif orientation == 'DL' then
+			frame:SetPoint('TOPRIGHT', -secondaryOffset, -primaryOffset)
+		elseif orientation == 'DR' then
+			frame:SetPoint('TOPLEFT', secondaryOffset, -primaryOffset)
+		elseif orientation == 'LU' then
+			frame:SetPoint('BOTTOMRIGHT', -primaryOffset, secondaryOffset)
+		elseif orientation == 'LD' then
+			frame:SetPoint('TOPRIGHT', -primaryOffset, -secondaryOffset)
+		elseif orientation == 'RU' then
+			frame:SetPoint('BOTTOMLEFT', primaryOffset, secondaryOffset)
+		elseif orientation == 'RD' then
+			frame:SetPoint('TOPLEFT', primaryOffset, -secondaryOffset)
 		end
 	end
 
 	local x, y = unpack(self.settings.position)
 	self.frame:ClearAllPoints()
-	if CDFrames.In('U,R', orientation) then
-		self.frame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', x - 20, y - 20)
-	elseif CDFrames.In('D,L', orientation) then
-		self.frame:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x + 20, y + 20)
+	if CDFrames.In('UR,RU', orientation) then
+		self.frame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', x-20, y-20)
+	elseif CDFrames.In('UL,LU', orientation) then
+		self.frame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMLEFT', x+20, y-20)
+	elseif CDFrames.In('DR,RD', orientation) then
+		self.frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x-20, y+20)
+	elseif CDFrames.In('DL,LD', orientation) then
+		self.frame:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x+20, y+20)
 	end
 end
 
@@ -188,30 +217,26 @@ end
 function m.method:Unlock()
 	self.frame:EnableMouse(true)
 	for i, frame in self.frame.iconFrames do
-		if i > self.settings.size then
-			frame:Hide()
-		else
-			frame:EnableMouse(false)
-			frame.texture:SetAlpha(1)
-			frame.border:SetAlpha(1)
-			frame.texture:SetTexture(unpack(self.color))
-			frame.border:SetVertexColor(unpack(self.color))
-			frame.texture:SetBlendMode('ADD')
-			frame.count:SetFont([[Fonts\FRIZQT__.ttf]], 16)
-			frame.count:SetShadowOffset(1, -1)
-			frame.count:SetTextColor(1, 1, 1)
-			frame.count:SetText(i)
-			frame.count:SetPoint('CENTER', -1, 0)
-			frame:Show()
-		end
+		frame:EnableMouse(false)
+		frame.texture:SetAlpha(1)
+		frame.border:SetAlpha(1)
+		frame.texture:SetTexture(unpack(self.color))
+		frame.border:SetVertexColor(unpack(self.color))
+		frame.texture:SetBlendMode('ADD')
+		frame.count:SetFont([[Fonts\FRIZQT__.ttf]], 16)
+		frame.count:SetShadowOffset(1, -1)
+		frame.count:SetTextColor(1, 1, 1)
+		frame.count:SetText(i)
+		frame.count:SetPoint('CENTER', -1, 0)
+		frame:Show()
 	end
 end
 
-function m.method:ButtonTooltip()
+function m.method:Tooltip()
 	GameTooltip_SetDefaultAnchor(GameTooltip, this)
 	GameTooltip:AddLine(self.title)
 	GameTooltip:AddLine('<Left Drag> move', 1, 1, 1)
-	GameTooltip:AddLine('<Left Click> rotate', 1, 1, 1)
+	GameTooltip:AddLine('<Left Click> change orientation', 1, 1, 1)
 	GameTooltip:AddLine('<Right Click> lock', 1, 1, 1)
 	GameTooltip:Show()
 end
@@ -227,7 +252,7 @@ function m.method:OnClick()
 	if arg1 == 'LeftButton' then
 		for i, orientation in ORIENTATIONS do
 			if orientation == self.settings.orientation then
-				self.settings.orientation = ORIENTATIONS[mod(i,4)+1]
+				self.settings.orientation = ORIENTATIONS[mod(i,getn(ORIENTATIONS))+1]
 				break
 			end
 		end
@@ -244,11 +269,7 @@ end
 
 function m.method:OnDragStop()
 	self.frame:StopMovingOrSizing()
-	if CDFrames.In('U,R', self.settings.orientation) then
-		self.settings.position = { self.frame:GetLeft() + 20, self.frame:GetBottom() + 20 }
-	elseif CDFrames.In('D,L', self.settings.orientation) then
-		self.settings.position = { self.frame:GetRight() - 20, self.frame:GetTop() - 20 }
-	end
+	self.settings.position = {self.frame.iconFrames[1]:GetCenter()}
 end
 
 function m.method:Ignored(name)
@@ -267,14 +288,14 @@ function m.method:Update()
 	for _, CD in self.CDs do
 		tinsert(CDList, CD)
 	end
-	sort(CDList, function(a, b) local ta, tb = a.expiration - t, b.expiration - t return ta < tb or tb == ta and a.name < b.name end)
+	sort(CDList, function(a, b) local ta, tb = a.expiration-t, b.expiration-t return ta < tb or tb == ta and a.name < b.name end)
 	for _, CD in CDList do
-		local timeleft = CD.expiration - t
+		local timeleft = CD.expiration-t
 
 		if timeleft > 0 then
-			if i <= self.settings.size and not self:Ignored(CD.name) then
+			if i <= getn(self.frame.iconFrames) and not self:Ignored(CD.name) then
 				local frame = self.frame.iconFrames[i]
-				if timeleft <= 10 then
+				if timeleft <= self.settings.blink then
 					local x = t*4/3
 					local a = (mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3
 					frame.texture:SetAlpha(a)
@@ -299,7 +320,7 @@ function m.method:Update()
 
 				frame.tooltip = {CD.name, CD.info}
 
-				i = i + 1
+				i = i+1
 			end
 		else
 			self.CDs[self:CDID(CD)] = nil
@@ -308,7 +329,7 @@ function m.method:Update()
 
 	while i <= getn(self.frame.iconFrames) do
 		self.frame.iconFrames[i]:Hide()
-		i = i + 1
+		i = i+1
 	end	
 end
 
