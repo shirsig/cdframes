@@ -96,7 +96,7 @@ local SKILLS = {
 	["Presence of Mind"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_EnchantArmor", classes = 'Mage'},
 	["Arcane Power"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_Lightning", classes = 'Mage'},
 	["Combustion"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire", classes = 'Mage'},
-	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", classes = 'Mage', trigger = function(player) m.StopCDs(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova') end},
+	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", classes = 'Mage'},
 	["Ice Block"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_Frost", classes = 'Mage'},
 
 	-- Rogue
@@ -113,7 +113,7 @@ local SKILLS = {
 
 	["Blade Flurry"] = {cooldown = 2*60, desc = "Increases your attack speed by 20%. In addition, attacks strike an additional nearby opponent. Lasts 15 sec.", icon = "Ability_Warrior_PunishingBlow", classes = 'Rogue'},
 	["Adrenaline Rush"] = {cooldown = 6*60, desc = "Increases your Energy regeneration rate by 100% for 15 sec.", icon = "Spell_Shadow_ShadowWordDominate", classes = 'Rogue'},
-	["Preparation"] = {cooldown = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", classes = 'Rogue', trigger = function(player) m.StopCDs(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood') end},
+	["Preparation"] = {cooldown = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", classes = 'Rogue'},
 	["Ghostly Strike"] = {cooldown = 20, desc = "A strike that deals 125% of weapon damage and increases your chance to dodge by 15% for 7 sec. Awards 1 combo points.", icon = "Spell_Shadow_Curse", classes = 'Rogue'},
 	["Premeditation"] = {cooldown = 60, desc = "When used, adds two combo points to your target. You must add to or use those combo points within 10 sec or the combo points are lost.", icon = "Spell_Shadow_Possession", classes = 'Rogue'},
 	["Cold Blood"] = {cooldown = 3*60, desc = "When activated, increases the critical strike chance of your next Sinister Strike, Backstab, Ambush, or Eviscerate by 100%.", icon = "Spell_Ice_Lament", classes = 'Rogue'},
@@ -334,11 +334,16 @@ function private.HideCD(key)
 	end
 end
 
-function private.StartCD(player, skill, started)
-	local trigger = SKILLS[skill].trigger
-	if trigger then
-		trigger(player)
+function private.triggers(player, skill)
+	if skill == 'Preparation' then
+		m.StopCDs(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
+	elseif skill == 'Cold Snap' then
+		m.StopCDs(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova')
 	end
+end
+
+function private.StartCD(player, skill, started)
+	m.triggers(player, skill)
 
 	local key = m.Key(player, skill)
 	if m.active[key] then
