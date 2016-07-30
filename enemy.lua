@@ -71,10 +71,10 @@ local SKILLS = {
 	["Hammer of Justice"] = {cooldown = 60, desc = "Stuns the target for 6 sec.", icon = "Spell_Holy_SealOfMight", classes = 'Paladin'},
 	["Judgement"] = {cooldown = 10, desc = "Unleashes the energy of a Seal spell upon an enemy. Refer to individual Seals for Judgement effect.", icon = "Spell_Holy_RighteousFury", classes = 'Paladin'},
 
-	["Divine Favor"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Holy_Heal", classes = 'Paladin'},
-	["Holy Shock"] = {cooldown = 30, desc = "Unknown!", icon = "Spell_Holy_SearingLight", classes = 'Paladin'},
-	["Holy Shield"] = {cooldown = 10, desc = "Unknown!", icon = "Spell_Holy_BlessingOfProtection", classes = 'Paladin'},
-	["Repentance"] = {cooldown = 60, desc = "Unknown!", icon = "Spell_Holy_PrayerOfHealing", classes = 'Paladin'},
+	["Divine Favor"] = {cooldown = 2*60, desc = "When activated, gives your next Flash of Light, Holy Light, or Holy Shock spell a 100% critical effect chance.", icon = "Spell_Holy_Heal", classes = 'Paladin'},
+	["Holy Shock"] = {cooldown = 30, desc = "Blasts the target with Holy energy, causing 365 to 396 Holy damage to an enemy, or 365 to 396 healing to an ally.", icon = "Spell_Holy_SearingLight", classes = 'Paladin'},
+	["Holy Shield"] = {cooldown = 10, desc = "Increases chance to block by 30% for 10 sec, and deals 130 Holy damage for each attack blocked while active. Damage caused by Holy Shield causes 20% additional threat. Each block expends a charge. 4 charges.", icon = "Spell_Holy_BlessingOfProtection", classes = 'Paladin'},
+	["Repentance"] = {cooldown = 60, desc = "Puts the enemy target in a state of meditation, incapacitating them for up to 6 sec. Any damage caused will awaken the target. Only works against Humanoids.", icon = "Spell_Holy_PrayerOfHealing", classes = 'Paladin'},
 
 	-- Mage
 	["Blink"] = {cooldown = 15, desc = "Teleports the caster 20 yards forward, unless something is in the way. Also frees the caster from stuns and bonds.", icon = "Spell_Arcane_Blink", classes = 'Mage'},

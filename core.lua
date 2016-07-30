@@ -11,6 +11,18 @@ public.events = CreateFrame('Frame')
 m.events:SetScript('OnEvent', function() this[event]() end)
 m.events:RegisterEvent('ADDON_LOADED')
 
+
+function public.List(first, ...)
+	for i=1,arg.n do
+		first = first..','..arg[i]
+	end
+	return first or ''
+end
+
+function public.Iter(list)
+	return string.gfind(list, '[^,]+')
+end
+
 function public.In(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then
@@ -74,9 +86,29 @@ function private.SlashHandler(str)
 			frame.settings.clickThrough = not frame.settings.clickThrough
 		elseif parameters[1] == 'BLINK' then
 			frame.settings.blink = m.parseNumber{input=parameters[2], min=0, default=10, integer=true}
+		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
+			local _, _, list = strfind(str, '[^,]*ADD%s+(.-)%s*$')
+			local names = {}
+			for name in m.Iter(list) do
+				if not m.In(frame.settings.ignoreList, name) then
+					tinsert(names, name)
+				end
+			end
+			frame.settings.ignoreList = frame.settings.ignoreList == '' and m.List(unpack(names)) or frame.settings.ignoreList..','..m.List(unpack(names))
+		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
+			local _, _, list = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
+			local names = {}
+			for name in m.Iter(frame.settings.ignoreList) do
+				if not m.In(list, name) then
+					tinsert(names, name)
+				end
+			end
+			frame.settings.ignoreList = m.List(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			local _, _, ignoreList = strfind(str, '^%s*'..frame.key..'%s+IGNORE%s+(.-)%s*$')
-			frame.settings.ignoreList = ignoreList or ''
+			DEFAULT_CHAT_FRAME:AddMessage(frame.key..':', 1, 1, 0)
+			for name in m.Iter(frame.settings.ignoreList) do
+				DEFAULT_CHAT_FRAME:AddMessage(name, 1, 1, 0)
+			end
 		elseif parameters[1] == 'RESET' then
 			frame:Reset()
 		else
