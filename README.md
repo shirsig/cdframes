@@ -16,7 +16,9 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cdframes scale x** (**x** between 0.5 and 2, default 1)<br/>
 **/cdframes click** (toggles click-through behavior, default off)<br/>
 **/cdframes blink x** (starts blinking at **x** seconds, default 10, 0 to deactivate)<br/>
-**/cdframes ignore ignorelist** (**ignorelist** is a comma separated list of skill names to ignore, no spaces except within the name, case insensitive. example: **mortal strike,blink,shadow word: pain**)<br/>
+**/cdframes ignore add list** (**list** is a comma separated list of skill names to ignore, no spaces except within the name, case insensitive. example: **mortal strike,blink,shadow word: pain**)
+**/cdframes ignore remove list**
+**/cdframes ignore** (shows the current ignore lists)
 **/cdframes reset** (restores the defaults for all settings)<br/>
 
 If you use **player** or **enemy** as the first parameter the command will only be applied for that frame.
