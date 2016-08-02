@@ -9,7 +9,7 @@ function CDFrames.events.SPELL_UPDATE_COOLDOWN()
 end
 
 function public.Setup()
-	public.frame = CDFrames.frame.Frame('PLAYER', 'Player Cooldowns', {0.2, 0.8, 0.2, 0.8})
+	public.frame = CDFrames.frame.New('PLAYER', 'Player Cooldowns', {0.2, 0.8, 0.2, 0.8})
 
 	CDFrames.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	CDFrames.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
@@ -19,18 +19,18 @@ function public.Setup()
 end
 
 do
-	active = {}
+	activeCooldowns = {}
 
 	function private.StartCD(name, texture, started, duration)
-		if active[name] then
-			m.frame:CancelCD(active[name])
+		if activeCooldowns[name] then
+			m.frame:CancelCD(activeCooldowns[name])
 		end
-		active[name] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
+		activeCooldowns[name] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
 	end
 
 	function private.StopCD(name)
-		if active[name] then
-			m.frame:CancelCD(active[name])
+		if activeCooldowns[name] then
+			m.frame:CancelCD(activeCooldowns[name])
 		end
 	end
 end

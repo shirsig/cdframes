@@ -62,11 +62,14 @@ function private.SlashHandler(str)
 	if parameters[1] == m.player.frame.key then
 		frames = {m.player.frame}
 		tremove(parameters, 1)
-	elseif parameters[1] == m.enemy.frame.key then
-		frames = {m.enemy.frame}
+	elseif parameters[1] == m.enemy.targetFrame.key then
+		frames = {m.enemy.targetFrame}
+		tremove(parameters, 1)
+	elseif parameters[1] == m.enemy.targetTargetFrame.key then
+		frames = {m.enemy.targetTargetFrame}
 		tremove(parameters, 1)
 	else
-		frames = {m.player.frame, m.enemy.frame}
+		frames = {m.player.frame, m.enemy.targetFrame, m.enemy.targetTargetFrame}
 	end
 
 	for _, frame in frames do

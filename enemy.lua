@@ -258,22 +258,27 @@ local COMBAT_LOG_PATTERNS_PARTIAL = {
 }
 
 function public.Setup()
-	public.frame = CDFrames.frame.Frame('ENEMY', 'Enemy Cooldowns', {0.8, 0.2, 0.2, 0.8})
+	public.targetFrame = CDFrames.frame.New('TARGET', 'Target Cooldowns', {0.8, 0.2, 0.2, 0.8})
+	public.targetTargetFrame = CDFrames.frame.New('TARGETTARGET', 'Target Target Cooldowns', {0.2, 0.2, 0.8, 0.8})
 
+	private.events = CreateFrame('Frame')
+	m.events:SetScript('OnUpdate', m.UPDATE)
+	m.events:SetScript('OnEvent', function() m[event]() end)
 	for _, event in COMBAT_LOG_EVENTS do
-		CDFrames.events[event] = m.OnCombatLogEvent
-		CDFrames.events:RegisterEvent(event)
+		private[event] = m.OnCombatLogEvent
+		m.events:RegisterEvent(event)
 	end
-	CDFrames.events:RegisterEvent('PLAYER_TARGET_CHANGED')
+	m.events:RegisterEvent('PLAYER_TARGET_CHANGED')
+
 	private.targeted_enemies = {}
-	private.active = {}
+	private.activeCooldowns = {}
 end
 
 function private.OnCombatLogEvent()
 	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
 		for skill in string.gfind(arg1, pattern) do
 			for _, enemy in m.targeted_enemies do
-				if SKILLS[skill] and not m.CD(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.In(SKILLS[skill].classes, enemy.class)) then
+				if SKILLS[skill] and not m.cooldown(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.In(SKILLS[skill].classes, enemy.class)) then
 					m.StartCD(enemy.name, skill, GetTime())
 					break
 				end
@@ -294,43 +299,43 @@ function private.Key(player, skill)
 	return player..'|'..skill
 end
 
-function private.expired(CD)
-	return CD.started + SKILLS[CD.skill].cooldown <= GetTime()
+function private.expired(cooldown)
+	return cooldown.started + SKILLS[cooldown.skill].cooldown <= GetTime()
 end
 
-function private.CD(player, skill)
+function private.cooldown(player, skill)
 	local key = m.Key(player, skill)
-	if m.active[key] and m.expired(m.active[key]) then
-		m.active[key] = nil
+	if m.activeCooldowns[key] and m.expired(m.activeCooldowns[key]) then
+		m.activeCooldowns[key] = nil
 	end
-	return m.active[key]
+	return m.activeCooldowns[key]
 end
 
 function private.CDs()
-	local CDs = {}
-	for _, CD in m.active do
-		tinsert(CDs, CD)
+	local cooldowns = {}
+	for _, cooldown in m.activeCooldowns do
+		tinsert(cooldowns, cooldown)
 	end
-	for _, CD in CDs do
-		if m.expired(CD) then
-			m.active[m.Key(CD.player, CD.skill)] = nil
+	for _, cooldown in cooldowns do
+		if m.expired(cooldown) then
+			m.activeCooldowns[m.Key(cooldown.player, cooldown.skill)] = nil
 		end
 	end
-	return m.active
+	return m.activeCooldowns
 end
 
-function private.ShowCD(key)
-	local CD = m.active[key]
-	if not CD.ID then
-		CD.ID = m.frame:StartCD(CD.skill, SKILLS[CD.skill].desc, SKILLS[CD.skill].icon, CD.started + SKILLS[CD.skill].cooldown)
+function private.ShowCD(frame, key)
+	local cooldown = m.activeCooldowns[key]
+	if not cooldown[frame.key] then
+		cooldown[frame.key] = frame:StartCD(cooldown.skill, SKILLS[cooldown.skill].desc, SKILLS[cooldown.skill].icon, cooldown.started + SKILLS[cooldown.skill].cooldown)
 	end
 end
 
-function private.HideCD(key)
-	local CD = m.active[key]
-	if CD.ID then
-		m.frame:CancelCD(CD.ID)
-		CD.ID = nil
+function private.HideCD(frame, key)
+	local cooldown = m.activeCooldowns[key]
+	if cooldown[frame.key] then
+		frame:CancelCD(cooldown[frame.key])
+		cooldown[frame.key] = nil
 	end
 end
 
@@ -346,46 +351,69 @@ function private.StartCD(player, skill, started)
 	m.triggers(player, skill)
 
 	local key = m.Key(player, skill)
-	if m.active[key] then
-		m.HideCD(key)
+	if m.activeCooldowns[key] then
+		m.HideCD(m.targetFrame, key)
+		m.HideCD(m.targetTargetFrame, key)
 	end
-	m.active[key] = {
+	m.activeCooldowns[key] = {
 		skill = skill,
 		player = player,
 		started = started,
 	}
 	if player == UnitName('target') then
-		m.ShowCD(key)
+		m.ShowCD(m.targetFrame, key)
+	end
+	if player == UnitName('targettarget') then
+		m.ShowCD(m.targetTargetFrame, key)
 	end
 end
 
 function private.StopCDs(player, ...)
 	for i=1,arg.n do
 		local key = m.Key(player, arg[i])
-		if m.active[key] then
-			m.HideCD(key)
-			m.active[key] = nil
+		if m.activeCooldowns[key] then
+			m.HideCD(m.targetFrame, key)
+			m.HideCD(m.targetTargetFrame, key)
+			m.activeCooldowns[key] = nil
 		end
 	end
 end
 
-function CDFrames.events.PLAYER_TARGET_CHANGED()
+function private.UpdateFrame(frame, playerName, playerClass)
+	for key, cooldown in m.CDs() do
+		if playerName == cooldown.player then
+			if SKILLS[cooldown.skill].classes and not CDFrames.In(SKILLS[cooldown.skill].classes, playerClass) then
+				Aux.log('kek')
+				m.StopCDs(cooldown.player, cooldown.skill)
+			else
+				Aux.log(key)
+				m.ShowCD(frame, key)
+			end
+		else
+			m.HideCD(frame, key)
+		end
+	end
+end
+
+function private.PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
 		tinsert(m.targeted_enemies, 1, {name = UnitName('target'), class = UnitClass('target')})
 		if getn(m.targeted_enemies) > 100 then
 			tremove(m.targeted_enemies)
 		end
 	end
+	m.UpdateFrame(m.targetFrame, UnitName('target'), UnitClass('target'))
+end
 
-	for key, CD in m.CDs() do
-		if UnitName('target') == CD.player then
-			if SKILLS[CD.skill].classes and not CDFrames.In(SKILLS[CD.skill].classes, UnitClass('target')) then
-				m.StopCDs(CD.player, CD.skill)
-			else
-				m.ShowCD(key)
-			end
-		else
-			m.HideCD(key)
+do
+	local skip = 0
+	function private.UPDATE()
+		if skip > 0 then
+			skip = skip - 1
+			return
 		end
+		skip = 5
+
+		m.UpdateFrame(m.targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
 	end
 end

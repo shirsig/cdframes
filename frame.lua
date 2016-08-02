@@ -17,7 +17,7 @@ local DEFAULT_SETTINGS = {
 	clickThrough = false,
 }
 
-function public.Frame(key, title, color)
+function public.New(key, title, color)
 	local self = {}
 	for k, v in m.method do
 		self[k] = v
@@ -26,7 +26,7 @@ function public.Frame(key, title, color)
 	self.key = key
 	self.title = title
 	self.color = color
-	self.CDs = {}
+	self.cooldowns = {}
 	self.iconFramePool = {}
 
 	self:LoadSettings()
@@ -276,24 +276,24 @@ function m.method:Ignored(name)
 	return CDFrames.In(strupper(self.settings.ignoreList), strupper(name))
 end
 
-function m.method:CDID(CD)
-	return tostring(CD)
+function m.method:CDID(cooldown)
+	return tostring(cooldown)
 end
 
 function m.method:Update()
 	local t = GetTime()
 	local i = 1
 
-	local CDList = {}
-	for _, CD in self.CDs do
-		tinsert(CDList, CD)
+	local cooldownList = {}
+	for _, cooldown in self.cooldowns do
+		tinsert(cooldownList, cooldown)
 	end
-	sort(CDList, function(a, b) local ta, tb = a.expiration-t, b.expiration-t return ta < tb or tb == ta and a.name < b.name end)
-	for _, CD in CDList do
-		local timeleft = CD.expiration-t
+	sort(cooldownList, function(a, b) local ta, tb = a.expiration-t, b.expiration-t return ta < tb or tb == ta and a.name < b.name end)
+	for _, cooldown in cooldownList do
+		local timeleft = cooldown.expiration-t
 
 		if timeleft > 0 then
-			if i <= getn(self.frame.iconFrames) and not self:Ignored(CD.name) then
+			if i <= getn(self.frame.iconFrames) and not self:Ignored(cooldown.name) then
 				local frame = self.frame.iconFrames[i]
 				if timeleft <= self.settings.blink then
 					local x = t*4/3
@@ -314,16 +314,16 @@ function m.method:Update()
 					frame.count:SetTextColor(1, 1, 0)
 				end
 
-				frame.texture:SetTexture([[Interface\Icons\]]..CD.texture)
+				frame.texture:SetTexture([[Interface\Icons\]]..cooldown.texture)
 				frame.count:SetText(timeleft)
 				frame:Show()
 
-				frame.tooltip = {CD.name, CD.info}
+				frame.tooltip = {cooldown.name, cooldown.info}
 
 				i = i+1
 			end
 		else
-			self.CDs[self:CDID(CD)] = nil
+			self.cooldowns[self:CDID(cooldown)] = nil
 		end
 	end
 
@@ -334,16 +334,16 @@ function m.method:Update()
 end
 
 function m.method:StartCD(name, info, texture, expiration)
-	local CD = {
+	local cooldown = {
 		name = name,
 		info = info,
 		texture = texture,
 		expiration = expiration,
 	}
-	self.CDs[self:CDID(CD)] = CD
-	return self:CDID(CD)
+	self.cooldowns[self:CDID(cooldown)] = cooldown
+	return self:CDID(cooldown)
 end
 
 function m.method:CancelCD(CDID)
-	self.CDs[CDID] = nil
+	self.cooldowns[CDID] = nil
 end
