@@ -7,10 +7,9 @@ function public.module(name)
 	return unpack(module)
 end
 
-public.events = CreateFrame('Frame')
+private.events = CreateFrame('Frame')
 m.events:SetScript('OnEvent', function() this[event]() end)
 m.events:RegisterEvent('ADDON_LOADED')
-
 
 function public.List(first, ...)
 	for i=1,arg.n do
