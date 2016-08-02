@@ -1,18 +1,20 @@
 local m, public, private = CDFrames.module'player'
 
-function CDFrames.events.BAG_UPDATE_COOLDOWN()
+function private.BAG_UPDATE_COOLDOWN()
 	m.DetectItemCooldowns()
 end
 
-function CDFrames.events.SPELL_UPDATE_COOLDOWN()
+function private.SPELL_UPDATE_COOLDOWN()
 	m.DetectSpellCooldowns()
 end
 
 function public.Setup()
 	public.frame = CDFrames.frame.New('PLAYER', 'Player Cooldowns', {0.2, 0.8, 0.2, 0.8})
 
-	CDFrames.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
-	CDFrames.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+	private.events = CreateFrame('Frame')
+	m.events:SetScript('OnEvent', function() m[event]() end)
+	m.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
+	m.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 
 	m.DetectItemCooldowns()
 	m.DetectSpellCooldowns()
