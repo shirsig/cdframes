@@ -3,32 +3,32 @@ local m, public, private = CDFrames.module'enemy'
 local SKILLS = {
 
 	-- Trinkets & Racials
-	["Will of the Forsaken"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Shadow_RaiseDead"},
-	["Perception"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_Sleep"},
-	["War Stomp"] = {cooldown = 2*60, desc = "Unknown!", icon = "Ability_WarStomp"},
-	["Escape Artist"] = {cooldown = 60, desc = "Unknown!", icon = "Ability_Rogue_Trip"},
-	["Stoneform"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Shadow_UnholyStrength"},
+	["Will of the Forsaken"] = {cooldown = 2*60, desc = "Provides immunity to Charm, Fear and Sleep while active. May also be used while already afflicted by Charm, Fear or Sleep. Lasts 5 sec.", icon = "Spell_Shadow_RaiseDead"},
+	["Perception"] = {cooldown = 3*60, desc = "Dramatically increases stealth detection for 20 sec.", icon = "Spell_Nature_Sleep"},
+	["War Stomp"] = {cooldown = 2*60, desc = "Stuns up to 5 enemies within 8 yds for 2 sec.", icon = "Ability_WarStomp"},
+	["Escape Artist"] = {cooldown = 60, desc = "Escape the effects of any immobilization or movement speed reduction effect.", icon = "Ability_Rogue_Trip"},
+	["Stoneform"] = {cooldown = 3*60, desc = "While active, grants immunity to Bleed, Poison, and Disease effects. In addition, Armor increased by 10%. Lasts 8 sec.", icon = "Spell_Shadow_UnholyStrength"},
 
-	["Brittle Armor"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Shadow_GrimWard"},
-	["Unstable Power"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Lightning_LightningBolt01"},
-	["Restless Strength"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Shadow_GrimWard"},
-	["Ephemeral Power"] = {cooldown = 90, desc = "Unknown!", icon = "Spell_Holy_MindVision"},
-	["Massive Destruction"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Fire_WindsofWoe"},
-	["Arcane Potency"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Arcane_StarFire"},
-	["Energized Shield"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_CallStorm"},
-	["Brilliant Light"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Holy_MindVision"},
-	["Mar'li's Brain Boost"] = {cooldown = 3*60, desc = "Unknown!", icon = "INV_ZulGurubTrinket"},
-	["Gift of Life"] = {cooldown = 5*60, desc = "Unknown!", icon = "INV_Misc_Gem_Pearl_05"},
-	["Nature Aligned"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Nature_SpiritArmor"},
-	["Earthstrike"] = {cooldown = 2*60, desc = "Unknown!", icon = "Spell_Nature_AbolishMagic"},
+	["Brittle Armor"] = {cooldown = 2*60, desc = "Increases your armor by 2000 and defense skill by 30 for 20 sec. Every time you take melee or ranged damage, this bonus is reduced by 200 armor and 3 defense.", icon = "Spell_Shadow_GrimWard"},
+	["Unstable Power"] = {cooldown = 2*60, desc = "Increases your spell damage by up to 204 and your healing by up to 408 for 20 sec. Every time you cast a spell, the bonus is reduced by 17 spell damage and 34 healing.", icon = "Spell_Lightning_LightningBolt01"},
+	["Restless Strength"] = {cooldown = 2*60, desc = "Increases your melee and ranged damage by 40 for 20 sec. Every time you hit a target, this bonus is reduced by 2.", icon = "Spell_Shadow_GrimWard"},
+	["Ephemeral Power"] = {cooldown = 90, desc = "Increases damage and healing done by magical spells and effects by up to 175 for 15 sec.", icon = "Spell_Holy_MindVision"},
+	["Massive Destruction"] = {cooldown = 3*60, desc = "Increases the critical hit chance of your Destruction spells by 10% for 20 sec.", icon = "Spell_Fire_WindsofWoe"},
+	["Arcane Potency"] = {cooldown = 3*60, desc = "Increases the critical hit chance of your Arcane spells by 5%, and increases the critical hit damage of your Arcane spells by 50% for 20 sec.", icon = "Spell_Arcane_StarFire"},
+	["Energized Shield"] = {cooldown = 3*60, desc = "Increases the damage dealt by your Lightning Shield spell by 100% for 20 sec.", icon = "Spell_Nature_CallStorm"},
+	["Brilliant Light"] = {cooldown = 3*60, desc = "Increases the critical hit chance of Holy spells by 10% for 15 sec.", icon = "Spell_Holy_MindVision"},
+	["Mar'li's Brain Boost"] = {cooldown = 3*60, desc = "Restores 60 mana every 5 sec for 30 sec.", icon = "INV_ZulGurubTrinket"},
+	["Gift of Life"] = {cooldown = 5*60, desc = "Heals yourself for 15% of your maximum health, and increases your maximum health by 15% for 20 sec.", icon = "INV_Misc_Gem_Pearl_05"},
+	["Nature Aligned"] = {cooldown = 5*60, desc = "Aligns the Shaman with nature, increasing spell damage by 20%, improving heal effects by 20%, and increasing mana cost of spells by 20% for 20 sec.", icon = "Spell_Nature_SpiritArmor"},
+	["Earthstrike"] = {cooldown = 2*60, desc = "Increases your melee and ranged attack power by 280. Effect lasts for 20 sec.", icon = "Spell_Nature_AbolishMagic"},
+	["Tidal Charm"] = {cooldown = 15*60, desc = "Stuns target for 3 sec.", icon = "INV_Misc_Rune_01"},
+	["Aura of Protection"] = {cooldown = 30*60, desc = "Absorbs 750 to 1251 damage. Lasts 20 sec.", icon = "INV_Misc_ArmorKit_04"},
 
-	["Frost Recleftor"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_FrostWard"},
-	["Shadow Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Shadow_AntiShadow"},
-	["Fire Reflector"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire"},
-	["Tidal Charm"] = {cooldown = 15*60, desc = "Unknown!", icon = "INV_Misc_Rune_01"},
-	["Aura of Protection"] = {cooldown = 30*60, desc = "Unknown!", icon = "INV_Misc_ArmorKit_04"},
+	["Frost Reflector"] = {cooldown = 5*60, desc = "Reflects Frost spells back at their caster for 5 sec.", icon = "Spell_Frost_FrostWard"},
+	["Shadow Reflector"] = {cooldown = 5*60, desc = "Reflects Shadow spells back at their caster for 5 sec.", icon = "Spell_Shadow_AntiShadow"},
+	["Fire Reflector"] = {cooldown = 5*60, desc = "Reflects Fire spells back at their caster for 5 sec.", icon = "Spell_Fire_SealOfFire"},
 
-	["First Aid"] = {cooldown = 60, desc = "Unknown!", icon = "Spell_Holy_Heal"},
+	["First Aid"] = {cooldown = 60, desc = "Heals 2000 damage over 8 sec.", icon = "Spell_Holy_Heal"},
 
 	-- Warrior
 	["Charge"] = {cooldown = 15, desc = "Charge an enemy, generate 15 rage, and stun it for 1 sec. Cannot be used in combat.", icon = "Ability_Warrior_Charge", classes = 'Warrior'},
@@ -53,6 +53,7 @@ local SKILLS = {
 	["Shield Slam"] = {cooldown = 6, desc = "Slam the target with your shield, causing 342 to 358 damage, modified by your shield block value, and has a 50% chance of dispelling 1 magic effect on the target. Also causes a high amount of threat.", icon = "INV_Shield_05", classes = 'Warrior'},
 	["Shield Wall"] = {cooldown = 30*60, desc = "Reduces the damage taken from melee attacks, ranged attacks and spells by 75% for 10 sec.", icon = "Ability_Warrior_ShieldWall", classes = 'Warrior'},
 
+	["Sweeping Strikes"] = {cooldown = 30, desc = "Your next 5 melee attacks strike an additional nearby opponent.", icon = "Ability_Rogue_SliceDice", classes = 'Warrior'},
 	["Last Stand"] = {cooldown = 10*60, desc = "When activated, this ability temporarily grants you 30% of your maximum hit points for 20 seconds. After the effect expires, the hit points are lost.", icon = "Spell_Holy_AshesToAshes", classes = 'Warrior'},
 	["Death Wish"] = {cooldown = 3*60, desc = "When activated, increases your physical damage by 20% and makes you immune to Fear effects, but lowers your armor and all resistances by -20%. Lasts 30 sec.", icon = "Spell_Shadow_DeathPact", classes = 'Warrior'},
 
@@ -93,11 +94,11 @@ local SKILLS = {
 	["Ice Barrier"] = {cooldown = 30, desc = "Instantly shields you, absorbing 818 damage. Lasts 1 min. While the shield holds, spells will not be interrupted.", icon = "Spell_Ice_Lament", classes = 'Mage'},
 	["Counterspell"] = {cooldown = 30, desc = "Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 10 sec. Generates a high amount of threat.", icon = "Spell_Frost_IceShock", classes = 'Mage'},
 
-	["Presence of Mind"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_EnchantArmor", classes = 'Mage'},
-	["Arcane Power"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_Lightning", classes = 'Mage'},
-	["Combustion"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Fire_SealOfFire", classes = 'Mage'},
-	["Cold Snap"] = {cooldown = 10*60, desc = "Unknown!", icon = "Spell_Frost_WizardMark", classes = 'Mage'},
-	["Ice Block"] = {cooldown = 5*60, desc = "Unknown!", icon = "Spell_Frost_Frost", classes = 'Mage'},
+	["Presence of Mind"] = {cooldown = 3*60, desc = "When activated, your next Mage spell with a casting time less than 10 sec becomes an instant cast spell.", icon = "Spell_Nature_EnchantArmor", classes = 'Mage'},
+	["Arcane Power"] = {cooldown = 3*60, desc = "When activated, your spells deal 30% more damage while costing 30% more mana to cast. This effect lasts 15 sec.", icon = "Spell_Nature_Lightning", classes = 'Mage'},
+	["Combustion"] = {cooldown = 3*60, desc = "When activated, this spell causes each of your Fire damage spell hits to increase your critical strike chance with Fire damage spells by 10%. This effect lasts until you have caused 3 critical strikes with Fire spells.", icon = "Spell_Fire_SealOfFire", classes = 'Mage'},
+	["Cold Snap"] = {cooldown = 10*60, desc = "When activated, this spell finishes the cooldown on all of your Frost spells.", icon = "Spell_Frost_WizardMark", classes = 'Mage'},
+	["Ice Block"] = {cooldown = 5*60, desc = "You become encased in a block of ice, protecting you from all physical attacks and spells for 10 sec, but during that time you cannot attack, move or cast spells.", icon = "Spell_Frost_Frost", classes = 'Mage'},
 
 	-- Rogue
 	["Kidney Shot"] = {cooldown = 20, desc = "Finishing move that stuns the target. Lasts longer per combo point.", icon = "Ability_Rogue_KidneyShot", classes = 'Rogue'},
@@ -130,9 +131,9 @@ local SKILLS = {
 	["Grounding Totem"] = {cooldown = 15, desc = "Summons a Grounding Totem with 5 health at the feet of the caster that will redirect one harmful spell cast on a nearby party member to itself every 10 seconds. Will not redirect area of effect spells. Lasts 45 sec.", icon = "Spell_Nature_GroundingTotem", classes = 'Shaman'},
 	["Mana Tide Totem"] = {cooldown = 5*60, desc = "Summons a Mana Tide Totem with 5 health at the feet of the caster for 12 sec that restores 290 mana every 3 seconds to group members within 20 yards.", icon = "Spell_Frost_SummonWaterElemental", classes = 'Shaman'},
 
-	["Elemental Mastery"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_WispHeal", classes = 'Shaman'},
-	["Stormstrike"] = {cooldown = 20, desc = "Unknown!", icon = "Spell_Holy_SealOfMight", classes = 'Shaman'},
-	["Nature's Swiftness"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_RavenForm", classes = 'Shaman,Druid'},
+	["Elemental Mastery"] = {cooldown = 3*60, desc = "When activated, this spell gives your next Fire, Frost, or Nature damage spell a 100% critical strike chance and reduces the mana cost by 100%.", icon = "Spell_Nature_WispHeal", classes = 'Shaman'},
+	["Stormstrike"] = {cooldown = 20, desc = "Gives you an extra attack. In addition, the next 2 sources of Nature damage dealt to the target are increased by 20%. Lasts 12 sec.", icon = "Spell_Holy_SealOfMight", classes = 'Shaman'},
+	["Nature's Swiftness"] = {cooldown = 3*60, desc = "When activated, your next Nature spell with a casting time less than 10 sec. becomes an instant cast spell.", icon = "Spell_Nature_RavenForm", classes = 'Shaman,Druid'},
 
 	-- Hunter
 	["Scare Beast"] = {cooldown = 30, desc = "Scares a beast, causing it to run in fear for up to 20 sec. Damage caused may interrupt the effect. Only one beast can be feared at a time.", icon = "Ability_Druid_Cower", classes = 'Hunter'},
@@ -155,10 +156,10 @@ local SKILLS = {
 	["Raptor Strike"] = {cooldown = 6, desc = "A strong attack that increases melee damage by 140.", icon = "Ability_MeleeDamage", classes = 'Hunter'},
 	["Wyvern Sting"] = {cooldown = 2*60, desc = "A stinging shot that puts the target to sleep for 12 sec. Any damage will cancel the effect. When the target wakes up, the Sting causes 600 Nature damage over 12 sec. Only usable out of combat. Only one Sting per Hunter can be active on the target at a time.", icon = "INV_Spear_02", classes = 'Hunter'},
 
-	["Bestial Wrath"] = {cooldown = 2*60, desc = "Unknown!", icon = "Ability_Druid_FerociousBite", classes = 'Hunter'},
-	["Intimidation"] = {cooldown = 60, desc = "Unknown!", icon = "Ability_Devour", classes = 'Hunter'},
-	["Detterance"] = {cooldown = 5*60, desc = "Unknown!", icon = "Ability_Whirlwind", classes = 'Hunter'},
-	["Scattershot"] = {cooldown = 30, desc = "Unknown!", icon = "Ability_GolemStormBolt", classes = 'Hunter'},
+	["Bestial Wrath"] = {cooldown = 2*60, desc = "Send your pet into a rage causing 50% additional damage for 18 sec. While enraged, the beast does not feel pity or remorse or fear and it cannot be stopped unless killed.", icon = "Ability_Druid_FerociousBite", classes = 'Hunter'},
+	["Intimidation"] = {cooldown = 60, desc = "Command your pet to intimidate the target on the next successful melee attack, causing a high amount of threat and stunning the target for 3 sec.", icon = "Ability_Devour", classes = 'Hunter'},
+	["Deterrence"] = {cooldown = 5*60, desc = "When activated, increases your Dodge and Parry chance by 25% for 10 sec.", icon = "Ability_Whirlwind", classes = 'Hunter'},
+	["Scatter Shot"] = {cooldown = 30, desc = "A short-range shot that deals 50% weapon damage and disorients the target for 4 sec. Any damage caused will remove the effect. Turns off your attack when used.", icon = "Ability_GolemStormBolt", classes = 'Hunter'},
 
 	-- Warlock
 	["Curse of Doom"] = {cooldown = 60, desc = "Curses the target with impending doom, causing 3200 Shadow damage after 1 min. If the target dies from this damage, there is a chance that a Doomguard will be summoned. Cannot be cast on players.", icon = "Spell_Shadow_AuraOfDarkness", classes = 'Warlock'},
@@ -175,7 +176,7 @@ local SKILLS = {
 	["Lash of Pain"] = {cooldown = 12, desc = "An instant attack that lashes the target, causing 99 Shadow damage.", icon = "Spell_Shadow_Curse", classes = 'Warlock'},
 	["Soothing Kiss"] = {cooldown = 4, desc = "Soothes the target, increasing the chance that it will attack something else. More effective than Soothing Kiss (Rank 3).", icon = "Spell_Shadow_SoothingKiss", classes = 'Warlock'},
 
-	["Fel Domination"] = {cooldown = 15*60, desc = "Unknown!", icon = "Spell_Nature_RemoveCurse"},
+	["Fel Domination"] = {cooldown = 15*60, desc = "Your next Imp, Voidwalker, Succubus, or Felhunter Summon spell has its casting time reduced by 5.5 sec and its Mana cost reduced by 50%.", icon = "Spell_Nature_RemoveCurse"},
 
 	-- Priest
 	["Elune's Grace"] = {cooldown = 5*60, desc = "Reduces ranged damage taken by 95 and increases chance to dodge by 10% for 15 sec.", icon = "Spell_Holy_ElunesGrace", classes = 'Priest'},
@@ -188,9 +189,9 @@ local SKILLS = {
 	["Mind Blast"] = {cooldown = 8, desc = "Blasts the target for 503 to 531 Shadow damage, but causes a high amount of threat.", icon = "Spell_Shadow_UnholyFrenzy", classes = 'Priest'},
 	["Psychic Scream"] = {cooldown = 30, desc = "The caster lets out a psychic scream, causing 5 enemies within 8 yards to flee for 8 sec. Damage caused may interrupt the effect.", icon = "Spell_Shadow_PsychicScream", classes = 'Priest'},
 
-	["Inner Focus"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Frost_WindWalkOn", classes = 'Priest'},
-	["Power Infusion"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Holy_PowerInfusion", classes = 'Priest'},
-	["Silence"] = {cooldown = 45, desc = "Unknown!", icon = "Spell_Shadow_ImpPhaseShift", classes = 'Priest'},
+	["Inner Focus"] = {cooldown = 3*60, desc = "When activated, reduces the Mana cost of your next spell by 100% and increases its critical effect chance by 25% if it is capable of a critical effect.", icon = "Spell_Frost_WindWalkOn", classes = 'Priest'},
+	["Power Infusion"] = {cooldown = 3*60, desc = "Infuses the target with power, increasing their spell damage and healing by 20%. Lasts 15 sec.", icon = "Spell_Holy_PowerInfusion", classes = 'Priest'},
+	["Silence"] = {cooldown = 45, desc = "Silences the target, preventing them from casting spells for 5 sec.", icon = "Spell_Shadow_ImpPhaseShift", classes = 'Priest'},
 
 	-- Druid
 	["Barkskin"] = {cooldown = 60, desc = "The druid's skin becomes as tough as bark. Physical damage taken is reduced by 20%. While protected, damaging attacks will not cause spellcasting delays but non-instant spells take 1 sec longer to cast and melee combat is slowed by 20%. Lasts 15 sec.", icon = "Spell_Nature_StoneClawTotem", classes = 'Druid'},
@@ -209,10 +210,10 @@ local SKILLS = {
 	["Tranquility"] = {cooldown = 5*60, desc = "Regenerates all nearby group members for 294 every 2 seconds for 10 sec. Druid must channel to maintain the spell.", icon = "Spell_Nature_Tranquility", classes = 'Druid'},
 	["Innervate"] = {cooldown = 6*60, desc = "Increases the target's Mana regeneration by 400% and allows 100% of the target's Mana regeneration to continue while casting. Lasts 20 sec.", icon = "Spell_Nature_Lightning", classes = 'Druid'},
 
-	["Faerie Fire (Feral)"] = {cooldown = 6, desc = "Unknown!", icon = "Spell_Nature_FaerieFire", classes = 'Druid'},
-	["Feral Charge"] = {cooldown = 15, desc = "Unknown!", icon = "Ability_Hunter_Pet_Bear", classes = 'Druid'},
-	-- ["Nature's Swiftness"] = {cooldown = 3*60, desc = "Unknown!", icon = "Spell_Nature_RavenForm"},
-	["Swiftmend"] = {cooldown = 15, desc = "Unknown!", icon = "Inv_Relics_IdolOfRejuvenation", classes = 'Druid'},
+	["Faerie Fire (Feral)"] = {cooldown = 6, desc = "Decrease the armor of the target by 505 for 40 sec. While affected, the target cannot stealth or turn invisible.", icon = "Spell_Nature_FaerieFire", classes = 'Druid'},
+	["Feral Charge"] = {cooldown = 15, desc = "Causes you to charge an enemy, immobilizing and interrupting any spell being cast for 4 sec.", icon = "Ability_Hunter_Pet_Bear", classes = 'Druid'},
+	-- ["Nature's Swiftness"] = {cooldown = 3*60, desc = "When activated, your next Nature spell becomes an instant cast spell.", icon = "Spell_Nature_RavenForm"},
+	["Swiftmend"] = {cooldown = 15, desc = "Consumes a Rejuvenation or Regrowth effect on a friendly target to instantly heal them an amount equal to 12 sec. of Rejuvenation or 18 sec. of Regrowth.", icon = "Inv_Relics_IdolOfRejuvenation", classes = 'Druid'},
 }
 
 local COMBAT_LOG_EVENTS = {
