@@ -384,10 +384,8 @@ function private.UpdateFrame(frame, playerName, playerClass)
 	for key, cooldown in m.CDs() do
 		if playerName == cooldown.player then
 			if SKILLS[cooldown.skill].classes and not CDFrames.In(SKILLS[cooldown.skill].classes, playerClass) then
-				Aux.log('kek')
 				m.StopCDs(cooldown.player, cooldown.skill)
 			else
-				Aux.log(key)
 				m.ShowCD(frame, key)
 			end
 		else
