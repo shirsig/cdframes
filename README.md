@@ -12,7 +12,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cdframes off** (deactivates frames)<br/>
 **/cdframes lock** (locks frames, default off)<br/>
 **/cdframes unlock** (unlocks frames)<br/>
-**/cdframes size a b** (number of timers in primary and secondary direction, **a** and **b** between 1 and 20, default 8 and 2)<br/>
+**/cdframes size a,b** (number of timers in primary and secondary direction, **a** and **b** between 1 and 20, default 8 and 2)<br/>
 **/cdframes scale x** (**x** between 0.5 and 2, default 1)<br/>
 **/cdframes click** (toggles click-through behavior, default off)<br/>
 **/cdframes blink x** (starts blinking at **x** seconds, default 10, 0 to deactivate)<br/>
@@ -21,6 +21,6 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cdframes ignore** (shows the current ignore lists)<br/>
 **/cdframes reset** (restores the defaults for all settings)<br/>
 
-If you use **player**, **target** or **targettarget** as the first parameter the command will only be applied for that frame.
+If you use **player**, **target**, **targettarget** or a comma separated list of these as the first parameter the command will only be applied for the specified frames.
 
 When unlocked you can drag the frame with the left button or rotate it by **\<Left Click>**. **\<Right Click>** has the same effect as **/cdframes frame lock**.
