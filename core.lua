@@ -20,8 +20,12 @@ function public.List(first, ...)
 	return first or ''
 end
 
-function public.Iter(list)
-	return string.gfind(list, '[^,]+')
+function public.Elems(list)
+	local elems = {}
+	for elem in string.gfind(list, '[^,]+') do
+		tinsert(elems, elem)
+	end
+	return elems
 end
 
 function public.In(list, str)
@@ -44,7 +48,7 @@ function m.events.ADDON_LOADED()
 	m.enemy.Setup()
 end
 
-function private.parseNumber(arg)
+function private.ParseNumber(arg)
 	local number = tonumber(arg.input) or arg.default
 	if arg.min then
 		number = max(arg.min, number)
@@ -59,18 +63,20 @@ function private.SlashHandler(str)
 	str = strupper(str)
 	local parameters = m.Tokenize(str)
 
-	local frames
-	if parameters[1] == m.player.frame.key then
-		frames = {m.player.frame}
-		tremove(parameters, 1)
-	elseif parameters[1] == m.enemy.targetFrame.key then
-		frames = {m.enemy.targetFrame}
-		tremove(parameters, 1)
-	elseif parameters[1] == m.enemy.targetTargetFrame.key then
-		frames = {m.enemy.targetTargetFrame}
-		tremove(parameters, 1)
-	else
+	local frames = {}
+	if m.In(parameters[1], 'PLAYER') then
+		tinsert(frames, m.player.frame)
+	end
+	if m.In(parameters[1], 'TARGET') then
+		tinsert(frames, m.enemy.targetFrame)
+	end
+	if m.In(parameters[1], 'TARGETTARGET') then
+		tinsert(frames, m.enemy.targetTargetFrame)
+	end
+	if getn(frames) == 0 then
 		frames = {m.player.frame, m.enemy.targetFrame, m.enemy.targetTargetFrame}
+	else
+		tremove(parameters, 1)
 	end
 
 	for _, frame in frames do
@@ -83,17 +89,18 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = {m.parseNumber{input=parameters[2], min=1, max=20, default=10, integer=true}, m.parseNumber{input=parameters[3], min=1, max=20, default=1, integer=true}}
+			local primary, secondary = unpack(m.Elems(parameters[2] or ''))
+			frame.settings.size = {m.ParseNumber{input=primary, min=1, max=20, default=10, integer=true}, m.ParseNumber{input=secondary, min=1, max=20, default=1, integer=true}}
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = m.parseNumber{input=parameters[2], min=0.5, max=2, default=1}
+			frame.settings.scale = m.ParseNumber{input=parameters[2], min=0.5, max=2, default=1}
 		elseif parameters[1] == 'CLICK' then
 			frame.settings.clickThrough = not frame.settings.clickThrough
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = m.parseNumber{input=parameters[2], min=0, default=10, integer=true}
+			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=10, integer=true}
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 			local _, _, list = strfind(str, '[^,]*ADD%s+(.-)%s*$')
 			local names = {}
-			for name in m.Iter(list) do
+			for _, name in m.Elems(list) do
 				if not m.In(frame.settings.ignoreList, name) then
 					tinsert(names, name)
 				end
@@ -102,7 +109,7 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 			local _, _, list = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
 			local names = {}
-			for name in m.Iter(frame.settings.ignoreList) do
+			for _, name in m.Elems(frame.settings.ignoreList) do
 				if not m.In(list, name) then
 					tinsert(names, name)
 				end
@@ -110,7 +117,7 @@ function private.SlashHandler(str)
 			frame.settings.ignoreList = m.List(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
 			DEFAULT_CHAT_FRAME:AddMessage(frame.key..':', 1, 1, 0)
-			for name in m.Iter(frame.settings.ignoreList) do
+			for _, name in m.Elems(frame.settings.ignoreList) do
 				DEFAULT_CHAT_FRAME:AddMessage(name, 1, 1, 0)
 			end
 		elseif parameters[1] == 'RESET' then
