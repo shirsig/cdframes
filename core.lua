@@ -1,6 +1,8 @@
 local interface, m, public, private = unpack(CDFrames_Module())
 CDFrames = interface
 
+CDFrames_Settings = {}
+
 function public.module(name)
 	local module = CDFrames_Module()
 	public[name] = tremove(module, 1)
@@ -117,7 +119,7 @@ function private.SlashHandler(str)
 			return
 		end
 
-		frame:Initialize()
+		frame:Configure()
 	end
 end
 

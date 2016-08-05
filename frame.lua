@@ -1,14 +1,12 @@
 local m, public, private = CDFrames.module'frame'
 
-CDFrames_Settings = {}
+private.BASE_SCALE = 0.85
+private.ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
-local BASE_SCALE = 0.85
-local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
-
-local DEFAULT_SETTINGS = {
+private.DEFAULT_SETTINGS = {
 	active = true,
 	locked = false,
-	position = {UIParent:GetWidth()/2/BASE_SCALE, UIParent:GetHeight()/2/BASE_SCALE},
+	position = {UIParent:GetWidth()/2/m.BASE_SCALE, UIParent:GetHeight()/2/m.BASE_SCALE},
 	scale = 1,
 	size = {8, 2},
 	orientation = 'RU',
@@ -17,20 +15,18 @@ local DEFAULT_SETTINGS = {
 	clickThrough = false,
 }
 
-function public.New(key, title, color)
+function public.New(title, color, settings)
 	local self = {}
 	for k, v in m.method do
 		self[k] = v
 	end
 
-	self.key = key
 	self.title = title
 	self.color = color
 	self.cooldowns = {}
 	self.iconFramePool = {}
 
-	self:LoadSettings()
-	self:Initialize()
+	self:LoadSettings(settings)
 
 	return self
 end
@@ -46,18 +42,12 @@ end
 
 private.method = {}
 
-function m.method:LoadSettings()
-	if not CDFrames_Settings[self.key] then
-		self:CreateSettings()
+function m.method:LoadSettings(settings)
+	for k, v in m.DEFAULT_SETTINGS do
+		settings[k] = settings[k] or v
 	end
-	self.settings = CDFrames_Settings[self.key]
-end
-
-function m.method:CreateSettings()
-	CDFrames_Settings[self.key] = {}
-	for k, v in DEFAULT_SETTINGS do
-		CDFrames_Settings[self.key][k] = v
-	end
+	self.settings = settings
+	self:Configure()
 end
 
 function m.method:CreateFrames()
@@ -132,7 +122,7 @@ function m.method:IconFrame()
 	return frame
 end
 
-function m.method:Initialize()
+function m.method:Configure()
 	self:CreateFrames()
 
 	if self.settings.active then
@@ -151,7 +141,7 @@ function m.method:Initialize()
 end
 
 function m.method:PlaceFrames()
-	self.frame:SetScale(self.settings.scale * BASE_SCALE)
+	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
 
 	local orientation = self.settings.orientation
 	local primarySize, secondarySize = unpack(self.settings.size)
@@ -250,16 +240,19 @@ end
 
 function m.method:OnClick()
 	if arg1 == 'LeftButton' then
-		for i, orientation in ORIENTATIONS do
+		for i, orientation in m.ORIENTATIONS do
 			if orientation == self.settings.orientation then
-				self.settings.orientation = ORIENTATIONS[mod(i,getn(ORIENTATIONS))+1]
+				for _=1,(self.settings.size[2] == 1 and 2 or 1) do
+					i = mod(i,getn(m.ORIENTATIONS)) + 1
+					self.settings.orientation = m.ORIENTATIONS[i]
+				end
 				break
 			end
 		end
 		self:PlaceFrames()
 	elseif arg1 == 'RightButton' then
 		self.settings.locked = true
-		self:Initialize()
+		self:Configure()
 	end
 end
 

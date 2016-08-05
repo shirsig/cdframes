@@ -9,7 +9,8 @@ function private.SPELL_UPDATE_COOLDOWN()
 end
 
 function public.Setup()
-	public.frame = CDFrames.frame.New('PLAYER', 'Player Cooldowns', {0.2, 0.8, 0.2, 0.8})
+	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or {}
+	public.frame = CDFrames.frame.New('Player Cooldowns', {0.2, 0.8, 0.2, 0.8}, CDFrames_Settings.PLAYER)
 
 	private.events = CreateFrame('Frame')
 	m.events:SetScript('OnEvent', function() m[event]() end)

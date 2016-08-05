@@ -1,6 +1,6 @@
 local m, public, private = CDFrames.module'enemy'
 
-local SKILLS = {
+private.COOLDOWNS = {
 
 	-- Trinkets & Racials
 	["Will of the Forsaken"] = {cooldown = 2*60, desc = "Provides immunity to Charm, Fear and Sleep while active. May also be used while already afflicted by Charm, Fear or Sleep. Lasts 5 sec.", icon = "Spell_Shadow_RaiseDead"},
@@ -216,7 +216,7 @@ local SKILLS = {
 	["Swiftmend"] = {cooldown = 15, desc = "Consumes a Rejuvenation or Regrowth effect on a friendly target to instantly heal them an amount equal to 12 sec. of Rejuvenation or 18 sec. of Regrowth.", icon = "Inv_Relics_IdolOfRejuvenation", classes = 'Druid'},
 }
 
-local COMBAT_LOG_EVENTS = {
+private.COMBAT_LOG_EVENTS = {
 	'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
@@ -232,7 +232,7 @@ local COMBAT_LOG_EVENTS = {
 	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
 }
 
-local COMBAT_LOG_PATTERNS = {
+private.COMBAT_LOG_PATTERNS = {
 	"(.+) performs (.+)%.",
 	"(.+) performs (.+) on ",
 	"(.+) casts (.+)%.",
@@ -253,19 +253,21 @@ local COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
-local COMBAT_LOG_PATTERNS_PARTIAL = {
+private.COMBAT_LOG_PATTERNS_PARTIAL = {
 	"You are afflicted by (.+)%.",
 	"You are afflicted by (.+) %-",
 }
 
 function public.Setup()
-	public.targetFrame = CDFrames.frame.New('TARGET', 'Target Cooldowns', {0.8, 0.2, 0.2, 0.8})
-	public.targetTargetFrame = CDFrames.frame.New('TARGETTARGET', 'Target Target Cooldowns', {0.2, 0.2, 0.8, 0.8})
+	CDFrames_Settings.TARGET = CDFrames_Settings.TARGET or {}
+	CDFrames_Settings.TARGETTARGET = CDFrames_Settings.TARGETTARGET or {}
+	public.targetFrame = CDFrames.frame.New('Target Cooldowns', {0.8, 0.2, 0.2, 0.8}, CDFrames_Settings.TARGET)
+	public.targetTargetFrame = CDFrames.frame.New('Target Target Cooldowns', {0.2, 0.2, 0.8, 0.8}, CDFrames_Settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	m.events:SetScript('OnUpdate', m.UPDATE)
 	m.events:SetScript('OnEvent', function() m[event]() end)
-	for _, event in COMBAT_LOG_EVENTS do
+	for _, event in m.COMBAT_LOG_EVENTS do
 		private[event] = m.OnCombatLogEvent
 		m.events:RegisterEvent(event)
 	end
@@ -276,37 +278,37 @@ function public.Setup()
 end
 
 function private.OnCombatLogEvent()
-	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
-		for skill in string.gfind(arg1, pattern) do
+	for _, pattern in m.COMBAT_LOG_PATTERNS_PARTIAL do
+		for cooldownName in string.gfind(arg1, pattern) do
 			for _, enemy in m.targeted_enemies do
-				if SKILLS[skill] and not m.cooldown(enemy.name, skill) and (not SKILLS[skill].classes or CDFrames.In(SKILLS[skill].classes, enemy.class)) then
-					m.StartCD(enemy.name, skill, GetTime())
+				if m.COOLDOWNS[cooldownName] and not m.Active(enemy.name, cooldownName) and (not m.COOLDOWNS[cooldownName].classes or CDFrames.In(m.COOLDOWNS[cooldownName].classes, enemy.class)) then
+					m.StartCD(enemy.name, cooldownName, GetTime())
 					break
 				end
 			end
 		end
 	end
 
-	for _, pattern in COMBAT_LOG_PATTERNS do
-		for player, skill in string.gfind(arg1, pattern) do
-			if SKILLS[skill] then
-				m.StartCD(player, skill, GetTime())
+	for _, pattern in m.COMBAT_LOG_PATTERNS do
+		for player, cooldownName in string.gfind(arg1, pattern) do
+			if m.COOLDOWNS[cooldownName] then
+				m.StartCD(player, cooldownName, GetTime())
 			end
 		end
 	end
 end
 
-function private.Key(player, skill)
-	return player..'|'..skill
+function private.Key(player, cooldownName)
+	return player..'|'..cooldownName
 end
 
-function private.expired(cooldown)
-	return cooldown.started + SKILLS[cooldown.skill].cooldown <= GetTime()
+function private.Expired(cooldown)
+	return cooldown.started + m.COOLDOWNS[cooldown.name].cooldown <= GetTime()
 end
 
-function private.cooldown(player, skill)
-	local key = m.Key(player, skill)
-	if m.activeCooldowns[key] and m.expired(m.activeCooldowns[key]) then
+function private.Active(player, cooldownName)
+	local key = m.Key(player, cooldownName)
+	if m.activeCooldowns[key] and m.Expired(m.activeCooldowns[key]) then
 		m.activeCooldowns[key] = nil
 	end
 	return m.activeCooldowns[key]
@@ -318,8 +320,8 @@ function private.CDs()
 		tinsert(cooldowns, cooldown)
 	end
 	for _, cooldown in cooldowns do
-		if m.expired(cooldown) then
-			m.activeCooldowns[m.Key(cooldown.player, cooldown.skill)] = nil
+		if m.Expired(cooldown) then
+			m.activeCooldowns[m.Key(cooldown.player, cooldown.name)] = nil
 		end
 	end
 	return m.activeCooldowns
@@ -328,7 +330,7 @@ end
 function private.ShowCD(frame, key)
 	local cooldown = m.activeCooldowns[key]
 	if not cooldown[frame.key] then
-		cooldown[frame.key] = frame:StartCD(cooldown.skill, SKILLS[cooldown.skill].desc, SKILLS[cooldown.skill].icon, cooldown.started + SKILLS[cooldown.skill].cooldown)
+		cooldown[frame.key] = frame:StartCD(cooldown.name, m.COOLDOWNS[cooldown.name].desc, m.COOLDOWNS[cooldown.name].icon, cooldown.started + m.COOLDOWNS[cooldown.name].cooldown)
 	end
 end
 
@@ -340,24 +342,24 @@ function private.HideCD(frame, key)
 	end
 end
 
-function private.triggers(player, skill)
-	if skill == 'Preparation' then
+function private.triggers(player, cooldownName)
+	if cooldownName == 'Preparation' then
 		m.StopCDs(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
-	elseif skill == 'Cold Snap' then
+	elseif cooldownName == 'Cold Snap' then
 		m.StopCDs(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova')
 	end
 end
 
-function private.StartCD(player, skill, started)
-	m.triggers(player, skill)
+function private.StartCD(player, cooldownName, started)
+	m.triggers(player, cooldownName)
 
-	local key = m.Key(player, skill)
+	local key = m.Key(player, cooldownName)
 	if m.activeCooldowns[key] then
 		m.HideCD(m.targetFrame, key)
 		m.HideCD(m.targetTargetFrame, key)
 	end
 	m.activeCooldowns[key] = {
-		skill = skill,
+		name = cooldownName,
 		player = player,
 		started = started,
 	}
@@ -383,8 +385,8 @@ end
 function private.UpdateFrame(frame, playerName, playerClass)
 	for key, cooldown in m.CDs() do
 		if playerName == cooldown.player then
-			if SKILLS[cooldown.skill].classes and not CDFrames.In(SKILLS[cooldown.skill].classes, playerClass) then
-				m.StopCDs(cooldown.player, cooldown.skill)
+			if m.COOLDOWNS[cooldown.name].classes and not CDFrames.In(m.COOLDOWNS[cooldown.name].classes, playerClass) then
+				m.StopCDs(cooldown.player, cooldown.name)
 			else
 				m.ShowCD(frame, key)
 			end
