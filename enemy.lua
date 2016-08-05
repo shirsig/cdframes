@@ -273,14 +273,14 @@ function public.Setup()
 	end
 	m.events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	private.targeted_enemies = {}
+	private.targetedEnemies = {}
 	private.activeCooldowns = {}
 end
 
 function private.OnCombatLogEvent()
 	for _, pattern in m.COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldownName in string.gfind(arg1, pattern) do
-			for _, enemy in m.targeted_enemies do
+			for _, enemy in m.targetedEnemies do
 				if m.COOLDOWNS[cooldownName] and not m.Active(enemy.name, cooldownName) and (not m.COOLDOWNS[cooldownName].classes or CDFrames.In(m.COOLDOWNS[cooldownName].classes, enemy.class)) then
 					m.StartCD(enemy.name, cooldownName, GetTime())
 					break
@@ -329,16 +329,16 @@ end
 
 function private.ShowCD(frame, key)
 	local cooldown = m.activeCooldowns[key]
-	if not cooldown[frame.key] then
-		cooldown[frame.key] = frame:StartCD(cooldown.name, m.COOLDOWNS[cooldown.name].desc, m.COOLDOWNS[cooldown.name].icon, cooldown.started + m.COOLDOWNS[cooldown.name].cooldown)
+	if not cooldown[frame] then
+		cooldown[frame] = frame:StartCD(cooldown.name, m.COOLDOWNS[cooldown.name].desc, m.COOLDOWNS[cooldown.name].icon, cooldown.started + m.COOLDOWNS[cooldown.name].cooldown)
 	end
 end
 
 function private.HideCD(frame, key)
 	local cooldown = m.activeCooldowns[key]
-	if cooldown[frame.key] then
-		frame:CancelCD(cooldown[frame.key])
-		cooldown[frame.key] = nil
+	if cooldown[frame] then
+		frame:CancelCD(cooldown[frame])
+		cooldown[frame] = nil
 	end
 end
 
@@ -398,9 +398,9 @@ end
 
 function private.PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
-		tinsert(m.targeted_enemies, 1, {name = UnitName('target'), class = UnitClass('target')})
-		if getn(m.targeted_enemies) > 100 then
-			tremove(m.targeted_enemies)
+		tinsert(m.targetedEnemies, 1, {name = UnitName('target'), class = UnitClass('target')})
+		if getn(m.targetedEnemies) > 100 then
+			tremove(m.targetedEnemies)
 		end
 	end
 	m.UpdateFrame(m.targetFrame, UnitName('target'), UnitClass('target'))
