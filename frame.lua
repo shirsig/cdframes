@@ -44,7 +44,9 @@ private.method = {}
 
 function m.method:LoadSettings(settings)
 	for k, v in m.DEFAULT_SETTINGS do
-		settings[k] = settings[k] or v
+		if settings[k] == nil then
+			settings[k] = v
+		end
 	end
 	self.settings = settings
 	self:Configure()
