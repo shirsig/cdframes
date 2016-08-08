@@ -413,8 +413,9 @@ do
 			skip = skip - 1
 			return
 		end
-		skip = 5
-
-		m.UpdateFrame(m.targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
+		if CDFrames_Settings.TARGETTARGET.active then
+			skip = 5
+			m.UpdateFrame(m.targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
+		end
 	end
 end
