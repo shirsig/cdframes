@@ -13,6 +13,10 @@ private.events = CreateFrame('Frame')
 m.events:SetScript('OnEvent', function() this[event]() end)
 m.events:RegisterEvent('ADDON_LOADED')
 
+function public.Log(msg)
+	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
+end
+
 function public.List(first, ...)
 	for i=1,arg.n do
 		first = first..','..arg[i]
@@ -116,9 +120,9 @@ function private.SlashHandler(str)
 			end
 			frame.settings.ignoreList = m.List(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			DEFAULT_CHAT_FRAME:AddMessage(frame.key..':', 1, 1, 0)
+			m.Log(frame.key..':')
 			for _, name in m.Elems(frame.settings.ignoreList) do
-				DEFAULT_CHAT_FRAME:AddMessage(name, 1, 1, 0)
+				m.Log(name)
 			end
 		elseif parameters[1] == 'RESET' then
 			frame:Reset()
