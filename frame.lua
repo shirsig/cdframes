@@ -1,17 +1,21 @@
 local m, public, private = CDFrames.module'frame'
 
-private.BASE_SCALE = 0.85
+public.BASE_SCALE = .85
+-- public.BASE_SCALE = 21/36
 private.ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 private.DEFAULT_SETTINGS = {
 	active = true,
 	locked = false,
-	position = {UIParent:GetWidth()/2/m.BASE_SCALE, UIParent:GetHeight()/2/m.BASE_SCALE},
+	position = {0,0},
 	scale = 1,
-	size = {8, 2},
+	size = 16,
+	line = 8,
 	orientation = 'RU',
 	ignoreList = '',
-	blink = 10,
+	count = 1,
+	blink = 7,
+	animation = false,
 	clickThrough = false,
 }
 
@@ -20,23 +24,19 @@ function public.New(title, color, settings)
 	for k, v in m.method do
 		self[k] = v
 	end
-
 	self.title = title
 	self.color = color
 	self.cooldowns = {}
 	self.iconFramePool = {}
-
 	self:LoadSettings(settings)
-
 	return self
 end
 
 do
-	local x = 0
-
-	function private.ID()
-		x = x + 1
-		return 'CDFrames_Frame'..x
+	local id = 0
+	function private.Name()
+		id = id + 1
+		return 'CDFrames_Frame'..id
 	end
 end
 
@@ -54,17 +54,19 @@ end
 
 function m.method:CreateFrames()
 	if not self.frame then
-		local frame = CreateFrame('Button', tostring({}), UIParent)
+		local frame = CreateFrame('Button', m.Name(), UIParent)
+		self.frame = frame
 		frame:SetMovable(true)
 		frame:SetToplevel(true)
 		frame:SetClampedToScreen(true)
 		frame:RegisterForDrag('LeftButton')
 		frame:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
 		frame:SetScript('OnDragStart', function()
-			self:OnDragStart()
+			self.frame:StartMoving()
 		end)
 		frame:SetScript('OnDragStop', function()
-			self:OnDragStop()
+			this:StopMovingOrSizing()
+			self.settings.position = {self.frame.iconFrames[1]:GetCenter()}
 		end)
 		frame:SetScript('OnClick', function()
 			self:OnClick()
@@ -81,27 +83,34 @@ function m.method:CreateFrames()
 			end
 		end)
 		frame.iconFrames = {}
-		self.frame = frame
+		frame.dummyFrames = {}
 	end
 
-	local count = self.settings.size[1]*self.settings.size[2]
-
-	while getn(self.frame.iconFrames) > count do
-		local frame = tremove(self.frame.iconFrames)
-		frame:Hide()
-		tinsert(self.iconFramePool, frame)
-	end
-	for i=getn(self.frame.iconFrames)+1,count do
+	for i=getn(self.frame.iconFrames)+1,self.settings.size do
 		tinsert(self.frame.iconFrames, self:IconFrame())
+		tinsert(self.frame.dummyFrames, self:DummyFrame(i))
+		self.frame.dummyFrames[i]:SetPoint('CENTER', self.frame.iconFrames[i], 'CENTER')
 	end
+	for i=self.settings.size+1,getn(self.frame.iconFrames) do
+		self.frame.iconFrames[i]:Hide()
+		self.frame.dummyFrames[i]:Hide()
+	end
+	for i=1,self.settings.size do
+		local iconFrame = self.frame.iconFrames[i]
+		iconFrame:EnableMouse(not self.settings.clickThrough)
+		if self.settings.count == 1 then
+			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
+			iconFrame.count:SetPoint('CENTER', 0, 0)
+		elseif self.settings.count == 2 then
+			iconFrame.count:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
+			iconFrame.count:SetPoint('CENTER', 0, 1)
+		end
+	end
+
 end
 
 function m.method:IconFrame()
-	if getn(self.iconFramePool) > 0 then
-		return tremove(self.iconFramePool)
-	end
-
-	local frame = CreateFrame('CheckButton', m.ID(), self.frame, 'ActionButtonTemplate')
+	local frame = CreateFrame('CheckButton', m.Name(), self.frame, 'ActionButtonTemplate')
 	frame:SetHighlightTexture(nil)
 	frame:RegisterForClicks()
 	frame:SetScript('OnEnter', function()
@@ -110,56 +119,81 @@ function m.method:IconFrame()
 	frame:SetScript('OnLeave', function()
 		GameTooltip:Hide()
 	end)
-
 	frame.texture = getglobal(frame:GetName()..'Icon')
-	frame.texture:SetTexCoord(0.06,0.94,0.06,0.94)
-
+	frame.texture:SetTexCoord(.06, .94, .06, .94)
 	frame.border = frame:GetNormalTexture()
-
-	frame.count = frame:CreateFontString()
+	frame.cooldown = getglobal(frame:GetName()..'Cooldown')
+	frame.cooldown:Show()
+	frame.cooldown:SetScript('OnAnimFinished', nil)
+	frame.cooldown:SetScript('OnUpdateModel', function()
+		if self.settings.animation and this.started then
+			local progress = (GetTime() - this.started) / this.duration
+			this:SetSequenceTime(0, (1 - progress) * 1000)
+		end
+	end)
+	frame.cooldown:SetSequenceTime(0, 1000)
+	frame.count = frame.cooldown:CreateFontString(nil, 'OVERLAY')
 	frame.count:SetJustifyH('CENTER')
-	frame.count:SetWidth(38)
-	frame.count:SetHeight(12)
+	return frame
+end
 
+function m.method:DummyFrame(i)
+	local frame = CreateFrame('Frame', nil, self.frame)
+	frame:SetWidth(36)
+	frame:SetHeight(36)
+	local background = frame:CreateTexture()
+	background:SetAllPoints()
+	background:SetTexture(unpack(self.color))
+	background:SetAlpha(0.85)
+	local border = frame:CreateTexture(nil, 'OVERLAY')
+	border:SetPoint('TOPLEFT', -3, 2)
+	border:SetPoint('BOTTOMRIGHT', 3, -2)
+	border:SetTexture([[Interface\Buttons\UI-Debuff-Overlays]])
+	border:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
+	border:SetVertexColor(unpack(self.color))
+	border:SetAlpha(0.85)
+	local index = frame:CreateFontString()
+	index:SetPoint('CENTER', -1, 0)
+	index:SetFont([[Fonts\FRIZQT__.ttf]], 16)
+	index:SetShadowOffset(1, -1)
+	index:SetText(i)
 	return frame
 end
 
 function m.method:Configure()
 	self:CreateFrames()
-
 	if self.settings.active then
 		self.frame:Show()
 	else
 		self.frame:Hide()
 	end
-
 	if self.settings.locked then
 		self:Lock()
 	else
 		self:Unlock()
 	end
-
 	self:PlaceFrames()
 end
 
 function m.method:PlaceFrames()
 	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
-
 	local orientation = self.settings.orientation
-	local primarySize, secondarySize = unpack(self.settings.size)
+	local size, line = self.settings.size, self.settings.line
 
+	local slotSize = 40
 	if CDFrames.In('UL,UR,DL,DR', orientation) then
-		self.frame:SetWidth(secondarySize*40)
-		self.frame:SetHeight(primarySize*40)
+		self.frame:SetWidth(ceil(size/line) * slotSize)
+		self.frame:SetHeight(min(size, line) * slotSize)
 	elseif CDFrames.In('LU,LD,RU,RD', orientation) then
-		self.frame:SetWidth(primarySize*40)
-		self.frame:SetHeight(secondarySize*40)
+		self.frame:SetWidth(min(size, line) * slotSize)
+		self.frame:SetHeight(ceil(size/line) * slotSize)
 	end
 	
-	for i, frame in self.frame.iconFrames do
+	for i=1,size do
+		local frame = self.frame.iconFrames[i]
 		frame:ClearAllPoints()
-		local primaryOffset = 2+mod(i-1, primarySize)*40
-		local secondaryOffset = 2+floor((i-1)/primarySize)*40
+		local primaryOffset = 2 + mod(i-1, line) * slotSize
+		local secondaryOffset = 2 + floor((i-1)/line) * slotSize
 
 		if orientation == 'UL' then
 			frame:SetPoint('BOTTOMRIGHT', -secondaryOffset, primaryOffset)
@@ -183,44 +217,28 @@ function m.method:PlaceFrames()
 	local x, y = unpack(self.settings.position)
 	self.frame:ClearAllPoints()
 	if CDFrames.In('UR,RU', orientation) then
-		self.frame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', x-20, y-20)
+		self.frame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', x-slotSize/2, y-slotSize/2)
 	elseif CDFrames.In('UL,LU', orientation) then
-		self.frame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMLEFT', x+20, y-20)
+		self.frame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMLEFT', x+slotSize/2, y-slotSize/2)
 	elseif CDFrames.In('DR,RD', orientation) then
-		self.frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x-20, y+20)
+		self.frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x-slotSize/2, y+slotSize/2)
 	elseif CDFrames.In('DL,LD', orientation) then
-		self.frame:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x+20, y+20)
+		self.frame:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x+slotSize/2, y+slotSize/2)
 	end
 end
 
 function m.method:Lock()
 	self.frame:EnableMouse(false)
-	for _, frame in self.frame.iconFrames do
-		frame:EnableMouse(not self.settings.clickThrough)
-		frame.border:SetVertexColor(1, 1, 1)
-		frame.texture:SetBlendMode('BLEND')
-		frame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
-		frame.count:SetShadowOffset(0, 0)
-		frame.count:SetPoint('CENTER', 0, 0)
-		frame:Hide()
+	for i=1,self.settings.size do
+		self.frame.dummyFrames[i]:Hide()
 	end
 end
 
 function m.method:Unlock()
 	self.frame:EnableMouse(true)
-	for i, frame in self.frame.iconFrames do
-		frame:EnableMouse(false)
-		frame.texture:SetAlpha(1)
-		frame.border:SetAlpha(1)
-		frame.texture:SetTexture(unpack(self.color))
-		frame.border:SetVertexColor(unpack(self.color))
-		frame.texture:SetBlendMode('ADD')
-		frame.count:SetFont([[Fonts\FRIZQT__.ttf]], 16)
-		frame.count:SetShadowOffset(1, -1)
-		frame.count:SetTextColor(1, 1, 1)
-		frame.count:SetText(i)
-		frame.count:SetPoint('CENTER', -1, 0)
-		frame:Show()
+	for i=1,self.settings.size do
+		self.frame.iconFrames[i]:Hide()
+		self.frame.dummyFrames[i]:Show()
 	end
 end
 
@@ -228,7 +246,7 @@ function m.method:Tooltip()
 	GameTooltip_SetDefaultAnchor(GameTooltip, this)
 	GameTooltip:AddLine(self.title)
 	GameTooltip:AddLine('<Left Drag> move', 1, 1, 1)
-	GameTooltip:AddLine('<Left Click> change orientation', 1, 1, 1)
+	GameTooltip:AddLine('<Left Click> turn', 1, 1, 1)
 	GameTooltip:AddLine('<Right Click> lock', 1, 1, 1)
 	GameTooltip:Show()
 end
@@ -244,7 +262,7 @@ function m.method:OnClick()
 	if arg1 == 'LeftButton' then
 		for i, orientation in m.ORIENTATIONS do
 			if orientation == self.settings.orientation then
-				for _=1,(self.settings.size[2] == 1 and 2 or 1) do
+				for _=1,(self.settings.size <= self.settings.line and 2 or 1) do
 					i = mod(i,getn(m.ORIENTATIONS)) + 1
 					self.settings.orientation = m.ORIENTATIONS[i]
 				end
@@ -256,15 +274,6 @@ function m.method:OnClick()
 		self.settings.locked = true
 		self:Configure()
 	end
-end
-
-function m.method:OnDragStart()
-	self.frame:StartMoving()
-end
-
-function m.method:OnDragStop()
-	self.frame:StopMovingOrSizing()
-	self.settings.position = {self.frame.iconFrames[1]:GetCenter()}
 end
 
 function m.method:Ignored(name)
@@ -283,57 +292,57 @@ function m.method:Update()
 	for _, cooldown in self.cooldowns do
 		tinsert(cooldownList, cooldown)
 	end
-	sort(cooldownList, function(a, b) local ta, tb = a.expiration-t, b.expiration-t return ta < tb or tb == ta and a.name < b.name end)
+	sort(cooldownList, function(a, b) local ta, tb = a.started + a.duration - t, b.started + b.duration - t return ta < tb or tb == ta and a.name < b.name end)
 	for _, cooldown in cooldownList do
-		local timeleft = cooldown.expiration-t
+		local timeLeft = cooldown.started + cooldown.duration - t
 
-		if timeleft > 0 then
-			if i <= getn(self.frame.iconFrames) and not self:Ignored(cooldown.name) then
+		if timeLeft > 0 then
+			if i <= self.settings.size and not self:Ignored(cooldown.name) then
 				local frame = self.frame.iconFrames[i]
-				if timeleft <= self.settings.blink then
-					local x = t*4/3
-					local a = (mod(floor(x),2) == 0 and x-floor(x) or 1-x+floor(x))*0.7+0.3
+				if timeLeft <= self.settings.blink then
+					local a = m.blinkAlpha1(t)
 					frame.texture:SetAlpha(a)
 					frame.border:SetAlpha(a)
-					-- frame:SetAlpha((math.sin(t*4/3*math.pi)+1)/2*0.7+0.3)
 				else
 					frame.texture:SetAlpha(1)
 					frame.border:SetAlpha(1)
 				end
 
-				timeleft = ceil(timeleft)
-				if timeleft >= 60 then
-					timeleft = ceil((timeleft/60)*10)/10
-					frame.count:SetTextColor(0, 1, 0)
-				else
-					frame.count:SetTextColor(1, 1, 0)
+				frame.cooldown.started = cooldown.started
+				frame.cooldown.duration = cooldown.duration
+				local text, color
+				if self.settings.count == 1 then
+					text, color = m.TimeFormat1(timeLeft)
+				elseif self.settings.count == 2 then
+					text, color = m.TimeFormat2(timeLeft)
 				end
-
-				frame.texture:SetTexture([[Interface\Icons\]]..cooldown.texture)
-				frame.count:SetText(timeleft)
+				if self.settings.count ~= 0 then
+					frame.count:SetText(text)
+					frame.count:SetTextColor(unpack(color))
+				end
+				frame.texture:SetTexture(cooldown.texture)
+				frame.tooltip = {cooldown.name, cooldown.info}
 				frame:Show()
 
-				frame.tooltip = {cooldown.name, cooldown.info}
-
-				i = i+1
+				i = i + 1
 			end
 		else
 			self.cooldowns[self:CDID(cooldown)] = nil
 		end
 	end
 
-	while i <= getn(self.frame.iconFrames) do
-		self.frame.iconFrames[i]:Hide()
-		i = i+1
+	for j=i,self.settings.size do
+		self.frame.iconFrames[j]:Hide()
 	end	
 end
 
-function m.method:StartCD(name, info, texture, expiration)
+function m.method:StartCD(name, info, texture, started, duration)
 	local cooldown = {
 		name = name,
 		info = info,
 		texture = texture,
-		expiration = expiration,
+		started = started,
+		duration = duration,
 	}
 	self.cooldowns[self:CDID(cooldown)] = cooldown
 	return self:CDID(cooldown)
@@ -341,4 +350,33 @@ end
 
 function m.method:CancelCD(CDID)
 	self.cooldowns[CDID] = nil
+end
+
+function private.blinkAlpha1(t)
+	local x = t * 4/3
+	return (mod(floor(x), 2) == 0 and x - floor(x) or 1 - x + floor(x)) * .7 + .3
+end
+
+function private.blinkAlpha2(t)
+	return (math.sin(t * 4/3 * math.pi) + 1) / 2 * .7 + .3
+end
+
+function private.TimeFormat1(t)
+	if t > 60 then
+		return ceil((t / 60) * 10) / 10, {0, 1, 0}
+	else
+		return ceil(t), {1, 1, 0}
+	end
+end
+
+function private.TimeFormat2(t)
+	if t > 86400 then
+		return ceil(t / 86400) .. 'd', {.8, .8, .9}
+	elseif t > 3600 then
+		return ceil(t / 3600) .. 'h', {.8, .8, .9}
+	elseif t > 60 then
+		return ceil(t / 60) .. 'm', {.8, .8, .9}
+	else
+		return ceil(t), t > 5 and {1, 1, .4} or {1, 0, 0}
+	end
 end

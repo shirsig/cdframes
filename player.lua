@@ -10,7 +10,7 @@ end
 
 function public.Setup()
 	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or {}
-	public.frame = CDFrames.frame.New('Player Cooldowns', {0.2, 0.8, 0.2, 0.8}, CDFrames_Settings.PLAYER)
+	public.frame = CDFrames.frame.New('Player Cooldowns', {.35, .85, .35}, CDFrames_Settings.PLAYER)
 
 	private.events = CreateFrame('Frame')
 	m.events:SetScript('OnEvent', function() m[event]() end)
@@ -28,7 +28,7 @@ do
 		if activeCooldowns[name] then
 			m.frame:CancelCD(activeCooldowns[name])
 		end
-		activeCooldowns[name] = m.frame:StartCD(name, '', strsub(texture, 17), started + duration)
+		activeCooldowns[name] = m.frame:StartCD(name, '', texture, started, duration)
 	end
 
 	function private.StopCD(name)

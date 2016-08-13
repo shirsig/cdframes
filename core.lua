@@ -17,6 +17,10 @@ function public.Log(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
 end
 
+function public.Present(value)
+	return value ~= nil and {[value]=true} or {}
+end
+
 function public.List(first, ...)
 	for i=1,arg.n do
 		first = first..','..arg[i]
@@ -52,15 +56,15 @@ function m.events.ADDON_LOADED()
 	m.enemy.Setup()
 end
 
-function private.ParseNumber(arg)
-	local number = tonumber(arg.input) or arg.default
-	if arg.min then
-		number = max(arg.min, number)
+function private.ParseNumber(params)
+	local number = tonumber(params.input) or params.default
+	if params.min then
+		number = max(params.min, number)
 	end
-	if arg.max then
-		number = min(arg.max, number)
+	if params.max then
+		number = min(params.max, number)
 	end
-	return arg.integer and floor(number+0.5) or number
+	return params.integer and floor(number + .5) or number
 end
 
 function private.SlashHandler(str)
@@ -93,14 +97,19 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			local primary, secondary = unpack(m.Elems(parameters[2] or ''))
-			frame.settings.size = {m.ParseNumber{input=primary, min=1, max=20, default=10, integer=true}, m.ParseNumber{input=secondary, min=1, max=20, default=1, integer=true}}
+			frame.settings.size = m.ParseNumber{input=parameters[2], min=1, max=100, default=16, integer=true}
+		elseif parameters[1] == 'LINE' then
+			frame.settings.line = m.ParseNumber{input=parameters[2], min=1, max=100, default=8, integer=true}
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = m.ParseNumber{input=parameters[2], min=0.5, max=2, default=1}
-		elseif parameters[1] == 'CLICK' then
-			frame.settings.clickThrough = not frame.settings.clickThrough
+			frame.settings.scale = m.ParseNumber{input=parameters[2], min=21/36/m.frame.BASE_SCALE, max=2, default=1}
+		elseif parameters[1] == 'COUNT' then
+			frame.settings.count = m.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=10, integer=true}
+			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=10}
+		elseif parameters[1] == 'ANIMATION' then
+			frame.settings.animation = not frame.settings.animation
+		elseif parameters[1] == 'CLICKTHROUGH' then
+			frame.settings.clickThrough = not frame.settings.clickThrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 			local _, _, list = strfind(str, '[^,]*ADD%s+(.-)%s*$')
 			local names = {}

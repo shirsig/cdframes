@@ -260,9 +260,9 @@ private.COMBAT_LOG_PATTERNS_PARTIAL = {
 
 function public.Setup()
 	CDFrames_Settings.TARGET = CDFrames_Settings.TARGET or {}
-	CDFrames_Settings.TARGETTARGET = CDFrames_Settings.TARGETTARGET or {}
-	public.targetFrame = CDFrames.frame.New('Target Cooldowns', {0.8, 0.2, 0.2, 0.8}, CDFrames_Settings.TARGET)
-	public.targetTargetFrame = CDFrames.frame.New('Target Target Cooldowns', {0.2, 0.2, 0.8, 0.8}, CDFrames_Settings.TARGETTARGET)
+	CDFrames_Settings.TARGETTARGET = CDFrames_Settings.TARGETTARGET or {active=false}
+	public.targetFrame = CDFrames.frame.New('Target Cooldowns', {.85, .35, .35}, CDFrames_Settings.TARGET)
+	public.targetTargetFrame = CDFrames.frame.New('Target Target Cooldowns', {.35, .35, .85}, CDFrames_Settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	m.events:SetScript('OnUpdate', m.UPDATE)
@@ -330,7 +330,7 @@ end
 function private.ShowCD(frame, key)
 	local cooldown = m.activeCooldowns[key]
 	if not cooldown[frame] then
-		cooldown[frame] = frame:StartCD(cooldown.name, m.COOLDOWNS[cooldown.name].desc, m.COOLDOWNS[cooldown.name].icon, cooldown.started + m.COOLDOWNS[cooldown.name].cooldown)
+		cooldown[frame] = frame:StartCD(cooldown.name, m.COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]]..m.COOLDOWNS[cooldown.name].icon, cooldown.started, m.COOLDOWNS[cooldown.name].cooldown)
 	end
 end
 
