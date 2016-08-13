@@ -1,7 +1,6 @@
 local m, public, private = CDFrames.module'frame'
 
 public.BASE_SCALE = .85
--- public.BASE_SCALE = 21/36
 private.ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 private.DEFAULT_SETTINGS = {
@@ -99,6 +98,7 @@ function m.method:CreateFrames()
 	for i=1,self.settings.size do
 		local iconFrame = self.frame.iconFrames[i]
 		iconFrame:EnableMouse(not self.settings.clickThrough)
+		iconFrame.cooldown:SetSequenceTime(0, 1000)
 		if self.settings.count == 1 then
 			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 			iconFrame.count:SetPoint('CENTER', 0, 0)
@@ -132,7 +132,6 @@ function m.method:IconFrame()
 			this:SetSequenceTime(0, (1 - progress) * 1000)
 		end
 	end)
-	frame.cooldown:SetSequenceTime(0, 1000)
 	frame.count = frame.cooldown:CreateFontString(nil, 'OVERLAY')
 	frame.count:SetJustifyH('CENTER')
 	return frame
@@ -179,9 +178,9 @@ end
 function m.method:PlaceFrames()
 	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
 	local orientation = self.settings.orientation
-	local size, line = self.settings.size, self.settings.line
+	local size, line, spacing = self.settings.size, self.settings.line, self.settings.spacing
 
-	local slotSize = 40 + self.settings.spacing
+	local slotSize = 40 + spacing
 	if CDFrames.In('UL,UR,DL,DR', orientation) then
 		self.frame:SetWidth(ceil(size/line) * slotSize)
 		self.frame:SetHeight(min(size, line) * slotSize)
@@ -193,8 +192,8 @@ function m.method:PlaceFrames()
 	for i=1,size do
 		local frame = self.frame.iconFrames[i]
 		frame:ClearAllPoints()
-		local primaryOffset = 2 + mod(i-1, line) * slotSize
-		local secondaryOffset = 2 + floor((i-1)/line) * slotSize
+		local primaryOffset = 2 + spacing/2 + mod(i-1, line) * slotSize
+		local secondaryOffset = 2 + spacing/2 + floor((i-1)/line) * slotSize
 
 		if orientation == 'UL' then
 			frame:SetPoint('BOTTOMRIGHT', -secondaryOffset, primaryOffset)
