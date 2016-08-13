@@ -100,12 +100,14 @@ function private.SlashHandler(str)
 			frame.settings.size = m.ParseNumber{input=parameters[2], min=1, max=100, default=16, integer=true}
 		elseif parameters[1] == 'LINE' then
 			frame.settings.line = m.ParseNumber{input=parameters[2], min=1, max=100, default=8, integer=true}
+		elseif parameters[1] == 'SPACING' then
+			frame.settings.spacing = m.ParseNumber{input=parameters[2], min=0, max=10, default=0}
 		elseif parameters[1] == 'SCALE' then
 			frame.settings.scale = m.ParseNumber{input=parameters[2], min=21/36/m.frame.BASE_SCALE, max=2, default=1}
 		elseif parameters[1] == 'COUNT' then
 			frame.settings.count = m.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=10}
+			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=7}
 		elseif parameters[1] == 'ANIMATION' then
 			frame.settings.animation = not frame.settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then

@@ -11,6 +11,7 @@ private.DEFAULT_SETTINGS = {
 	scale = 1,
 	size = 16,
 	line = 8,
+	spacing = 2,
 	orientation = 'RU',
 	ignoreList = '',
 	count = 1,
@@ -180,7 +181,7 @@ function m.method:PlaceFrames()
 	local orientation = self.settings.orientation
 	local size, line = self.settings.size, self.settings.line
 
-	local slotSize = 40
+	local slotSize = 40 + self.settings.spacing
 	if CDFrames.In('UL,UR,DL,DR', orientation) then
 		self.frame:SetWidth(ceil(size/line) * slotSize)
 		self.frame:SetHeight(min(size, line) * slotSize)
