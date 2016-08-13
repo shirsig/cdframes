@@ -15,7 +15,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cdframes size x** (maximum number of timers per frame, **x** between 1 and 100, default 16)<br/>
 **/cdframes line x** (maximum number of timers per line, **x** between 1 and 100, default 8)<br/>
 **/cdframes scale x** (**x** between 0.5 and 2, default 1)<br/>
-**/cdframes click** (toggles click-through behavior, default off)<br/>
+**/cdframes clickthrough** (toggles click-through behavior, default off)<br/>
 **/cdframes blink x** (starts blinking at **x** seconds, default 7, 0 to deactivate)<br/>
 **/cdframes animation** (cooldown shadow animation, default off)<br/>
 **/cdframes count x** (counter style, **x** between 0 and 2, default 1, 0 means no counter)<br/>
