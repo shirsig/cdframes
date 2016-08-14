@@ -175,12 +175,11 @@ function m.method:Configure()
 end
 
 function m.method:PlaceFrames()
-	local scale = self.settings.scale * m.BASE_SCALE
-	self.frame:SetScale(scale)
+	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
 	local orientation = self.settings.orientation
 	local size, line, spacing = self.settings.size, self.settings.line, self.settings.spacing
 
-	local slotSize = 40 + spacing * (1/scale)
+	local slotSize = 36 * (1 + self.settings.spacing) + 4
 	if CDFrames.In('UL,UR,DL,DR', orientation) then
 		self.frame:SetWidth(ceil(size/line) * slotSize)
 		self.frame:SetHeight(min(size, line) * slotSize)

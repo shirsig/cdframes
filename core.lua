@@ -101,7 +101,7 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'LINE' then
 			frame.settings.line = m.ParseNumber{input=parameters[2], min=1, max=100, default=8, integer=true}
 		elseif parameters[1] == 'SPACING' then
-			frame.settings.spacing = m.ParseNumber{input=parameters[2], min=0, max=10, default=0}
+			frame.settings.spacing = m.ParseNumber{input=parameters[2], min=0, max=1, default=0}
 		elseif parameters[1] == 'SCALE' then
 			frame.settings.scale = m.ParseNumber{input=parameters[2], min=21/36/m.frame.BASE_SCALE, max=2, default=1}
 		elseif parameters[1] == 'COUNT' then
