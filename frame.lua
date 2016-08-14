@@ -99,11 +99,11 @@ function m.method:CreateFrames()
 		local iconFrame = self.frame.iconFrames[i]
 		iconFrame:EnableMouse(not self.settings.clickThrough)
 		iconFrame.cooldown:SetSequenceTime(0, 1000)
-		if self.settings.count == 1 then
+		if self.settings.text == 1 then
 			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
 			iconFrame.count:SetPoint('CENTER', 1, 0)
 			iconFrame.count:SetJustifyH('CENTER')
-		elseif self.settings.count == 2 then
+		elseif self.settings.text == 2 then
 			iconFrame.count:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
 			iconFrame.count:SetPoint('CENTER', 0, 1)
 		end
@@ -287,13 +287,14 @@ end
 
 function m.method:Update()
 	local t = GetTime()
-	local i = 1
 
 	local cooldownList = {}
 	for _, cooldown in self.cooldowns do
 		tinsert(cooldownList, cooldown)
 	end
 	sort(cooldownList, function(a, b) local ta, tb = a.started + a.duration - t, b.started + b.duration - t return ta < tb or tb == ta and a.name < b.name end)
+
+	local i = 1
 	for _, cooldown in cooldownList do
 		local timeLeft = cooldown.started + cooldown.duration - t
 
@@ -312,12 +313,12 @@ function m.method:Update()
 				frame.cooldown.started = cooldown.started
 				frame.cooldown.duration = cooldown.duration
 				local text, color
-				if self.settings.count == 1 then
+				if self.settings.text == 1 then
 					text, color = m.TimeFormat1(timeLeft)
-				elseif self.settings.count == 2 then
+				elseif self.settings.text == 2 then
 					text, color = m.TimeFormat2(timeLeft)
 				end
-				if self.settings.count ~= 0 then
+				if self.settings.text ~= 0 then
 					frame.count:SetText(text)
 					frame.count:SetTextColor(unpack(color))
 				end
