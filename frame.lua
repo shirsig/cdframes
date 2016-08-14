@@ -115,9 +115,11 @@ end
 
 function m.method:IconFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(40)
-	frame:SetHeight(40)
+	frame:SetWidth(41)
+	frame:SetHeight(41)
 	frame.button = CreateFrame('CheckButton', m.Name(), frame, 'ActionButtonTemplate')
+	frame.button:SetWidth(37)
+	frame.button:SetHeight(37)
 	frame.button:SetPoint('CENTER', 0, 0)
 	frame.button:SetHighlightTexture(nil)
 	frame.button:RegisterForClicks()
@@ -190,8 +192,8 @@ function m.method:PlaceFrames()
 	}
 	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM')..(strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
 
-	local spacing = self.settings.spacing * 40
-	local slotSize = 40 + spacing
+	local spacing = self.settings.spacing * 41
+	local slotSize = 41 + spacing
 
 	local size = {
 		[axis1] = min(self.settings.size, self.settings.line) * slotSize - spacing,
