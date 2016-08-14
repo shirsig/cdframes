@@ -10,13 +10,13 @@ private.DEFAULT_SETTINGS = {
 	scale = 1,
 	size = 16,
 	line = 8,
-	spacing = 2,
+	spacing = 0,
 	orientation = 'RU',
-	ignoreList = '',
-	count = 1,
+	text = 1,
 	blink = 7,
 	animation = false,
 	clickThrough = false,
+	ignoreList = '',
 }
 
 function public.New(title, color, settings)
