@@ -215,7 +215,7 @@ function m.method:PlaceFrames()
 
 	local x, y = unpack(self.settings.position)
 	self.frame:ClearAllPoints()
-	self.frame:SetPoint(anchor, UIParent, 'BOTTOMLEFT', x - sign.x * slotSize/2, y - sign.y * slotSize/2)
+	self.frame:SetPoint(anchor, UIParent, 'BOTTOMLEFT', x - sign.x * (slotSize-spacing)/2, y - sign.y * (slotSize-spacing)/2)
 end
 
 function m.method:Lock()
