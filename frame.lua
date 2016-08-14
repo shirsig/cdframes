@@ -106,6 +106,8 @@ function m.method:CreateFrames()
 		elseif self.settings.text == 2 then
 			iconFrame.count:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
 			iconFrame.count:SetPoint('CENTER', 0, 1)
+		elseif iconFrame.count:GetText() then
+			iconFrame.count:SetText('')
 		end
 	end
 
