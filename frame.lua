@@ -100,7 +100,7 @@ function m.method:CreateFrames()
 		iconFrame:EnableMouse(not self.settings.clickThrough)
 		iconFrame.cooldown:SetSequenceTime(0, 1000)
 		if self.settings.count == 1 then
-			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
+			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
 			iconFrame.count:SetPoint('CENTER', 0, 0)
 		elseif self.settings.count == 2 then
 			iconFrame.count:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
@@ -175,11 +175,12 @@ function m.method:Configure()
 end
 
 function m.method:PlaceFrames()
-	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
+	local scale = self.settings.scale * m.BASE_SCALE
+	self.frame:SetScale(scale)
 	local orientation = self.settings.orientation
 	local size, line, spacing = self.settings.size, self.settings.line, self.settings.spacing
 
-	local slotSize = 40 + spacing
+	local slotSize = 40 + spacing * (1/scale)
 	if CDFrames.In('UL,UR,DL,DR', orientation) then
 		self.frame:SetWidth(ceil(size/line) * slotSize)
 		self.frame:SetHeight(min(size, line) * slotSize)
