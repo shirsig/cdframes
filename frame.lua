@@ -1,6 +1,6 @@
 local m, public, private = CDFrames.module'frame'
 
-public.BASE_SCALE = 1
+public.BASE_SCALE = .85
 private.ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 private.DEFAULT_SETTINGS = {
@@ -149,14 +149,14 @@ function m.method:DummyFrame(i)
 	background:SetPoint('TOPLEFT', 3, -5)
 	background:SetPoint('BOTTOMRIGHT', -2, 1)
 	background:SetTexture(unpack(self.color))
-	background:SetAlpha(1)
+	background:SetAlpha(.85)
 	local border = frame:CreateTexture(nil, 'OVERLAY')
 	border:SetPoint('TOPLEFT', -1, -1)
 	border:SetPoint('BOTTOMRIGHT', 1, -1)
 	border:SetTexture([[Interface\Buttons\UI-Debuff-Overlays]])
 	border:SetTexCoord(.296875, .5703125, 0, .515625)
 	border:SetVertexColor(unpack(self.color))
-	border:SetAlpha(1)
+	border:SetAlpha(.85)
 	local index = frame:CreateFontString()
 	index:SetPoint('CENTER', 0, 0)
 	index:SetFont([[Fonts\FRIZQT__.ttf]], 16)
