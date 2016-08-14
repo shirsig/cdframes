@@ -101,7 +101,7 @@ function m.method:CreateFrames()
 		iconFrame.cooldown:SetSequenceTime(0, 1000)
 		if self.settings.text == 1 then
 			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
-			iconFrame.count:SetPoint('CENTER', 1, 0)
+			iconFrame.count:SetPoint('CENTER', .5, 0)
 			iconFrame.count:SetJustifyH('CENTER')
 		elseif self.settings.text == 2 then
 			iconFrame.count:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
