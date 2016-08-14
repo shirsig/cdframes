@@ -105,7 +105,7 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'SCALE' then
 			frame.settings.scale = m.ParseNumber{input=parameters[2], min=21/36/m.frame.BASE_SCALE, max=2, default=1}
 		elseif parameters[1] == 'TEXT' then
-			frame.settings.count = m.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
+			frame.settings.text = m.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
 		elseif parameters[1] == 'BLINK' then
 			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=7}
 		elseif parameters[1] == 'ANIMATION' then
