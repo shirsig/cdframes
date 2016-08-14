@@ -1,6 +1,6 @@
 local m, public, private = CDFrames.module'frame'
 
-public.BASE_SCALE = .85
+public.BASE_SCALE = 1
 private.ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 private.DEFAULT_SETTINGS = {
@@ -89,7 +89,7 @@ function m.method:CreateFrames()
 	for i=getn(self.frame.iconFrames)+1,self.settings.size do
 		tinsert(self.frame.iconFrames, self:IconFrame())
 		tinsert(self.frame.dummyFrames, self:DummyFrame(i))
-		self.frame.dummyFrames[i]:SetPoint('CENTER', self.frame.iconFrames[i], 'CENTER')
+		self.frame.dummyFrames[i]:SetAllPoints(self.frame.iconFrames[i])
 	end
 	for i=self.settings.size+1,getn(self.frame.iconFrames) do
 		self.frame.iconFrames[i]:Hide()
@@ -97,7 +97,7 @@ function m.method:CreateFrames()
 	end
 	for i=1,self.settings.size do
 		local iconFrame = self.frame.iconFrames[i]
-		iconFrame:EnableMouse(not self.settings.clickThrough)
+		iconFrame.button:EnableMouse(not self.settings.clickThrough)
 		iconFrame.cooldown:SetSequenceTime(0, 1000)
 		if self.settings.text == 1 then
 			iconFrame.count:SetFont([[Fonts\ARIALN.ttf]], 16, 'THICKOUTLINE')
@@ -114,19 +114,23 @@ function m.method:CreateFrames()
 end
 
 function m.method:IconFrame()
-	local frame = CreateFrame('CheckButton', m.Name(), self.frame, 'ActionButtonTemplate')
-	frame:SetHighlightTexture(nil)
-	frame:RegisterForClicks()
-	frame:SetScript('OnEnter', function()
+	local frame = CreateFrame('Frame', nil, self.frame)
+	frame:SetWidth(40)
+	frame:SetHeight(40)
+	frame.button = CreateFrame('CheckButton', m.Name(), frame, 'ActionButtonTemplate')
+	frame.button:SetPoint('CENTER', 0, 0)
+	frame.button:SetHighlightTexture(nil)
+	frame.button:RegisterForClicks()
+	frame.button:SetScript('OnEnter', function()
 		self:CDTooltip()
 	end)
-	frame:SetScript('OnLeave', function()
+	frame.button:SetScript('OnLeave', function()
 		GameTooltip:Hide()
 	end)
-	frame.texture = getglobal(frame:GetName()..'Icon')
+	frame.texture = getglobal(frame.button:GetName()..'Icon')
 	frame.texture:SetTexCoord(.06, .94, .06, .94)
-	frame.border = frame:GetNormalTexture()
-	frame.cooldown = getglobal(frame:GetName()..'Cooldown')
+	frame.border = frame.button:GetNormalTexture()
+	frame.cooldown = getglobal(frame.button:GetName()..'Cooldown')
 	frame.cooldown:Show()
 	frame.cooldown:SetScript('OnAnimFinished', nil)
 	frame.cooldown:SetScript('OnUpdateModel', function()
@@ -141,20 +145,18 @@ end
 
 function m.method:DummyFrame(i)
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(36)
-	frame:SetHeight(36)
 	local background = frame:CreateTexture()
-	background:SetPoint('TOPLEFT', 0, 0)
-	background:SetPoint('BOTTOMRIGHT', 0, -1)
+	background:SetPoint('TOPLEFT', 3, -5)
+	background:SetPoint('BOTTOMRIGHT', -2, 1)
 	background:SetTexture(unpack(self.color))
-	background:SetAlpha(.85)
+	background:SetAlpha(1)
 	local border = frame:CreateTexture(nil, 'OVERLAY')
-	border:SetPoint('TOPLEFT', -3, 2)
-	border:SetPoint('BOTTOMRIGHT', 3, -3)
+	border:SetPoint('TOPLEFT', -1, -1)
+	border:SetPoint('BOTTOMRIGHT', 1, -1)
 	border:SetTexture([[Interface\Buttons\UI-Debuff-Overlays]])
 	border:SetTexCoord(.296875, .5703125, 0, .515625)
 	border:SetVertexColor(unpack(self.color))
-	border:SetAlpha(.85)
+	border:SetAlpha(1)
 	local index = frame:CreateFontString()
 	index:SetPoint('CENTER', 0, 0)
 	index:SetFont([[Fonts\FRIZQT__.ttf]], 16)
@@ -181,53 +183,37 @@ end
 function m.method:PlaceFrames()
 	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
 	local orientation = self.settings.orientation
-	local size, line, spacing = self.settings.size, self.settings.line, self.settings.spacing
+	local axis1, axis2 = unpack(strfind(orientation, '^[LR]') and {'x', 'y'} or {'y', 'x'})
+	local sign = {
+		x = (strfind(orientation, 'R') and 1 or -1),
+		y = (strfind(orientation, 'U') and 1 or -1),
+	}
+	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM')..(strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
 
-	local slotSize = 36 * (1 + self.settings.spacing) + 4
-	if CDFrames.In('UL,UR,DL,DR', orientation) then
-		self.frame:SetWidth(ceil(size/line) * slotSize)
-		self.frame:SetHeight(min(size, line) * slotSize)
-	elseif CDFrames.In('LU,LD,RU,RD', orientation) then
-		self.frame:SetWidth(min(size, line) * slotSize)
-		self.frame:SetHeight(ceil(size/line) * slotSize)
-	end
+	local spacing = self.settings.spacing * 40
+	local slotSize = 40 + spacing
+
+	local size = {
+		[axis1] = min(self.settings.size, self.settings.line) * slotSize - spacing,
+		[axis2] = ceil(self.settings.size/self.settings.line) * slotSize - spacing,
+	}
+
+	self.frame:SetWidth(size.x)
+	self.frame:SetHeight(size.y)
 	
-	for i=1,size do
+	for i=1,self.settings.size do
 		local frame = self.frame.iconFrames[i]
 		frame:ClearAllPoints()
-		local primaryOffset = 2 + spacing/2 + mod(i-1, line) * slotSize
-		local secondaryOffset = 2 + spacing/2 + floor((i-1)/line) * slotSize
-
-		if orientation == 'UL' then
-			frame:SetPoint('BOTTOMRIGHT', -secondaryOffset, primaryOffset)
-		elseif orientation == 'UR' then
-			frame:SetPoint('BOTTOMLEFT', secondaryOffset, primaryOffset)
-		elseif orientation == 'DL' then
-			frame:SetPoint('TOPRIGHT', -secondaryOffset, -primaryOffset)
-		elseif orientation == 'DR' then
-			frame:SetPoint('TOPLEFT', secondaryOffset, -primaryOffset)
-		elseif orientation == 'LU' then
-			frame:SetPoint('BOTTOMRIGHT', -primaryOffset, secondaryOffset)
-		elseif orientation == 'LD' then
-			frame:SetPoint('TOPRIGHT', -primaryOffset, -secondaryOffset)
-		elseif orientation == 'RU' then
-			frame:SetPoint('BOTTOMLEFT', primaryOffset, secondaryOffset)
-		elseif orientation == 'RD' then
-			frame:SetPoint('TOPLEFT', primaryOffset, -secondaryOffset)
-		end
+		local offset = {
+			[axis1] = sign[axis1] * mod(i-1, self.settings.line) * slotSize,
+			[axis2] = sign[axis2] * floor((i-1)/self.settings.line) * slotSize,
+		}
+		frame:SetPoint(anchor, offset.x, offset.y)
 	end
 
 	local x, y = unpack(self.settings.position)
 	self.frame:ClearAllPoints()
-	if CDFrames.In('UR,RU', orientation) then
-		self.frame:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', x-slotSize/2, y-slotSize/2)
-	elseif CDFrames.In('UL,LU', orientation) then
-		self.frame:SetPoint('BOTTOMRIGHT', UIParent, 'BOTTOMLEFT', x+slotSize/2, y-slotSize/2)
-	elseif CDFrames.In('DR,RD', orientation) then
-		self.frame:SetPoint('TOPLEFT', UIParent, 'BOTTOMLEFT', x-slotSize/2, y+slotSize/2)
-	elseif CDFrames.In('DL,LD', orientation) then
-		self.frame:SetPoint('TOPRIGHT', UIParent, 'BOTTOMLEFT', x+slotSize/2, y+slotSize/2)
-	end
+	self.frame:SetPoint(anchor, UIParent, 'BOTTOMLEFT', x - sign.x * slotSize/2, y - sign.y * slotSize/2)
 end
 
 function m.method:Lock()
@@ -256,8 +242,8 @@ end
 
 function m.method:CDTooltip()
 	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
-	GameTooltip:AddLine(this.tooltip[1])
-	GameTooltip:AddLine(this.tooltip[2], .8, .8, .8, 1)
+	GameTooltip:AddLine(this:GetParent().tooltip[1])
+	GameTooltip:AddLine(this:GetParent().tooltip[2], .8, .8, .8, 1)
 	GameTooltip:Show()
 end
 
