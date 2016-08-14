@@ -66,7 +66,9 @@ function m.method:CreateFrames()
 		end)
 		frame:SetScript('OnDragStop', function()
 			this:StopMovingOrSizing()
-			self.settings.position = {self.frame.iconFrames[1]:GetCenter()}
+			local scale = self.settings.scale * m.BASE_SCALE
+			local x, y = self.frame.iconFrames[1]:GetCenter()
+			self.settings.position = {x*scale, y*scale}
 		end)
 		frame:SetScript('OnClick', function()
 			self:OnClick()
@@ -183,7 +185,8 @@ function m.method:Configure()
 end
 
 function m.method:PlaceFrames()
-	self.frame:SetScale(self.settings.scale * m.BASE_SCALE)
+	local scale = self.settings.scale * m.BASE_SCALE
+	self.frame:SetScale(scale)
 	local orientation = self.settings.orientation
 	local axis1, axis2 = unpack(strfind(orientation, '^[LR]') and {'x', 'y'} or {'y', 'x'})
 	local sign = {
@@ -215,7 +218,7 @@ function m.method:PlaceFrames()
 
 	local x, y = unpack(self.settings.position)
 	self.frame:ClearAllPoints()
-	self.frame:SetPoint(anchor, UIParent, 'BOTTOMLEFT', x - sign.x * (slotSize-spacing)/2, y - sign.y * (slotSize-spacing)/2)
+	self.frame:SetPoint(anchor, UIParent, 'BOTTOMLEFT', x/scale - sign.x * (slotSize-spacing)/2, y/scale - sign.y * (slotSize-spacing)/2)
 end
 
 function m.method:Lock()
