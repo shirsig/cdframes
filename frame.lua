@@ -133,7 +133,6 @@ function m.method:IconFrame()
 		end
 	end)
 	frame.count = frame.cooldown:CreateFontString(nil, 'OVERLAY')
-	frame.count:SetJustifyH('CENTER')
 	return frame
 end
 

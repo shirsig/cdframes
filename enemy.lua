@@ -409,12 +409,10 @@ end
 do
 	local skip = 0
 	function private.UPDATE()
-		if skip > 0 then
-			skip = skip - 1
-			return
-		end
+		if skip ~= 0 then return end
+		skip = mod(skip - 1, 6)
+
 		if CDFrames_Settings.TARGETTARGET.active then
-			skip = 5
 			m.UpdateFrame(m.targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
 		end
 	end
