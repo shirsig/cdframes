@@ -17,7 +17,7 @@ function public.Log(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
 end
 
-function public.present(...)
+function public.Present(...)
 	local called
 	return function()
 		if not called then
