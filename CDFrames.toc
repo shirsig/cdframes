@@ -2,7 +2,8 @@
 ## Title: CDFrames
 ## Author: shirsig
 ## SavedVariables: CDFrames_Settings
-module.lua
+libs\module.lua
+libs\green_t.lua
 core.lua
 frame.lua
 player.lua

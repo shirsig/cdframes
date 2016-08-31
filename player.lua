@@ -1,11 +1,11 @@
-local m, public, private = CDFrames.module'player'
+CDFrames 'player'
 
 function private.BAG_UPDATE_COOLDOWN()
-	m.DetectItemCooldowns()
+	M.DetectItemCooldowns()
 end
 
 function private.SPELL_UPDATE_COOLDOWN()
-	m.DetectSpellCooldowns()
+	M.DetectSpellCooldowns()
 end
 
 function public.Setup()
@@ -13,12 +13,12 @@ function public.Setup()
 	public.frame = CDFrames.frame.New('Player Cooldowns', {.35, .85, .35}, CDFrames_Settings.PLAYER)
 
 	private.events = CreateFrame('Frame')
-	m.events:SetScript('OnEvent', function() m[event]() end)
-	m.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
-	m.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+	M.events:SetScript('OnEvent', function() M[event]() end)
+	M.events:RegisterEvent('BAG_UPDATE_COOLDOWN')
+	M.events:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 
-	m.DetectItemCooldowns()
-	m.DetectSpellCooldowns()
+	M.DetectItemCooldowns()
+	M.DetectSpellCooldowns()
 end
 
 do
@@ -26,14 +26,14 @@ do
 
 	function private.StartCD(name, texture, started, duration)
 		if activeCooldowns[name] then
-			m.frame:CancelCD(activeCooldowns[name])
+			M.frame:CancelCD(activeCooldowns[name])
 		end
-		activeCooldowns[name] = m.frame:StartCD(name, '', texture, started, duration)
+		activeCooldowns[name] = M.frame:StartCD(name, '', texture, started, duration)
 	end
 
 	function private.StopCD(name)
 		if activeCooldowns[name] then
-			m.frame:CancelCD(activeCooldowns[name])
+			M.frame:CancelCD(activeCooldowns[name])
 		end
 	end
 end
@@ -50,16 +50,16 @@ function private.DetectItemCooldowns()
             for slot = 1, GetContainerNumSlots(bag) do
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
 				if enabled == 1 then
-					local name = m.LinkName(GetContainerItemLink(bag, slot))
+					local name = M.LinkName(GetContainerItemLink(bag, slot))
 					if duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
-						m.StartCD(
+						M.StartCD(
 							name,
 							GetContainerItemInfo(bag, slot),
 							started,
 							duration
 						)
 					elseif duration == 0 then
-						m.StopCD(started)
+						M.StopCD(started)
 					end
 				end
             end
@@ -68,16 +68,16 @@ function private.DetectItemCooldowns()
 	for slot=0,19 do
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
-			local name = m.LinkName(GetInventoryItemLink('player', slot))
+			local name = M.LinkName(GetInventoryItemLink('player', slot))
 			if duration > 3 and duration <= 1800 then
-				m.StartCD(
+				M.StartCD(
 					name,
 					GetInventoryItemTexture('player', slot),
 					started,
 					duration
 				)
 			elseif duration == 0 then
-				m.StopCD(started)
+				M.StopCD(started)
 			end
 		end
 	end
@@ -90,14 +90,14 @@ function private.DetectSpellCooldowns()
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
 		if enabled == 1 and duration > 2.5 then
-			m.StartCD(
+			M.StartCD(
 				name,
 				GetSpellTexture(id, BOOKTYPE_SPELL),
 				started,
 				duration
 			)
 		elseif duration == 0 then
-			m.StopCD(name)
+			M.StopCD(name)
 		end
 	end
 end
