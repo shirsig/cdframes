@@ -91,30 +91,69 @@ end
 
 
 function method:CDFrame(i)
-	local name = unique_name
-	local frame = CreateFrame('CheckButton', name, self.frame, 'PetActionButtonTemplate')
-	frame:SetScript('OnEnter', function() self:CDTooltip() end)
-	frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
+	local frame = CreateFrame('Frame', nil, self.frame)
+	frame:SetWidth(30)
+	frame:SetHeight(30)
 	do
 		local background = frame:CreateTexture(nil, 'BACKGROUND')
-		background:SetTexture(unpack(self.color))
-		background:SetAllPoints()
-		frame.background = background
+		local r, g, b = unpack(self.color)
+		background:SetTexture(.5*r, .5*g, .5*b)
+		background:SetPoint('CENTER', 0, 0)
+		background:SetWidth(30)
+		background:SetHeight(30)
 	end
 	do
-		frame.icon = _G[name..'Icon']
-		frame.icon:SetTexCoord(.06, .94, .06, .94)
+		local icon = frame:CreateTexture()
+		icon:SetDrawLayer('BACKGROUND', 1)
+		icon:SetPoint('CENTER', 0, 0)
+		icon:SetWidth(34)
+		icon:SetHeight(34)
+		icon:SetTexCoord(.07, .93, .07, .93)
+		frame.icon = icon
 	end
 	do
-		frame.border = frame:GetNormalTexture()
+		local border = frame:CreateTexture()
+		border:SetDrawLayer('BACKGROUND', 2)
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\Border]])
+		border:SetPoint('CENTER', 0, 0)
+		border:SetWidth(32)
+		border:SetHeight(32)
+		border:SetBlendMode'ADD'
+		frame.border = border
 	end
 	do
-		local autocast = _G[name..'AutoCast']
---		autocast:Show()
+		local gloss = frame:CreateTexture(nil, 'OVERLAY')
+		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Gloss]])
+		gloss:SetPoint('CENTER', 0, 0)
+		gloss:SetWidth(36)
+		gloss:SetHeight(36)
+		--gloss:SetBlendMode'ADD'
 	end
+--	local name = unique_name
+--	local frame = CreateFrame('CheckButton', name, self.frame, 'PetActionButtonTemplate')
+--	frame:SetScript('OnEnter', function() self:CDTooltip() end)
+--	frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
+--	do
+--		local background = frame:CreateTexture(nil, 'BACKGROUND')
+--		background:SetTexture(unpack(self.color))
+--		background:SetAllPoints()
+--		frame.background = background
+--	end
+--	do
+--		frame.icon = _G[name..'Icon']
+--		frame.icon:SetTexCoord(.06, .94, .06, .94)
+--	end
+--	do
+--		frame.border = frame:GetNormalTexture()
+--	end
+--	do
+--		local autocast = _G[name..'AutoCast']
+----		autocast:Show()
+--	end
 	do
-		local cooldown = _G[name..'Cooldown']
-		cooldown:ClearAllPoints()
+--		local cooldown = _G[name..'Cooldown']
+		local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
+--		cooldown:ClearAllPoints()
 		cooldown:SetAllPoints()
 		cooldown:SetScript('OnAnimFinished', nil)
 		cooldown:SetScript('OnUpdateModel', function()
@@ -123,12 +162,12 @@ function method:CDFrame(i)
 				this:SetSequenceTime(0, (1 - progress) * 1000)
 			end
 		end)
-		cooldown:Show()
+--		cooldown:Show()
 		frame.cooldown = cooldown
 	end
 	do
 		local text_frame = CreateFrame('Frame', nil, frame)
-		text_frame:SetFrameLevel(4)
+		text_frame:SetFrameLevel(5)
 		local text = text_frame:CreateFontString()
 		text:ClearAllPoints()
 		frame.text = text
@@ -170,8 +209,10 @@ function method:PlaceFrames()
 	)
 	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM')..(strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
 
-	local spacing = self.settings.spacing * 32.5
-	local slotSize = 32.5 + spacing
+	local spacing = self.settings.spacing * 35.2
+	local slotSize = 35.2 + spacing
+--	local spacing = self.settings.spacing * 32.5
+--	local slotSize = 32.5 + spacing
 
 	local size = temp-T(
 		axis1, min(self.settings.size, self.settings.line) * slotSize - spacing,
