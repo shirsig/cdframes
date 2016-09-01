@@ -9,8 +9,8 @@ function private.SPELL_UPDATE_COOLDOWN()
 end
 
 function public.Setup()
-	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or {}
-	public.frame = CDFrames.frame.New('Player Cooldowns', {.35, .85, .35}, CDFrames_Settings.PLAYER)
+	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or t
+	public.frame = CDFrames.frame.New('Player Cooldowns', {.2, .8, .2}, CDFrames_Settings.PLAYER)
 
 	private.events = CreateFrame('Frame')
 	M.events:SetScript('OnEvent', function() M[event]() end)
@@ -22,7 +22,7 @@ function public.Setup()
 end
 
 do
-	activeCooldowns = {}
+	activeCooldowns = t
 
 	function private.StartCD(name, texture, started, duration)
 		if activeCooldowns[name] then
@@ -86,7 +86,7 @@ end
 function private.DetectSpellCooldowns()	
 	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
 	local totalSpells = offset + spellCount
-	for id=1,totalSpells do
+	for id = 1, totalSpells do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
 		if enabled == 1 and duration > 2.5 then

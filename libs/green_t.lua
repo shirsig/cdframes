@@ -18,8 +18,7 @@ end
 
 function wipe(t) -- like with a cloth or something
 	for k in t do t[k] = nil end
-	t.reset = 1
-	t.reset = nil
+	t.reset, t.reset = nil, 1
 	setn(t, 0)
 	return setmetatable(t, nil)
 end
@@ -78,43 +77,43 @@ do
 	do
 		local mt = mt(function(t) tmp[t] = true; return t end)
 		public.temp
-		{
-			get = function() return setmetatable(table(), mt) end,
-			set = function(t) tmp[t] = true end,
-		}
+			{
+				get = function() return setmetatable(table(), mt) end,
+				set = function(t) tmp[t] = true end,
+			}
 	end
 	do
 		local mt = mt(function(t) tmp[t] = nil; return t end)
 		public.perm
-		{
-			get = function() return setmetatable(table(), mt) end,
-			set = function(t) tmp[t] = nil end,
-		}
+			{
+				get = function() return setmetatable(table(), mt) end,
+				set = function(t) tmp[t] = nil end,
+			}
 	end
 end
 do
-	local KEYS, VALUES, RETURN_VALUES, PAIRS = 1, 2, 3, 4
+	local SET, ARRAY, ARRAY0, TABLE = 1, 2, 3, 4
 	local function insert(type)
 		local code = 'local setn = table.setn; return function('
 		for i = 1, 99 do
 			code = code..'a'..i..','
 		end
 		code = code..'overflow) local t = t;'
-		if type == KEYS then
+		if type == SET then
 			for i = 1, 99 do
 				code = code..format('if a%d == nil then return t end; t[a%d] = true;', i, i)
 			end
-		elseif type == VALUES then
+		elseif type == ARRAY then
 			code = code..'setn(t, 99); if a1 == nil then return t end; t[1] = a1;'
 			for i = 2, 99 do
 				code = code..format('if a%d == nil then setn(t, %d); return t end; t[%d] = a%d;', i, i - 1, i, i)
 			end
-		elseif type == RETURN_VALUES then
+		elseif type == ARRAY0 then
 			code = code..'setn(t, 99);'
 			for i = 1, 99 do
 				code = code..format('t[%d] = a%d;', i, i)
 			end
-		elseif type == PAIRS then
+		elseif type == TABLE then
 			for i = 1, 97, 2 do
 				code = code..format('if a%d == nil then return t end; t[a%d] = a%d;', i, i, i + 1)
 			end
@@ -124,8 +123,8 @@ do
 		setfenv(f, M)
 		return f
 	end
-	public.set.get = insert(KEYS)
-	public.list.get = insert(VALUES)
-	public.ret.get = insert(RETURN_VALUES)
-	public.T.get = insert(PAIRS)
+	public.S.get = insert(SET)
+	public.A.get = insert(ARRAY)
+	public.A0.get = insert(ARRAY0)
+	public.T.get = insert(TABLE)
 end

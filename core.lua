@@ -2,10 +2,12 @@ do
 	local modules = {}
 	CDFrames = function(name)
 		if not modules[name] then
-			module()
-			modules[name] = M
-			import (green_t)
-			private.CDFrames = setmetatable({}, {__metatable=false, __index=function(_, key) return modules[key].I end, __newindex=error})
+			(function()
+				module()
+				modules[name] = M
+				import (green_t)
+				private.CDFrames = setmetatable({}, {__metatable=false, __index=function(_, key) return modules[key].I end, __newindex=error})
+			end)()
 		end
 		modules[name].import (modules.core.I)
 		setfenv(2, modules[name])
@@ -25,7 +27,7 @@ function public.Log(msg)
 end
 
 function public.List(first, ...)
-	for i=1,arg.n do
+	for i = 1, arg.n do
 		first = first..','..arg[i]
 	end
 	return first or ''
@@ -71,7 +73,6 @@ end
 function private.SlashHandler(str)
 	str = strupper(str)
 	local parameters = M.Tokenize(str)
-
 	local frames = {}
 	if M.In(parameters[1], 'PLAYER') then
 		tinsert(frames, CDFrames.player.frame)
@@ -87,7 +88,6 @@ function private.SlashHandler(str)
 	else
 		tremove(parameters, 1)
 	end
-
 	for _, frame in frames do
 		if parameters[1] == 'ON' then
 			frame.settings.active = true
@@ -104,7 +104,7 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'SPACING' then
 			frame.settings.spacing = M.ParseNumber{input=parameters[2], min=0, max=1, default=0}
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = M.ParseNumber{input=parameters[2], min=21/37/CDFrames.frame.BASE_SCALE, max=2, default=1}
+			frame.settings.scale = M.ParseNumber{input=parameters[2], min=21/37, max=1, default=1}
 		elseif parameters[1] == 'TEXT' then
 			frame.settings.text = M.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
 		elseif parameters[1] == 'BLINK' then
@@ -141,7 +141,6 @@ function private.SlashHandler(str)
 		else
 			return
 		end
-
 		frame:Configure()
 	end
 end

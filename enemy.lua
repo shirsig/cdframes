@@ -261,8 +261,8 @@ private.COMBAT_LOG_PATTERNS_PARTIAL = {
 function public.Setup()
 	CDFrames_Settings.TARGET = CDFrames_Settings.TARGET or {}
 	CDFrames_Settings.TARGETTARGET = CDFrames_Settings.TARGETTARGET or {active=false}
-	public.targetFrame = CDFrames.frame.New('Target Cooldowns', {.85, .35, .35}, CDFrames_Settings.TARGET)
-	public.targetTargetFrame = CDFrames.frame.New('Target Target Cooldowns', {.35, .35, .85}, CDFrames_Settings.TARGETTARGET)
+	public.targetFrame = CDFrames.frame.New('Target Cooldowns', {.8, .2, .2}, CDFrames_Settings.TARGET)
+	public.targetTargetFrame = CDFrames.frame.New('Target Target Cooldowns', {.2, .2, .8}, CDFrames_Settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	M.events:SetScript('OnUpdate', M.UPDATE)
@@ -273,8 +273,8 @@ function public.Setup()
 	end
 	M.events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	private.targetedEnemies = {}
-	private.activeCooldowns = {}
+	private.targetedEnemies = t
+	private.activeCooldowns = t
 end
 
 function private.OnCombatLogEvent()
