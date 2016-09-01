@@ -92,42 +92,51 @@ end
 
 function method:CDFrame(i)
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(30)
-	frame:SetHeight(30)
+	frame:SetWidth(34)
+	frame:SetHeight(34)
 	do
-		local background = frame:CreateTexture(nil, 'BACKGROUND')
+		local background = frame:CreateTexture()
+		background:SetDrawLayer('BACKGROUND', 1)
 		local r, g, b = unpack(self.color)
 		background:SetTexture(.5*r, .5*g, .5*b)
 		background:SetPoint('CENTER', 0, 0)
-		background:SetWidth(30)
-		background:SetHeight(30)
+		background:SetWidth(34)
+		background:SetHeight(34)
 	end
 	do
 		local icon = frame:CreateTexture()
-		icon:SetDrawLayer('BACKGROUND', 1)
+		icon:SetDrawLayer('BACKGROUND', 2)
 		icon:SetPoint('CENTER', 0, 0)
 		icon:SetWidth(34)
 		icon:SetHeight(34)
-		icon:SetTexCoord(.07, .93, .07, .93)
+		icon:SetTexCoord(.08, .92, .08, .92)
 		frame.icon = icon
 	end
 	do
-		local border = frame:CreateTexture()
-		border:SetDrawLayer('BACKGROUND', 2)
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\Border]])
+		local normal = frame:CreateTexture()
+		normal:SetDrawLayer('BACKGROUND', 3)
+		normal:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]])
+		normal:SetPoint('CENTER', 0, 0)
+		normal:SetWidth(42)
+		normal:SetHeight(42)
+		normal:SetVertexColor(.3, .3, .3)
+		frame.normal = normal
+	end
+	do
+		local border = frame:CreateTexture(nil, 'BORDER')
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Border]])
 		border:SetPoint('CENTER', 0, 0)
-		border:SetWidth(32)
-		border:SetHeight(32)
-		border:SetBlendMode'ADD'
+		border:SetWidth(42)
+		border:SetHeight(42)
 		frame.border = border
 	end
 	do
 		local gloss = frame:CreateTexture(nil, 'OVERLAY')
-		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Gloss]])
+		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Gloss]])
 		gloss:SetPoint('CENTER', 0, 0)
-		gloss:SetWidth(36)
-		gloss:SetHeight(36)
-		--gloss:SetBlendMode'ADD'
+		gloss:SetWidth(42)
+		gloss:SetHeight(42)
+		gloss:SetBlendMode('ADD')
 	end
 --	local name = unique_name
 --	local frame = CreateFrame('CheckButton', name, self.frame, 'PetActionButtonTemplate')
