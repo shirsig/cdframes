@@ -1,0 +1,170 @@
+v7.0.3
+-update TOC
+
+v5.4.7
+-updated "Push" color for higher visibility
+-updated Masque version number
+
+v5.4
+-update TOC
+
+v5.33
+-fix typo
+
+v5.3
+-update TOC
+
+v5.2
+-update TOC, minor tweaks
+
+v5.1
+-update TOC pending changes which I'm still testing
+
+v5.0.3
+-added Fade Circle
+
+v5.0.2
+-fixed typo, version update
+
+v5.0.1
+-update TOC
+
+v4.3.4
+-code cleanup, version update
+
+v4.3
+-update TOC
+
+v4.2m1
+-transitioning to Masque, revised code accordingly
+
+v4.2
+-revert Blendmode on "Light" skins to BLEND
+-update TOC
+
+v4.1
+-update TOC to 40100
+
+v4.1beta2
+-addressed Light code typo as reported by LimeAndSugar on WoWI
+-revised Thinnerest Gloss
+-revised Circle textures and code
+-added Circle Pro skin
+
+v4.1beta
+-adjust Hotkey and Count text positions
+-fixed equipped border coloring for "Light" versions 
+-revise all textures except "Circle" (still revising)
+-Square Thin is slightly wider
+-added Thinnerest for "so thin i can barely see it fans"
+
+v4.0.3a
+-recode all skins to comply with and take advantage of the new LBF_Version data table
+-revised all textures for Beveled, Rounded, Square, Square Thin
+-changed Gloss texture
+-added Fade skin for testing
+
+v4.0.1
+-merge beta changes with live
+-removed XL, XXL, Dark skins
+-Rounded XL renamed to Rounded
+-fixed Pushed and Highlight sizing for Square skin
+
+v4.0.3.13117
+-revised textures for Backdrops and Overlays
+-revised Square Thin Normal and Border textures
+-revised Normal and Border textures (Beveled, Circled, Rounded) to address pixlation
+-revised code
+-removed shadow under Circle Normal texture
+-submitting for public testing with Cataclysm Beta and ButtonFacade 3.3.333
+
+v9.06beta
+-revised Backdrop and Overlay textures for Beveled XL and Square Thin
+-revised Pushed, Highlight and Flash colors for Beveled XL and Square Thin
+
+v8.20beta
+-added Square Thin skin
+-renamed "Limb0 XL" to "Beveled XL"
+
+v0810
+-added Limb0 skin
+
+v0708
+-revert to grey Backrop for users wishing to recolor as requested by Nevyr28
+
+v0707
+-revised Backdrop textures
+
+v0706
+-removed solid skins
+-revised Round skins
+-revised Square skins
+-revised some Circle skins
+-revised code to work with new ButtonFacade (still issues with Satrina Buff Frames though)
+
+v0512
+-revised RoundedSquareShade Gloss
+
+v0511
+-cleaned up code
+-added "SquareShadeDark" skin
+-renamed "Circle" to "CircleShade"
+-renamed "Circle2" to "Circle"
+
+v0507
+-resized all textures
+-added "SquareShade" skin
+
+v0506
+-revised RoundedSquareShade Gloss
+
+v0429
+-added "RoundedSquareShade" skin
+-recode to fix  equipped and disabled border colors not showing up
+-darkened a few textures
+-added "RoundedSquareShade2" skin for a darker feel
+
+v0428
+-revised RoundedSquare Gloss
+-revised default Circle Normal color to white
+-revised Circle2 Normal texture
+-revised Square Normal texture
+
+v0427
+-added "RoundedSquare" skin
+
+v0223
+-revised Square Gloss (nicer fade for larger buttons)
+
+v0213
+-revised colors
+
+v0211
+-revised Square Gloss texture
+
+v0209
+-revised location of Name and Count for Square skin
+
+v0208
+-revised Square sizing
+-revised default colors
+
+v0206
+-revised Circle Normal  texture
+
+v0205
+-added "Circle2" skin (basic circle, less shading)
+
+v0202
+-new Gloss textures
+-new Circle Normal texture
+
+v0201
+-new Circle textures
+-new Square textures
+-adjust Name position
+-adjust Number position
+-adjust Hotkey position
+
+v0131 
+-initial commit
