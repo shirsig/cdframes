@@ -39,9 +39,13 @@ function method:LoadSettings(settings)
 	self:Configure()
 end
 
+do local i = 0
+	function public.unique_name.get() i = i + 1; return 'CDFrame'..i end
+end
+
 function method:CreateFrames()
 	if not self.frame then
-		local frame = CreateFrame('Button')
+		local frame = CreateFrame('Button', unique_name, UIParent)
 		self.frame = frame
 		frame:SetMovable(true)
 		frame:SetToplevel(true)
@@ -85,10 +89,9 @@ function method:CreateFrames()
 	end
 end
 
-local id = 0
+
 function method:CDFrame(i)
-	id = id + 1
-	local name = 'kekkek'..id
+	local name = unique_name
 	local frame = CreateFrame('CheckButton', name, self.frame, 'PetActionButtonTemplate')
 	frame:SetScript('OnEnter', function() self:CDTooltip() end)
 	frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
@@ -111,6 +114,8 @@ function method:CDFrame(i)
 	end
 	do
 		local cooldown = _G[name..'Cooldown']
+		cooldown:ClearAllPoints()
+		cooldown:SetAllPoints()
 		cooldown:SetScript('OnAnimFinished', nil)
 		cooldown:SetScript('OnUpdateModel', function()
 			if self.settings.animation and this.started then
