@@ -96,46 +96,48 @@ function method:CDFrame(i)
 	frame:SetHeight(34)
 	do
 		local background = frame:CreateTexture()
-		background:SetDrawLayer('BACKGROUND', 1)
+		background:SetDrawLayer('BACKGROUND')
 		local r, g, b = unpack(self.color)
 		background:SetTexture(.5*r, .5*g, .5*b)
 		background:SetPoint('CENTER', 0, 0)
-		background:SetWidth(34)
-		background:SetHeight(34)
+		background:SetWidth(32)
+		background:SetHeight(32)
 	end
 	do
 		local icon = frame:CreateTexture()
-		icon:SetDrawLayer('BACKGROUND', 2)
+		icon:SetDrawLayer('BORDER')
 		icon:SetPoint('CENTER', 0, 0)
-		icon:SetWidth(34)
-		icon:SetHeight(34)
+		icon:SetWidth(32)
+		icon:SetHeight(32)
 		icon:SetTexCoord(.08, .92, .08, .92)
 		frame.icon = icon
 	end
 	do
 		local normal = frame:CreateTexture()
-		normal:SetDrawLayer('BACKGROUND', 3)
-		normal:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]])
+		normal:SetDrawLayer('ARTWORK')
+		normal:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
 		normal:SetPoint('CENTER', 0, 0)
 		normal:SetWidth(42)
 		normal:SetHeight(42)
-		normal:SetVertexColor(.3, .3, .3)
+		normal:SetVertexColor(0, 0, 0)
 		frame.normal = normal
 	end
 	do
-		local border = frame:CreateTexture(nil, 'BORDER')
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Border]])
+		local border = frame:CreateTexture(nil, 'OVERLAY')
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
 		border:SetPoint('CENTER', 0, 0)
 		border:SetWidth(42)
 		border:SetHeight(42)
+		border:SetVertexColor(0, 0, 0)
 		frame.border = border
 	end
 	do
 		local gloss = frame:CreateTexture(nil, 'OVERLAY')
-		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Gloss]])
+		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
 		gloss:SetPoint('CENTER', 0, 0)
 		gloss:SetWidth(42)
 		gloss:SetHeight(42)
+		gloss:SetVertexColor(1, 1, 1, .65)
 		gloss:SetBlendMode('ADD')
 	end
 --	local name = unique_name
@@ -179,6 +181,7 @@ function method:CDFrame(i)
 		text_frame:SetFrameLevel(5)
 		local text = text_frame:CreateFontString()
 		text:ClearAllPoints()
+		text:SetAllPoints()
 		frame.text = text
 	end
 --	frame:SetChecked(1)
