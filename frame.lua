@@ -92,53 +92,47 @@ end
 
 function method:CDFrame(i)
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(34)
-	frame:SetHeight(34)
+	frame:SetWidth(42)
+	frame:SetHeight(42)
 	do
-		local background = frame:CreateTexture()
-		background:SetDrawLayer('BACKGROUND')
+		local background = frame:CreateTexture(nil, 'BACKGROUND')
 		local r, g, b = unpack(self.color)
 		background:SetTexture(.5*r, .5*g, .5*b)
 		background:SetPoint('CENTER', 0, 0)
-		background:SetWidth(32)
-		background:SetHeight(32)
+		background:SetWidth(36)
+		background:SetHeight(36)
 	end
 	do
-		local icon = frame:CreateTexture()
-		icon:SetDrawLayer('BORDER')
+		local icon = frame:CreateTexture(nil, 'BORDER')
 		icon:SetPoint('CENTER', 0, 0)
-		icon:SetWidth(32)
-		icon:SetHeight(32)
-		icon:SetTexCoord(.08, .92, .08, .92)
+		icon:SetWidth(36)
+		icon:SetHeight(36)
+--		icon:SetTexCoord(.08, .92, .08, .92)
 		frame.icon = icon
 	end
 	do
-		local normal = frame:CreateTexture()
-		normal:SetDrawLayer('ARTWORK')
-		normal:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
-		normal:SetPoint('CENTER', 0, 0)
-		normal:SetWidth(42)
-		normal:SetHeight(42)
-		normal:SetVertexColor(0, 0, 0)
+		local normal = frame:CreateTexture(nil, 'ARTWORK')
+		normal:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
+		normal:SetAllPoints()
+		normal:SetVertexColor(.3, .3, .3)
 		frame.normal = normal
 	end
 	do
 		local border = frame:CreateTexture(nil, 'OVERLAY')
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
-		border:SetPoint('CENTER', 0, 0)
-		border:SetWidth(42)
-		border:SetHeight(42)
-		border:SetVertexColor(0, 0, 0)
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Border]])
+		border:SetAllPoints()
+--		border:SetVertexColor(0, 0, 0)
+		border:SetBlendMode('ADD')
 		frame.border = border
 	end
 	do
 		local gloss = frame:CreateTexture(nil, 'OVERLAY')
-		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
+		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Gloss]])
 		gloss:SetPoint('CENTER', 0, 0)
 		gloss:SetWidth(42)
 		gloss:SetHeight(42)
-		gloss:SetVertexColor(1, 1, 1, .65)
-		gloss:SetBlendMode('ADD')
+		gloss:SetAlpha(.8)
+--		gloss:SetBlendMode('ADD')
 	end
 --	local name = unique_name
 --	local frame = CreateFrame('CheckButton', name, self.frame, 'PetActionButtonTemplate')
