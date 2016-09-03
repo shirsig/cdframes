@@ -21,9 +21,9 @@ do local frame = CreateFrame('Frame')
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.CDFrames_Settings = {}
+_G.CDFrames_Settings = t
 
-function public.Log(msg)
+function public.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
 end
 
@@ -133,9 +133,9 @@ function private.SLASH(str)
 			end
 			frame.settings.ignoreList = M.List(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			M.Log(frame.key..':')
+			print(frame.key..':')
 			for _, name in M.Elems(frame.settings.ignoreList) do
-				M.Log(name)
+				print(name)
 			end
 		elseif parameters[1] == 'RESET' then
 			frame:Reset()

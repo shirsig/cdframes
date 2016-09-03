@@ -39,13 +39,9 @@ function method:LoadSettings(settings)
 	self:Configure()
 end
 
-do local i = 0
-	function public.unique_name.get() i = i + 1; return 'CDFrame'..i end
-end
-
 function method:CreateFrames()
 	if not self.frame then
-		local frame = CreateFrame('Button', unique_name, UIParent)
+		local frame = CreateFrame('Button', nil, UIParent)
 		self.frame = frame
 		frame:SetMovable(true)
 		frame:SetToplevel(true)
@@ -94,26 +90,29 @@ function method:CDFrame(i)
 	frame.id = i
 	frame:SetWidth(42)
 	frame:SetHeight(42)
-	do
-		local icon = frame:CreateTexture(nil, 'BACKGROUND')
+	do local icon = frame:CreateTexture(nil, 'BACKGROUND')
 		icon:SetPoint('CENTER', 0, 0)
-		icon:SetWidth(32)
+		icon:SetWidth(32) -- fade
 		icon:SetHeight(32)
-		icon:SetTexCoord(.08, .92, .08, .92)
+--		icon:SetWidth(34) -- thinnerest
+--		icon:SetHeight(34)
+--		icon:SetWidth(36) -- caith
+--		icon:SetHeight(36)
+--		icon:SetTexCoord(.07, .93, .07, .93) -- blizzard
+		icon:SetTexCoord(.08, .92, .08, .92) -- fade/thinnerest
 		frame.icon = icon
 	end
-	do
-		local border = frame:CreateTexture(nil, 'BORDER')
-		border:SetAllPoints()
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
---				border:SetVertexColor(0.77, 0.12, 0.23, 1)
-		frame.border = border
-	end
-	do
-		local border = frame:CreateTexture(nil, 'ARTWORK')
+	do local border = frame:CreateTexture(nil, 'BORDER')
 		border:SetAllPoints()
 		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
-		border:SetVertexColor(0, 0, 0)
+		border:SetVertexColor(0, 0, 0, 1)
+--		border:SetBlendMode('ADD') -- caith
+		frame.border = border
+	end
+	do local border = frame:CreateTexture(nil, 'ARTWORK')
+		border:SetAllPoints()
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
+		border:SetVertexColor(0, 0, 0, 1)
 		frame.border = border
 	end
 --	do
@@ -126,8 +125,7 @@ function method:CDFrame(i)
 		gloss:SetAllPoints()
 		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
 		gloss:SetAlpha(1)
---		gloss:SetVertexColor(1,1,1,1)
-		gloss:SetBlendMode('ADD')
+		gloss:SetBlendMode('ADD') -- fade/thinnerest
 	end
 	do local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
@@ -144,6 +142,13 @@ function method:CDFrame(i)
 		end)
 		cooldown:Show()
 		frame.cooldown = cooldown
+	end
+	do local autocast = CreateFrame('Model', nil, frame)
+		autocast:SetModel([[Interface\Buttons\UI-AutoCastButton.mdx]])
+		autocast:SetAllPoints(frame.icon)
+		autocast:SetScale(1.2 * frame.icon:GetWidth()/30)
+		autocast:Show()
+		frame.autocast = autocast
 	end
 	do local text_frame = CreateFrame('Frame', nil, frame)
 		text_frame:SetFrameLevel(4)
@@ -348,7 +353,7 @@ function private.blink_alpha1(t)
 end
 
 function private.blink_alpha2(t)
-	return (math.sin(t * 4/3 * math.pi) + 1) / 2 * .7 + .3
+	return (sin(t * 4/3 * 180) + 1) / 2 * .7 + .3
 end
 
 function private.time_format1(t) -- TODO ¼ ½ ¾
