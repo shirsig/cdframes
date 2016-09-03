@@ -78,10 +78,10 @@ function method:CreateFrames()
 		cd_frame:EnableMouse(not self.settings.clickThrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
 		if self.settings.text == 1 then
-			cd_frame.text:SetPoint('CENTER', 0, 0)
+			cd_frame.text:SetPoint('CENTER', cd_frame, 'CENTER', 1, 0)
 			cd_frame.text:SetFont([[Fonts\ARIALN.ttf]], 16.5, 'THICKOUTLINE')
 		elseif self.settings.text == 2 then
-			cd_frame.text:SetPoint('CENTER', 0, 1)
+			cd_frame.text:SetPoint('CENTER', cd_frame, 'CENTER', 0, 1)
 			cd_frame.text:SetFont(STANDARD_TEXT_FONT, 16.5, 'OUTLINE')
 		elseif cd_frame.text:GetText() then
 			cd_frame.text:SetText('')
@@ -89,77 +89,52 @@ function method:CreateFrames()
 	end
 end
 
-
 function method:CDFrame(i)
 	local frame = CreateFrame('Frame', nil, self.frame)
+	frame.id = i
 	frame:SetWidth(42)
 	frame:SetHeight(42)
 	do
-		local background = frame:CreateTexture(nil, 'BACKGROUND')
-		local r, g, b = unpack(self.color)
-		background:SetTexture(.5*r, .5*g, .5*b)
-		background:SetPoint('CENTER', 0, 0)
-		background:SetWidth(36)
-		background:SetHeight(36)
-	end
-	do
-		local icon = frame:CreateTexture(nil, 'BORDER')
+		local icon = frame:CreateTexture(nil, 'BACKGROUND')
 		icon:SetPoint('CENTER', 0, 0)
-		icon:SetWidth(36)
-		icon:SetHeight(36)
---		icon:SetTexCoord(.08, .92, .08, .92)
+		icon:SetWidth(32)
+		icon:SetHeight(32)
+		icon:SetTexCoord(.08, .92, .08, .92)
 		frame.icon = icon
 	end
 	do
-		local normal = frame:CreateTexture(nil, 'ARTWORK')
-		normal:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
-		normal:SetAllPoints()
-		normal:SetVertexColor(.3, .3, .3)
-		frame.normal = normal
-	end
-	do
-		local border = frame:CreateTexture(nil, 'OVERLAY')
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Border]])
+		local border = frame:CreateTexture(nil, 'BORDER')
 		border:SetAllPoints()
---		border:SetVertexColor(0, 0, 0)
-		border:SetBlendMode('ADD')
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
+--				border:SetVertexColor(0.77, 0.12, 0.23, 1)
 		frame.border = border
 	end
 	do
-		local gloss = frame:CreateTexture(nil, 'OVERLAY')
-		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Gloss]])
-		gloss:SetPoint('CENTER', 0, 0)
-		gloss:SetWidth(42)
-		gloss:SetHeight(42)
-		gloss:SetAlpha(.8)
---		gloss:SetBlendMode('ADD')
+		local border = frame:CreateTexture(nil, 'ARTWORK')
+		border:SetAllPoints()
+		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
+		border:SetVertexColor(0, 0, 0)
+		frame.border = border
 	end
---	local name = unique_name
---	local frame = CreateFrame('CheckButton', name, self.frame, 'PetActionButtonTemplate')
---	frame:SetScript('OnEnter', function() self:CDTooltip() end)
---	frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
 --	do
---		local background = frame:CreateTexture(nil, 'BACKGROUND')
---		background:SetTexture(unpack(self.color))
---		background:SetAllPoints()
---		frame.background = background
+--		local flash = frame:CreateTexture(nil, 'ARTWORK')
+--		flash:SetAllPoints()
+--		flash:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Overlay]])
+--		flash:SetVertexColor(.5, 0, 1, .6)
 --	end
---	do
---		frame.icon = _G[name..'Icon']
---		frame.icon:SetTexCoord(.06, .94, .06, .94)
---	end
---	do
---		frame.border = frame:GetNormalTexture()
---	end
---	do
---		local autocast = _G[name..'AutoCast']
-----		autocast:Show()
---	end
-	do
---		local cooldown = _G[name..'Cooldown']
-		local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
---		cooldown:ClearAllPoints()
-		cooldown:SetAllPoints()
+	do local gloss = frame:CreateTexture(nil, 'OVERLAY')
+		gloss:SetAllPoints()
+		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
+		gloss:SetAlpha(1)
+--		gloss:SetVertexColor(1,1,1,1)
+		gloss:SetBlendMode('ADD')
+	end
+	do local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
+		cooldown:ClearAllPoints()
+		cooldown:SetPoint('BOTTOMLEFT', frame.icon, 'BOTTOMLEFT', 0, -1)
+		cooldown:SetScale(frame.icon:GetWidth()/36)
+		cooldown:SetWidth(36)
+		cooldown:SetHeight(36)
 		cooldown:SetScript('OnAnimFinished', nil)
 		cooldown:SetScript('OnUpdateModel', function()
 			if self.settings.animation and this.started then
@@ -167,33 +142,30 @@ function method:CDFrame(i)
 				this:SetSequenceTime(0, (1 - progress) * 1000)
 			end
 		end)
---		cooldown:Show()
+		cooldown:Show()
 		frame.cooldown = cooldown
 	end
-	do
-		local text_frame = CreateFrame('Frame', nil, frame)
-		text_frame:SetFrameLevel(5)
-		local text = text_frame:CreateFontString()
-		text:ClearAllPoints()
-		text:SetAllPoints()
-		frame.text = text
+	do local text_frame = CreateFrame('Frame', nil, frame)
+		text_frame:SetFrameLevel(4)
+		frame.text = text_frame:CreateFontString()
 	end
---	frame:SetChecked(1)
 	frame.tooltip = t
 	return frame
 end
 
+--	● × TODO aux
+--M(public) -- TODO
+--__(public)
+--public()
+
+--interface = false
+--
+--import '{aux} kek as moo, kuk'
+
 function method:SetDummyStyle(frame)
 	frame:EnableMouse(false)
 	frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
-	frame.icon:SetBlendMode('ADD')
-	if frame.id == 1 then
-		local text = frame.text
-		text:SetPoint('CENTER', frame, 'CENTER', 0, 0)
-		text:SetFont([[Fonts\ARIALN.ttf]], 30, 'OUTLINE')
-		text:SetTextColor(1, 1, 1, .7)
-		text:SetText('●') -- ×
-	end
+--	frame.icon:SetTexture(unpack(self.color))
 	return frame
 end
 
@@ -215,8 +187,8 @@ function method:PlaceFrames()
 	)
 	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM')..(strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
 
-	local spacing = self.settings.spacing * 35.2
-	local slotSize = 35.2 + spacing
+	local spacing = self.settings.spacing * 36
+	local slotSize = 36 + spacing
 --	local spacing = self.settings.spacing * 32.5
 --	local slotSize = 32.5 + spacing
 
@@ -260,7 +232,7 @@ end
 
 function method:Tooltip()
 	GameTooltip_SetDefaultAnchor(GameTooltip, this)
-	GameTooltip:AddLine(self.title, unpack(self.color))
+	GameTooltip:AddLine(self.title)
 	GameTooltip:AddLine('<Left Drag> move', 1, 1, 1)
 	GameTooltip:AddLine('<Left Click> turn', 1, 1, 1)
 	GameTooltip:AddLine('<Right Click> lock', 1, 1, 1)
@@ -293,7 +265,7 @@ function method:OnClick()
 end
 
 function method:Ignored(name)
-	return In(strupper(self.settings.ignoreList), strupper(name))
+	return contains(strupper(self.settings.ignoreList), strupper(name))
 end
 
 function method:CDID(cooldown)

@@ -281,7 +281,7 @@ function private.OnCombatLogEvent()
 	for _, pattern in M.COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldownName in string.gfind(arg1, pattern) do
 			for _, enemy in M.targetedEnemies do
-				if M.COOLDOWNS[cooldownName] and not M.Active(enemy.name, cooldownName) and (not M.COOLDOWNS[cooldownName].classes or In(M.COOLDOWNS[cooldownName].classes, enemy.class)) then
+				if COOLDOWNS[cooldownName] and not M.Active(enemy.name, cooldownName) and (not COOLDOWNS[cooldownName].classes or In(COOLDOWNS[cooldownName].classes, enemy.class)) then
 					M.StartCD(enemy.name, cooldownName, GetTime())
 					break
 				end
@@ -291,7 +291,7 @@ function private.OnCombatLogEvent()
 
 	for _, pattern in M.COMBAT_LOG_PATTERNS do
 		for player, cooldownName in string.gfind(arg1, pattern) do
-			if M.COOLDOWNS[cooldownName] then
+			if COOLDOWNS[cooldownName] then
 				M.StartCD(player, cooldownName, GetTime())
 			end
 		end
@@ -303,7 +303,7 @@ function private.Key(player, cooldownName)
 end
 
 function private.Expired(cooldown)
-	return cooldown.started + M.COOLDOWNS[cooldown.name].cooldown <= GetTime()
+	return cooldown.started + COOLDOWNS[cooldown.name].cooldown <= GetTime()
 end
 
 function private.Active(player, cooldownName)
@@ -330,7 +330,7 @@ end
 function private.ShowCD(frame, key)
 	local cooldown = M.activeCooldowns[key]
 	if not cooldown[frame] then
-		cooldown[frame] = frame:StartCD(cooldown.name, M.COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]]..M.COOLDOWNS[cooldown.name].icon, cooldown.started, M.COOLDOWNS[cooldown.name].cooldown)
+		cooldown[frame] = frame:StartCD(cooldown.name, COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]]..COOLDOWNS[cooldown.name].icon, cooldown.started, COOLDOWNS[cooldown.name].cooldown)
 	end
 end
 
@@ -385,7 +385,7 @@ end
 function private.UpdateFrame(frame, playerName, playerClass)
 	for key, cooldown in M.CDs() do
 		if playerName == cooldown.player then
-			if M.COOLDOWNS[cooldown.name].classes and not In(M.COOLDOWNS[cooldown.name].classes, playerClass) then
+			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, playerClass) then
 				M.StopCDs(cooldown.player, cooldown.name)
 			else
 				M.ShowCD(frame, key)

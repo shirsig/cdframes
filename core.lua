@@ -16,11 +16,12 @@ end
 
 CDFrames 'core'
 
-_G.CDFrames_Settings = {}
+do local frame = CreateFrame('Frame')
+	frame:SetScript('OnEvent', function() M[event]() end)
+	frame:RegisterEvent('ADDON_LOADED')
+end
 
-private.events = CreateFrame('Frame')
-events:SetScript('OnEvent', function() this[event]() end)
-events:RegisterEvent('ADDON_LOADED')
+_G.CDFrames_Settings = {}
 
 function public.Log(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
@@ -41,7 +42,7 @@ function public.Elems(list)
 	return elems
 end
 
-function public.In(list, str)
+function public.contains(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then
 			return true
@@ -49,17 +50,17 @@ function public.In(list, str)
 	end
 end
 
-function M.events.ADDON_LOADED()
+function ADDON_LOADED()
 	if arg1 ~= 'CDFrames' then return end
 
 	_G.SLASH_CDFrames1 = '/cdframes'
-	_G.SlashCmdList.CDFrames = M.SlashHandler
+	_G.SlashCmdList.CDFrames = SLASH
 
 	CDFrames.player.Setup()
 	CDFrames.enemy.Setup()
 end
 
-function private.ParseNumber(params)
+function private.parse_number(params)
 	local number = tonumber(params.input) or params.default
 	if params.min then
 		number = max(params.min, number)
@@ -70,17 +71,17 @@ function private.ParseNumber(params)
 	return params.integer and floor(number + .5) or number
 end
 
-function private.SlashHandler(str)
+function private.SLASH(str)
 	str = strupper(str)
-	local parameters = M.Tokenize(str)
+	local parameters = tokenize(str)
 	local frames = {}
-	if M.In(parameters[1], 'PLAYER') then
+	if contains(parameters[1], 'PLAYER') then
 		tinsert(frames, CDFrames.player.frame)
 	end
-	if M.In(parameters[1], 'TARGET') then
+	if contains(parameters[1], 'TARGET') then
 		tinsert(frames, CDFrames.enemy.targetFrame)
 	end
-	if M.In(parameters[1], 'TARGETTARGET') then
+	if contains(parameters[1], 'TARGETTARGET') then
 		tinsert(frames, CDFrames.enemy.targetTargetFrame)
 	end
 	if getn(frames) == 0 then
@@ -98,35 +99,35 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = M.ParseNumber{input=parameters[2], min=1, max=100, default=16, integer=true}
+			frame.settings.size = parse_number{input=parameters[2], min=1, max=100, default=16, integer=true}
 		elseif parameters[1] == 'LINE' then
-			frame.settings.line = M.ParseNumber{input=parameters[2], min=1, max=100, default=8, integer=true}
+			frame.settings.line = parse_number{input=parameters[2], min=1, max=100, default=8, integer=true}
 		elseif parameters[1] == 'SPACING' then
-			frame.settings.spacing = M.ParseNumber{input=parameters[2], min=0, max=1, default=0}
+			frame.settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = M.ParseNumber{input=parameters[2], min=21/37, max=1, default=1}
+			frame.settings.scale = parse_number{input=parameters[2], min=21/37, max=5, default=1}
 		elseif parameters[1] == 'TEXT' then
-			frame.settings.text = M.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
+			frame.settings.text = parse_number{input=parameters[2], min=0, max=2, default=1, integer=true}
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = M.ParseNumber{input=parameters[2], min=0, default=7}
+			frame.settings.blink = parse_number{input=parameters[2], min=0, default=7}
 		elseif parameters[1] == 'ANIMATION' then
 			frame.settings.animation = not frame.settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then
 			frame.settings.clickThrough = not frame.settings.clickThrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 			local _, _, list = strfind(str, '[^,]*ADD%s+(.-)%s*$')
-			local names = {}
+			local names = tt
 			for _, name in M.Elems(list) do
-				if not M.In(frame.settings.ignoreList, name) then
+				if not contains(frame.settings.ignoreList, name) then
 					tinsert(names, name)
 				end
 			end
 			frame.settings.ignoreList = frame.settings.ignoreList == '' and M.List(unpack(names)) or frame.settings.ignoreList..','..M.List(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 			local _, _, list = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
-			local names = {}
+			local names = tt
 			for _, name in M.Elems(frame.settings.ignoreList) do
-				if not M.In(list, name) then
+				if not contains(list, name) then
 					tinsert(names, name)
 				end
 			end
@@ -145,8 +146,8 @@ function private.SlashHandler(str)
 	end
 end
 
-function private.Tokenize(str)
-	local tokens = {}
+function private.tokenize(str)
+	local tokens = t
 	for token in string.gfind(str, '%S+') do
 		tinsert(tokens, token)
 	end
