@@ -261,8 +261,8 @@ private.COMBAT_LOG_PATTERNS_PARTIAL = {
 function public.setup()
 	CDFrames_Settings.TARGET = CDFrames_Settings.TARGET or t
 	CDFrames_Settings.TARGETTARGET = CDFrames_Settings.TARGETTARGET or {active=false}
-	public.targetFrame = CDFrames.frame.New('Target Cooldowns', A(.8, .2, .2), CDFrames_Settings.TARGET)
-	public.targetTargetFrame = CDFrames.frame.New('Target Target Cooldowns', A(.2, .2, .8), CDFrames_Settings.TARGETTARGET)
+	public.targetFrame = CDFrames.frame.new('Target Cooldowns', A(.8, .2, .2), CDFrames_Settings.TARGET)
+	public.targetTargetFrame = CDFrames.frame.new('Target Target Cooldowns', A(.2, .2, .8), CDFrames_Settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
@@ -273,16 +273,16 @@ function public.setup()
 	end
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	private.targetedEnemies = t
+	private.targeted_enemies = t
 	private.active_cooldowns = t
 end
 
 function private.OnCombatLogEvent()
 	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldown_name in string.gfind(arg1, pattern) do
-			for _, enemy in targetedEnemies do
+			for _, enemy in targeted_enemies do
 				if COOLDOWNS[cooldown_name] and not active(enemy.name, cooldown_name) and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
-					start_cd(enemy.name, cooldown_name, GetTime()); break
+					start_cooldown(enemy.name, cooldown_name, GetTime()); break
 				end
 			end
 		end
@@ -290,7 +290,7 @@ function private.OnCombatLogEvent()
 
 	for _, pattern in COMBAT_LOG_PATTERNS do
 		for player, cooldown_name in string.gfind(arg1, pattern) do
-			if COOLDOWNS[cooldown_name] then start_cd(player, cooldown_name, GetTime()) end
+			if COOLDOWNS[cooldown_name] then start_cooldown(player, cooldown_name, GetTime()) end
 		end
 	end
 end
@@ -318,14 +318,14 @@ function private.cooldowns()
 	return active_cooldowns
 end
 
-function private.show_cd(frame, key)
+function private.show_cooldown(frame, key)
 	local cooldown = active_cooldowns[key]
 	if not cooldown[frame] then
 		cooldown[frame] = frame:StartCD(cooldown.name, COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]]..COOLDOWNS[cooldown.name].icon, cooldown.started, COOLDOWNS[cooldown.name].cooldown)
 	end
 end
 
-function private.hide_cd(frame, key)
+function private.hide_cooldown(frame, key)
 	local cooldown = active_cooldowns[key]
 	if cooldown[frame] then
 		frame:CancelCD(cooldown[frame])
@@ -335,35 +335,35 @@ end
 
 function private.triggers(player, cooldown_name)
 	if cooldown_name == 'Preparation' then
-		stop_cds(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
+		stop_cooldowns(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
 	elseif cooldown_name == 'Cold Snap' then
-		stop_cds(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova')
+		stop_cooldowns(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova')
 	end
 end
 
-function private.start_cd(player, cooldown_name, started)
+function private.start_cooldown(player, cooldown_name, started)
 	triggers(player, cooldown_name)
 
 	local key = Key(player, cooldown_name)
 	if active_cooldowns[key] then
-		hide_cd(targetFrame, key)
-		hide_cd(targetTargetFrame, key)
+		hide_cooldown(targetFrame, key)
+		hide_cooldown(targetTargetFrame, key)
 	end
 	active_cooldowns[key] = T(
 		'name', cooldown_name,
 		'player', player,
 		'started', started
 	)
-	if player == UnitName('target') then show_cd(targetFrame, key) end
-	if player == UnitName('targettarget') then show_cd(targetTargetFrame, key) end
+	if player == UnitName('target') then show_cooldown(targetFrame, key) end
+	if player == UnitName('targettarget') then show_cooldown(targetTargetFrame, key) end
 end
 
-function private.stop_cds(player, ...)
+function private.stop_cooldowns(player, ...)
 	for i=1,arg.n do
 		local key = Key(player, arg[i])
 		if active_cooldowns[key] then
-			hide_cd(targetFrame, key)
-			hide_cd(targetTargetFrame, key)
+			hide_cooldown(targetFrame, key)
+			hide_cooldown(targetTargetFrame, key)
 			active_cooldowns[key] = nil
 		end
 	end
@@ -373,20 +373,20 @@ function private.update_frame(frame, playerName, playerClass)
 	for key, cooldown in cooldowns() do
 		if playerName == cooldown.player then
 			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, playerClass) then
-				stop_cds(cooldown.player, cooldown.name)
+				stop_cooldowns(cooldown.player, cooldown.name)
 			else
-				show_cd(frame, key)
+				show_cooldown(frame, key)
 			end
 		else
-			hide_cd(frame, key)
+			hide_cooldown(frame, key)
 		end
 	end
 end
 
 function private.PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
-		tinsert(targetedEnemies, 1, T('name', UnitName('target'), 'class', UnitClass('target')))
-		if getn(targetedEnemies) > 100 then release(tremove(targetedEnemies)) end
+		tinsert(targeted_enemies, 1, T('name', UnitName('target'), 'class', UnitClass('target')))
+		if getn(targeted_enemies) > 100 then release(tremove(targeted_enemies)) end
 	end
 	update_frame(targetFrame, UnitName('target'), UnitClass('target'))
 end

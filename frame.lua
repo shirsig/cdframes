@@ -18,7 +18,7 @@ private.DEFAULT_SETTINGS = T(
 	'ignoreList', ''
 )
 
-function public.New(title, color, settings)
+function public.new(title, color, settings)
 	local self = t
 	for k, v in method do self[k] = v end
 	self.title = title
@@ -56,6 +56,7 @@ function method:CreateFrames()
 			wipe(self.settings.position)
 			A[self.settings.position](x * scale, y * scale)
 --			__(wipe(self.settings.position)):A(x * scale, y * scale)
+
 		end)
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
@@ -86,9 +87,61 @@ function method:CreateFrames()
 	end
 end
 
-function method:CDFrame(i)
+do
+	local BLIZZARD, FADE, THINNEREST, CAITH = 1, 2, 3, 4
+	local skin = {
+		blizzard = function(frame)
+			frame.icon:SetWidth(30); frame.icon:SetHeight(30)
+			frame.icon:SetTexCoords(.07, .93, .07, .93)
+			frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
+			frame.gloss:SetTexture(nil)
+			frame.cooldown:SetScale(32/36)
+		end,
+		fade = function(frame)
+			frame.icon:SetWidth(30); frame.icon:SetHeight(30)
+			frame.icon:SetTexCoords(.07, .93, .07, .93)
+			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
+			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
+			frame.gloss:SetBlendMode('ADD')
+			frame.cooldown:SetScale(32/36)
+		end,
+		thinnerest = function(frame)
+			frame.icon:SetWidth(30); frame.icon:SetHeight(30)
+			frame.icon:SetTexCoords(.07, .93, .07, .93)
+			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]])
+			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]])
+			frame.gloss:SetBlendMode('ADD')
+			frame.cooldown:SetScale(32/36)
+		end,
+		caith = function(frame)
+			frame.icon:SetWidth(30); frame.icon:SetHeight(30)
+			frame.icon:SetTexCoords(0, 1, 0, 1)
+			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
+			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
+			frame.gloss:SetBlendMode('BLEND')
+			frame.cooldown:SetScale(1)
+		end,
+		fade = {
+			icon = {size = 32, coordinates={.08, .92, .08, .92}},
+			border = {texture=[[Interface\Addons\CDFrames\Textures\caith\Normal]], color={0, 0, 0}},
+			gloss = {texture=[[Interface\Addons\CDFrames\Textures\caith\Gloss]], mode='ADD'},
+		},
+		caith = {
+			icon = {size = 34, coordinates={.08, .92, .08, .92}},
+			animation_size = 32,
+			border = {texture=[[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]], color={0, 0, 0}},
+			gloss = {texture=[[Interface\Addons\CDFrames\Textures\Thinnerest\Gloss]], mode='ADD'},
+		},
+		caith = {
+			icon = {size = 36},
+			border = {texture=[[Interface\Addons\CDFrames\Textures\caith\Normal]], color={.3, .3, .3}},
+			gloss = {texture=[[Interface\Addons\CDFrames\Textures\caith\Gloss]], mode='ADD'},
+		},
+	}
+end
+
+function method:CDFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame.id = i
 	frame:SetWidth(42)
 	frame:SetHeight(42)
 	do local icon = frame:CreateTexture(nil, 'BACKGROUND')
@@ -105,17 +158,16 @@ function method:CDFrame(i)
 	end
 	do local border = frame:CreateTexture(nil, 'BORDER')
 		border:SetAllPoints()
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
 		border:SetVertexColor(0, 0, 0, 1)
 --		border:SetBlendMode('ADD') -- caith
 		frame.border = border
 	end
-	do local border = frame:CreateTexture(nil, 'ARTWORK')
-		border:SetAllPoints()
-		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
-		border:SetVertexColor(0, 0, 0, 1)
-		frame.border = border
-	end
+--	do local border = frame:CreateTexture(nil, 'ARTWORK')
+--		border:SetAllPoints()
+--		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
+--		border:SetVertexColor(0, 0, 0, 1)
+--		frame.border = border
+--	end
 --	do
 --		local flash = frame:CreateTexture(nil, 'ARTWORK')
 --		flash:SetAllPoints()
@@ -124,14 +176,13 @@ function method:CDFrame(i)
 --	end
 	do local gloss = frame:CreateTexture(nil, 'OVERLAY')
 		gloss:SetAllPoints()
-		gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
-		gloss:SetAlpha(1)
-		gloss:SetBlendMode('ADD') -- fade/thinnerest
+--		gloss:SetAlpha(1)
+		frame.gloss = gloss
 	end
 	do local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
 		cooldown:SetPoint('BOTTOMLEFT', frame.icon, 'BOTTOMLEFT', 0, -1)
-		cooldown:SetScale(frame.icon:GetWidth()/36)
+--		cooldown:SetScale(frame.icon:GetWidth()/36)
 		cooldown:SetWidth(36)
 		cooldown:SetHeight(36)
 		cooldown:SetScript('OnAnimFinished', nil)
