@@ -58,7 +58,7 @@ function private.SPELL_UPDATE_COOLDOWN()
 	end
 end
 
-function public.Setup()
+function public.setup()
 	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or t
 	public.frame = CDFrames.frame.New('Player Cooldowns', {.2, .8, .2}, CDFrames_Settings.PLAYER)
 	do local frame = CreateFrame('Frame')
@@ -70,25 +70,16 @@ function public.Setup()
 	SPELL_UPDATE_COOLDOWN()
 end
 
-do
-	activeCooldowns = t
-
+do local cooldowns = t
 	function private.start_cd(name, texture, started, duration)
-		if activeCooldowns[name] then
-			frame:CancelCD(activeCooldowns[name])
-		end
-		activeCooldowns[name] = frame:StartCD(name, '', texture, started, duration)
+		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
+		cooldowns[name] = frame:StartCD(name, '', texture, started, duration)
 	end
-
 	function private.stop_cd(name)
-		if activeCooldowns[name] then
-			frame:CancelCD(activeCooldowns[name])
-		end
+		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
 	end
 end
 
 function private.link_name(link)
-	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do
-		return name
-	end
+	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do return name end
 end

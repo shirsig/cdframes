@@ -1,12 +1,11 @@
-do
-	local modules = {}
+do  local modules = {}
+	local mt = {__metatable=false, __index=function(_, key) return modules[key].I end, __newindex=error}
 	CDFrames = function(name)
 		if not modules[name] then
 			(function()
-				module()
-				modules[name] = M
+				modules[name] = module and M
 				import (green_t)
-				private.CDFrames = setmetatable({}, {__metatable=false, __index=function(_, key) return modules[key].I end, __newindex=error})
+				private.CDFrames = setmetatable(t, mt)
 			end)()
 		end
 		modules[name].import (modules.core.I)
@@ -27,26 +26,20 @@ function public.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
 end
 
-function public.List(first, ...)
-	for i = 1, arg.n do
-		first = first..','..arg[i]
-	end
+function public.list(first, ...)
+	for i = 1, arg.n do first = first..','..arg[i] end
 	return first or ''
 end
 
-function public.Elems(list)
-	local elems = {}
-	for elem in string.gfind(list, '[^,]+') do
-		tinsert(elems, elem)
-	end
+function public.elems(list)
+	local elems = t
+	for elem in string.gfind(list, '[^,]+') do tinsert(elems, elem) end
 	return elems
 end
 
 function public.contains(list, str)
 	for element in string.gfind(list, '[^,]+') do
-		if element == str then
-			return true
-		end
+		if element == str then return true end
 	end
 end
 
@@ -56,40 +49,35 @@ function ADDON_LOADED()
 	_G.SLASH_CDFrames1 = '/cdframes'
 	_G.SlashCmdList.CDFrames = SLASH
 
-	CDFrames.player.Setup()
-	CDFrames.enemy.Setup()
+	CDFrames.player.setup()
+	CDFrames.enemy.setup()
 end
 
 function private.parse_number(params)
 	local number = tonumber(params.input) or params.default
-	if params.min then
-		number = max(params.min, number)
-	end
-	if params.max then
-		number = min(params.max, number)
-	end
+	if params.min then number = max(params.min, number) end
+	if params.max then number = min(params.max, number) end
 	return params.integer and floor(number + .5) or number
 end
 
 function private.SLASH(str)
 	str = strupper(str)
-	local parameters = tokenize(str)
-	local frames = {}
+	local parameters, frames = tokenize(str), tt
 	if contains(parameters[1], 'PLAYER') then
-		tinsert(frames, CDFrames.player.frame)
+		frames[CDFrames.player.frame] = true
 	end
 	if contains(parameters[1], 'TARGET') then
-		tinsert(frames, CDFrames.enemy.targetFrame)
+		frames[CDFrames.enemy.targetFrame] = true
 	end
 	if contains(parameters[1], 'TARGETTARGET') then
-		tinsert(frames, CDFrames.enemy.targetTargetFrame)
+		frames[CDFrames.enemy.targetTargetFrame] = true
 	end
 	if getn(frames) == 0 then
-		frames = {CDFrames.player.frame, CDFrames.enemy.targetFrame, CDFrames.enemy.targetTargetFrame}
+		frames = temp-S(CDFrames.player.frame, CDFrames.enemy.targetFrame, CDFrames.enemy.targetTargetFrame)
 	else
 		tremove(parameters, 1)
 	end
-	for _, frame in frames do
+	for frame in frames do
 		if parameters[1] == 'ON' then
 			frame.settings.active = true
 		elseif parameters[1] == 'OFF' then
@@ -115,28 +103,22 @@ function private.SLASH(str)
 		elseif parameters[1] == 'CLICKTHROUGH' then
 			frame.settings.clickThrough = not frame.settings.clickThrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
-			local _, _, list = strfind(str, '[^,]*ADD%s+(.-)%s*$')
+			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
 			local names = tt
-			for _, name in M.Elems(list) do
-				if not contains(frame.settings.ignoreList, name) then
-					tinsert(names, name)
-				end
+			for _, name in temp-elems(match) do
+				if not contains(frame.settings.ignoreList, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = frame.settings.ignoreList == '' and M.List(unpack(names)) or frame.settings.ignoreList..','..M.List(unpack(names))
+			frame.settings.ignoreList = frame.settings.ignoreList == '' and list(unpack(names)) or frame.settings.ignoreList..','..list(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
-			local _, _, list = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
+			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
 			local names = tt
-			for _, name in M.Elems(frame.settings.ignoreList) do
-				if not contains(list, name) then
-					tinsert(names, name)
-				end
+			for _, name in temp-elems(frame.settings.ignoreList) do
+				if not contains(match, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = M.List(unpack(names))
+			frame.settings.ignoreList = list(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
 			print(frame.key..':')
-			for _, name in M.Elems(frame.settings.ignoreList) do
-				print(name)
-			end
+			for _, name in temp-elems(frame.settings.ignoreList) do print(name) end
 		elseif parameters[1] == 'RESET' then
 			frame:Reset()
 		else
@@ -148,8 +130,6 @@ end
 
 function private.tokenize(str)
 	local tokens = t
-	for token in string.gfind(str, '%S+') do
-		tinsert(tokens, token)
-	end
+	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
 	return tokens
 end

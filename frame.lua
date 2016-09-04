@@ -54,7 +54,8 @@ function method:CreateFrames()
 			local scale = self.settings.scale
 			local x, y = self.frame.cd_frames[1]:GetCenter()
 			wipe(self.settings.position)
-			self.settings.position = A(x * scale, y * scale)
+			A[self.settings.position](x * scale, y * scale)
+--			__(wipe(self.settings.position)):A(x * scale, y * scale)
 		end)
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
@@ -147,7 +148,7 @@ function method:CDFrame(i)
 		autocast:SetModel([[Interface\Buttons\UI-AutoCastButton.mdx]])
 		autocast:SetAllPoints(frame.icon)
 		autocast:SetScale(1.2 * frame.icon:GetWidth()/30)
-		autocast:Show()
+		autocast:Hide()
 		frame.autocast = autocast
 	end
 	do local text_frame = CreateFrame('Frame', nil, frame)
@@ -315,8 +316,7 @@ function method:Update()
 					frame.text:SetTextColor(unpack(color))
 				end
 				frame.icon:SetTexture(cooldown.icon)
-				recycle(frame.tooltip)
-				frame.tooltip = A(cooldown.name, cooldown.info)
+				A[wipe(frame.tooltip)](cooldown.name, cooldown.info)
 				frame:Show()
 
 				i = i + 1
@@ -344,7 +344,7 @@ end
 
 function method:CancelCD(CDID)
 	local cooldowns = self.cooldowns
-	cooldowns[CDID] = cooldowns[CDID] and recycle(cooldowns[CDID])
+	cooldowns[CDID] = cooldowns[CDID] and release(cooldowns[CDID])
 end
 
 function private.blink_alpha1(t)
@@ -353,25 +353,25 @@ function private.blink_alpha1(t)
 end
 
 function private.blink_alpha2(t)
-	return (sin(t * 4/3 * 180) + 1) / 2 * .7 + .3
+	return (sin(t * 240) + 1) / 2 * .7 + .3
 end
 
 function private.time_format1(t) -- TODO ¼ ½ ¾
 	if t > 60 then
-		return ceil((t / 60) * 10) / 10, {0, 1, 0}
+		return ceil((t / 60) * 10) / 10, A(0, 1, 0)
 	else
-		return ceil(t), {1, 1, 0}
+		return ceil(t), A(1, 1, 0)
 	end
 end
 
 function private.time_format2(t)
 	if t > 86400 then
-		return ceil(t / 86400) .. 'd', {.8, .8, .9}
+		return ceil(t / 86400) .. 'd', A(.8, .8, .9)
 	elseif t > 3600 then
-		return ceil(t / 3600) .. 'h', {.8, .8, .9}
+		return ceil(t / 3600) .. 'h', A(.8, .8, .9)
 	elseif t > 60 then
-		return ceil(t / 60) .. 'm', {.8, .8, .9}
+		return ceil(t / 60) .. 'm', A(.8, .8, .9)
 	else
-		return ceil(t), t > 5 and {1, 1, .4} or {1, 0, 0}
+		return ceil(t), t > 5 and A(1, 1, .4) or A(1, 0, 0)
 	end
 end
