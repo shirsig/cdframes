@@ -23,11 +23,11 @@ end
 _G.CDFrames_Settings = t
 
 function public.print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
+	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[CDFrames] ' .. msg)
 end
 
 function public.list(first, ...)
-	for i = 1, arg.n do first = first..','..arg[i] end
+	for i = 1, arg.n do first = first .. ',' .. arg[i] end
 	return first or ''
 end
 
@@ -108,7 +108,7 @@ function private.SLASH(str)
 			for _, name in temp-elems(match) do
 				if not contains(frame.settings.ignoreList, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = frame.settings.ignoreList == '' and list(unpack(names)) or frame.settings.ignoreList..','..list(unpack(names))
+			frame.settings.ignoreList = frame.settings.ignoreList == '' and list(unpack(names)) or frame.settings.ignoreList .. ',' .. list(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
 			local names = tt
@@ -117,7 +117,7 @@ function private.SLASH(str)
 			end
 			frame.settings.ignoreList = list(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			print(frame.key..':')
+			print(frame.key .. ':')
 			for _, name in temp-elems(frame.settings.ignoreList) do print(name) end
 		elseif parameters[1] == 'RESET' then
 			frame:Reset()

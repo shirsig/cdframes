@@ -5,14 +5,14 @@
 --local FIELD, INDEX, NEWINDEX = 1, 2, 3
 --
 --local inspect
---do local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(RED_FONT_COLOR_CODE..msg) end
+--do local function print(msg) DEFAULT_CHAT_FRAME:AddMessage(RED_FONT_COLOR_CODE .. msg) end
 --inspect = setmetatable({}, {
 --	__call=function(_, ...)
 --		for i = 1, arg.n do
---			print('arg'..i..' = '..(type(arg[i]) == 'string' and '"'..arg[i]..'"' or tostring(arg[i])))
+--			print('arg' .. i..' = ' .. (type(arg[i]) == 'string' and '"' .. arg[i] .. '"' or tostring(arg[i])))
 --			if type(arg[i]) == 'table' and next(arg[i]) then
 --				print('{')
---				for k, v in arg[i] do print('    '..(type(k) == 'string' and k or '['..tostring(k)..']')..' = '..(type(v) == 'string' and '"'..v..'"' or tostring(v))) end
+--				for k, v in arg[i] do print('    ' .. (type(k) == 'string' and k or '[' .. tostring(k) .. ']') .. ' = ' .. (type(v) == 'string' and '"' .. v..'"' or tostring(v))) end
 --				print('}')
 --			end
 --		end
@@ -23,7 +23,7 @@
 --end
 --p = inspect -- TODO
 --
---local function error(msg, ...) return _G.error(format(msg or '', unpack(arg))..'\n'..debugstack(), 0) end
+--local function error(msg, ...) return _G.error(format(msg or '', unpack(arg)) .. '\n' .. debugstack(), 0) end
 --local function import_error() error('Import error.') end
 --local function declaration_error() error('Declaration error.') end
 --local function collision_error(key) error('"%s" already exists.', key) end

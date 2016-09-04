@@ -53,9 +53,7 @@ function method:CreateFrames()
 			this:StopMovingOrSizing()
 			local scale = self.settings.scale
 			local x, y = self.frame.cd_frames[1]:GetCenter()
-			wipe(self.settings.position)
-			A[self.settings.position](x * scale, y * scale)
-			__(wipe(self.settings.position)): A(x * scale, y * scale)
+			__(self.settings.position) [1] (x * scale) [2] (y * scale)
 		end)
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
@@ -175,7 +173,7 @@ function method:CDFrame()
 		frame.text = text_frame:CreateFontString()
 	end
 	frame.tooltip = t
-	skin(frame, 'thinnerest')
+	skin(frame, 'blizzard')
 	return frame
 end
 
@@ -211,12 +209,10 @@ function method:PlaceFrames()
 		'x', (strfind(orientation, 'R') and 1 or -1),
 		'y', (strfind(orientation, 'U') and 1 or -1)
 	)
-	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM')..(strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
+	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM') .. (strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
 
 	local spacing = self.settings.spacing * 36
 	local slotSize = 36 + spacing
---	local spacing = self.settings.spacing * 32.5
---	local slotSize = 32.5 + spacing
 
 	local size = temp-T(
 		axis1, min(self.settings.size, self.settings.line) * slotSize - spacing,
@@ -243,9 +239,7 @@ end
 
 function method:Lock()
 	self.frame:EnableMouse(false)
-	for i = 1, self.settings.size do
-		self.frame.cd_frames[i]:Hide()
-	end
+	for i = 1, self.settings.size do self.frame.cd_frames[i]:Hide() end
 end
 
 function method:Unlock()
@@ -294,9 +288,7 @@ function method:Ignored(name)
 	return contains(strupper(self.settings.ignoreList), strupper(name))
 end
 
-function method:CDID(cooldown)
-	return tostring(cooldown)
-end
+function method:CDID(cooldown) return tostring(cooldown) end
 
 function method:Update()
 	local tm = GetTime()
@@ -330,10 +322,11 @@ function method:Update()
 				end
 				if self.settings.text ~= 0 then
 					frame.text:SetText(text)
-					frame.text:SetTextColor(bk(color))
+					frame.text:SetTextColor(retval(color))
 				end
 				frame.icon:SetTexture(cooldown.icon)
-				A[wipe(frame.tooltip)](cooldown.name, cooldown.info)
+				__(frame.tooltip) [1] (cooldown.name) [2] (cooldown.info)
+				__(frame.tooltip) (cooldown.name, cooldown.info)
 				frame:Show()
 
 				i = i + 1
@@ -342,9 +335,7 @@ function method:Update()
 			self.cooldowns[self:CDID(cooldown)] = nil
 		end
 	end
-	for j = i, self.settings.size do
-		self.frame.cd_frames[j]:Hide()
-	end	
+	for j = i, self.settings.size do self.frame.cd_frames[j]:Hide() end
 end
 
 function method:StartCD(name, info, icon, started, duration)
@@ -359,13 +350,11 @@ function method:StartCD(name, info, icon, started, duration)
 	return self:CDID(cooldown)
 end
 
-function method:CancelCD(CDID)
-	local cooldowns = self.cooldowns
+function method:CancelCD(CDID) local cooldowns = self.cooldowns
 	cooldowns[CDID] = cooldowns[CDID] and release(cooldowns[CDID])
 end
 
-function private.blink_alpha1(t)
-	local x = t * 4/3
+function private.blink_alpha1(t) local x = t * 4/3
 	return (mod(floor(x), 2) == 0 and x - floor(x) or 1 - x + floor(x)) * .7 + .3
 end
 
@@ -383,11 +372,11 @@ end
 
 function private.time_format2(t)
 	if t > 86400 then
-		return ceil(t / 86400) .. 'd', A(.8, .8, .9)
+		return ceil(t / 86400)  ..  'd', A(.8, .8, .9)
 	elseif t > 3600 then
-		return ceil(t / 3600) .. 'h', A(.8, .8, .9)
+		return ceil(t / 3600)  ..  'h', A(.8, .8, .9)
 	elseif t > 60 then
-		return ceil(t / 60) .. 'm', A(.8, .8, .9)
+		return ceil(t / 60)  ..  'm', A(.8, .8, .9)
 	else
 		return ceil(t), t > 5 and A(1, 1, .4) or A(1, 0, 0)
 	end

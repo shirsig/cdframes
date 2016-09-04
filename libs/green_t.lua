@@ -9,7 +9,7 @@
 --	return setmetatable(t, nil)
 --]]
 --
---local recycle_chunk = wipe_chunk..[[
+--local recycle_chunk = wipe_chunk .. [[
 --	if pool_size < 50 then
 --		pool_size = pool_size + 1
 --		pool[pool_size] = t
@@ -41,7 +41,7 @@
 --	local f = loadstring([[
 --		local setmetatable, setn = setmetatable, table.setn
 --		return function(t)
---	]]..wipe_chunk..'end') -- like with a cloth or something
+--	]] .. wipe_chunk .. 'end') -- like with a cloth or something
 --	setfenv(f, M)
 --	public.wipe = f()
 --end
@@ -50,7 +50,7 @@
 --	local f = loadstring([[
 --		local setmetatable, setn, pool, pool_size, overflow_pool = setmetatable, table.setn, pool, pool_size, overflow_pool
 --		return function(t)
---	]]..recycle_chunk..'end')
+--	]] .. recycle_chunk .. 'end')
 --	setfenv(f, M)
 --	public.recycle = f()
 --end
@@ -105,28 +105,28 @@
 --	local SET, ARRAY, ARRAY0, TABLE = 1, 2, 3, 4
 --	local function insert(type)
 --		local chunk = 'local setn, error = table.setn, error; return function('
---		for i = 1, 99 do chunk = chunk..'a'..i..',' end
---		chunk = chunk..'overflow)'..acquire_chunk
+--		for i = 1, 99 do chunk = chunk .. 'a' .. i..',' end
+--		chunk = chunk .. 'overflow)' .. acquire_chunk
 --		if type == SET then
 --			for i = 1, 99 do
---				chunk = chunk..format('if a%d == nil then return t end t[a%d] = true;', i, i)
+--				chunk = chunk .. format('if a%d == nil then return t end t[a%d] = true;', i, i)
 --			end
 --		elseif type == ARRAY then
---			chunk = chunk..'setn(t, 99); if a1 == nil then return t end t[1] = a1;'
+--			chunk = chunk .. 'setn(t, 99); if a1 == nil then return t end t[1] = a1;'
 --			for i = 2, 99 do
---				chunk = chunk..format('if a%d == nil then setn(t, %d); return t end t[%d] = a%d;', i, i - 1, i, i)
+--				chunk = chunk .. format('if a%d == nil then setn(t, %d); return t end t[%d] = a%d;', i, i - 1, i, i)
 --			end
 --		elseif type == ARRAY0 then
---			chunk = chunk..'setn(t, 99);'
+--			chunk = chunk .. 'setn(t, 99);'
 --			for i = 1, 99 do
---				chunk = chunk..format('t[%d] = a%d;', i, i)
+--				chunk = chunk .. format('t[%d] = a%d;', i, i)
 --			end
 --		elseif type == TABLE then
 --			for i = 1, 97, 2 do
---				chunk = chunk..format('if a%d == nil then return t end t[a%d] = a%d;', i, i, i + 1)
+--				chunk = chunk .. format('if a%d == nil then return t end t[a%d] = a%d;', i, i, i + 1)
 --			end
 --		end
---		chunk = chunk..'return overflow ~= nil and error("Overflow.") or t end'
+--		chunk = chunk .. 'return overflow ~= nil and error("Overflow.") or t end'
 --		local f = loadstring(chunk)
 --		setfenv(f, M)
 --		return f()

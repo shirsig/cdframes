@@ -296,7 +296,7 @@ function private.OnCombatLogEvent()
 end
 
 function private.Key(player, cooldown_name)
-	return player..'|'..cooldown_name
+	return player .. '|' .. cooldown_name
 end
 
 function private.expired(cooldown)
@@ -321,7 +321,7 @@ end
 function private.show_cooldown(frame, key)
 	local cooldown = active_cooldowns[key]
 	if not cooldown[frame] then
-		cooldown[frame] = frame:StartCD(cooldown.name, COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]]..COOLDOWNS[cooldown.name].icon, cooldown.started, COOLDOWNS[cooldown.name].cooldown)
+		cooldown[frame] = frame:StartCD(cooldown.name, COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]] .. COOLDOWNS[cooldown.name].icon, cooldown.started, COOLDOWNS[cooldown.name].cooldown)
 	end
 end
 
