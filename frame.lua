@@ -322,11 +322,10 @@ function method:Update()
 				end
 				if self.settings.text ~= 0 then
 					frame.text:SetText(text)
-					frame.text:SetTextColor(retval(color))
+					frame.text:SetTextColor(ret(color))
 				end
 				frame.icon:SetTexture(cooldown.icon)
 				__(frame.tooltip) [1] (cooldown.name) [2] (cooldown.info)
-				__(frame.tooltip) (cooldown.name, cooldown.info)
 				frame:Show()
 
 				i = i + 1
