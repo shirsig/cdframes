@@ -73,11 +73,11 @@ function method:CreateFrames()
 		cd_frame:EnableMouse(not self.settings.clickThrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
 		if self.settings.text == 1 then
-			cd_frame.text:SetPoint('CENTER', cd_frame, 'CENTER', 1, 0)
-			cd_frame.text:SetFont([[Fonts\ARIALN.ttf]], 16.5, 'THICKOUTLINE')
+			cd_frame.text:SetPoint('CENTER', 1, 0)
+			cd_frame.text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
 		elseif self.settings.text == 2 then
-			cd_frame.text:SetPoint('CENTER', cd_frame, 'CENTER', 0, 1)
-			cd_frame.text:SetFont(STANDARD_TEXT_FONT, 16.5, 'OUTLINE')
+			cd_frame.text:SetPoint('CENTER', 0, 1)
+			cd_frame.text:SetFont(STANDARD_TEXT_FONT, 18, 'OUTLINE')
 		elseif cd_frame.text:GetText() then
 			cd_frame.text:SetText('')
 		end
@@ -87,15 +87,21 @@ end
 do
 	local apply = {
 		blizzard = function()
-			icon:SetWidth(30); icon:SetHeight(30)
+			icon:SetWidth(30)
+			icon:SetHeight(30)
 			icon:SetTexCoord(.07, .93, .07, .93)
+			border:ClearAllPoints()
+			border:SetPoint('CENTER', .5, -.5)
+			border:SetWidth(56); border:SetHeight(56)
 			border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
 			gloss:SetTexture(nil)
 			cooldown:SetScale(32/36)
 		end,
 		fade = function()
-			icon:SetWidth(32); icon:SetHeight(32)
+			icon:SetWidth(32)
+			icon:SetHeight(32)
 			icon:SetTexCoord(.08, .92, .08, .92)
+			border:SetAllPoints()
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
 			border:SetVertexColor(0, 0, 0, 1)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
@@ -103,20 +109,50 @@ do
 			cooldown:SetScale(32/36)
 		end,
 		thinnerest = function()
-			icon:SetWidth(34); icon:SetHeight(34)
+			icon:SetWidth(34)
+			icon:SetHeight(34)
 			icon:SetTexCoord(.08, .92, .08, .92)
+			border:SetAllPoints()
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]])
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Gloss]])
 			gloss:SetBlendMode('ADD')
 			cooldown:SetScale(32/36)
 		end,
 		caith = function()
-			icon:SetWidth(36); icon:SetHeight(36)
+			icon:SetWidth(36)
+			icon:SetHeight(36)
 			icon:SetTexCoord(0, 1, 0, 1)
+			border:SetAllPoints()
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
 			border:SetVertexColor(.3, .3, .3)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Gloss]])
 			gloss:SetBlendMode('BLEND')
+			cooldown:SetScale(1)
+		end,
+		newsom = function()
+			icon:SetWidth(30)
+			icon:SetHeight(30)
+			icon:SetTexCoord(.07,.93,.07,.93)
+			border:SetAllPoints()
+			border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
+			border:SetTexCoord(0.14,0.86,0.14,0.86)
+			border:SetVertexColor(.3, .3, .3)
+			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
+			gloss:SetBlendMode('BLEND')
+			gloss:SetTexCoord(0.14,0.86,0.14,0.86)
+
+			cooldown:SetScale(1)
+		end,
+		imoen = function()
+			icon:SetWidth(32)
+			icon:SetHeight(32)
+			icon:SetTexCoord(.06,.94,.06,.94)
+			border:SetAllPoints()
+			border:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Normal]])
+			border:SetVertexColor(.3, .3, .3)
+			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Gloss]])
+			gloss:SetBlendMode('BLEND')
+			gloss:SetVertexColor(1, 1, 1, .3)
 			cooldown:SetScale(1)
 		end,
 	}
@@ -128,11 +164,15 @@ end
 
 function method:CDFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(42); frame:SetHeight(42)
+	frame:SetWidth(42)
+	frame:SetHeight(42)
+
 	frame.icon = frame:CreateTexture(nil, 'BACKGROUND')
 	frame.icon:SetPoint('CENTER', 0, 0)
+
 	frame.border = frame:CreateTexture(nil, 'BORDER')
 	frame.border:SetAllPoints()
+
 --	do local border = frame:CreateTexture(nil, 'ARTWORK')
 --		border:SetAllPoints()
 --		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
@@ -145,12 +185,16 @@ function method:CDFrame()
 --		flash:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Overlay]])
 --		flash:SetVertexColor(.5, 0, 1, .6)
 --	end
+
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
+	frame.gloss:SetAlpha(.3)
 	frame.gloss:SetAllPoints()
+
 	do local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
 		cooldown:SetPoint('BOTTOMLEFT', frame.icon, 'BOTTOMLEFT', 0, -1)
-		cooldown:SetWidth(36) cooldown:SetHeight(36)
+		cooldown:SetWidth(36)
+		cooldown:SetHeight(36)
 		cooldown:SetScript('OnAnimFinished', nil)
 		cooldown:SetScript('OnUpdateModel', function()
 			if self.settings.animation and this.started then
@@ -161,15 +205,9 @@ function method:CDFrame()
 		cooldown:Show()
 		frame.cooldown = cooldown
 	end
-	do local autocast = CreateFrame('Model', nil, frame)
-		autocast:SetModel([[Interface\Buttons\UI-AutoCastButton.mdx]])
-		autocast:SetAllPoints(frame.icon)
-		autocast:SetScale(1.2 * frame.icon:GetWidth()/30)
-		autocast:Hide()
-		frame.autocast = autocast
-	end
 	do local text_frame = CreateFrame('Frame', nil, frame)
 		text_frame:SetFrameLevel(4)
+		text_frame:SetAllPoints()
 		frame.text = text_frame:CreateFontString()
 	end
 	frame.tooltip = t
@@ -186,10 +224,18 @@ end
 --
 --import '{aux} kek as moo, kuk'
 
-function method:SetDummyStyle(frame)
+function method:SetDummyStyle(frame, index)
 	frame:EnableMouse(false)
 	frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 --	frame.icon:SetTexture(unpack(self.color))
+	frame.text:SetWidth(36)
+	frame.text:SetHeight(10)
+	frame.text:ClearAllPoints()
+	frame.text:SetFont([[Fonts\ARIALN.ttf]], 10)
+	frame.text:SetTextColor(1, 1, 1)
+	frame.text:SetPoint('BOTTOMRIGHT', -3, 6)
+	frame.text:SetJustifyH('RIGHT')
+	frame.text:SetText('#'..index)
 	return frame
 end
 
@@ -245,7 +291,7 @@ end
 function method:Unlock()
 	self.frame:EnableMouse(true)
 	for i = 1, self.settings.size do
-		self:SetDummyStyle(self.frame.cd_frames[i])
+		self:SetDummyStyle(self.frame.cd_frames[i], i)
 		self.frame.cd_frames[i]:Show()
 	end
 end
@@ -305,15 +351,9 @@ function method:Update()
 			if i <= self.settings.size and not self:Ignored(cooldown.name) then
 				local frame = self.frame.cd_frames[i]
 				do local alpha = timeLeft <= self.settings.blink and blink_alpha1(tm) or 1
-					frame.icon:SetAlpha(alpha)
-					frame.border:SetAlpha(alpha)
-					frame.gloss:SetAlpha(alpha)
-					frame.cooldown:SetAlpha(alpha)
-					frame.autocast:SetAlpha(alpha)
+					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
 				end
-
-				frame.cooldown.started = cooldown.started
-				frame.cooldown.duration = cooldown.duration
+				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
 				local text, color
 				if self.settings.text == 1 then
 					text, color = time_format1(timeLeft)
@@ -326,6 +366,8 @@ function method:Update()
 				end
 				frame.icon:SetTexture(cooldown.icon)
 				__(frame.tooltip) [1] (cooldown.name) [2] (cooldown.info)
+--				V(frame.tooltip) (1,2,3) .kek .kuck [1] (cooldown.name) [2] (cooldown.info) TODO maybe use it for arrays/sets too
+--				x=         __(tt).A(1, 2, 3, 4)         for v in temp-KV(1, 2, 3, 4, 5) do end           for v in -temp-keys/values/pairs(1, 2, 3, 4, 5) do end
 				frame:Show()
 
 				i = i + 1
@@ -361,22 +403,74 @@ function private.blink_alpha2(t)
 	return (sin(t * 240) + 1) / 2 * .7 + .3
 end
 
+--soon = {
+--	r = 1, g = .1, b = .1, a = 1,
+--	scale = 1.5
+--},
+--seconds = {
+--	r = 1, g = 1, b = .1, a = 1,
+--	scale = 1
+--},
+--minutes = {
+--	r = 1, g = 1, b = 1, a = 1,
+--	scale = 1
+--},
+--hours = {
+--	r = .7, g = .7, b = .7, a = 1,
+--	scale = .75
+--},
+
+
+--
+
+--
+--function Timer:GetTimeText(remain)
+--	if remain < tenthsDuration then
+--		return '%.1f', remain
+--	elseif remain < MINUTEISH then
+--		local seconds = round(remain)
+--		return seconds ~= 0 and seconds or ''
+--	elseif remain < mmSSDuration then
+--		local seconds = round(remain)
+--		return '%d:%02d', seconds/MINUTE, seconds%MINUTE
+--	elseif remain < HOURISH then
+--		return '%dm', round(remain/MINUTE)
+--	elseif remain < DAYISH then
+--		return '%dh', round(remain/HOUR)
+--	else
+--		return '%dd', round(remain/DAY)
+--	end
+--end
+
+local tenthsDuration, mmSSDuration = 0, 0
+
+local DAY, HOUR, MINUTE = 86400, 3600, 60
+local DAYISH, HOURISH, MINUTEISH, SOONISH = HOUR * 23.5, MINUTE * 59.5, 59.5, 5.5
+local HalfDayish, HalfHourish, HalfMinuteish = DAY/2 + .5, HOUR/2 + .5, MINUTE/2 + .5
+local round = function(x) return floor(x + .5) end
+
+local color_code = function(r, g, b) return format('|c%02X%02X%02X%02X', a, r*255, g*255, b*255) end
+
 function private.time_format1(t) -- TODO ¼ ½ ¾
-	if t > 60 then
-		return ceil((t / 60) * 10) / 10, A(0, 1, 0)
+	if t > HOUR then
+		return color_code(.7, .7, .7) .. ceil((t / HOUR) * 10) / 10
+	elseif t > MINUTE then
+		return color_code(0, 1, 0) .. ceil((t / MINUTE) * 10) / 10
 	else
-		return ceil(t), A(1, 1, 0)
+		return color_code(1, 1, 0) .. ceil(t)
 	end
 end
 
 function private.time_format2(t)
 	if t > 86400 then
-		return ceil(t / 86400)  ..  'd', A(.8, .8, .9)
-	elseif t > 3600 then
-		return ceil(t / 3600)  ..  'h', A(.8, .8, .9)
-	elseif t > 60 then
-		return ceil(t / 60)  ..  'm', A(.8, .8, .9)
-	else
-		return ceil(t), t > 5 and A(1, 1, .4) or A(1, 0, 0)
+		return color_code(.7, .7, .7) .. round(t / DAY)  ..  'd', .75
+	elseif t < DAYISH then
+		return color_code(.7, .7, .7) .. round(t / HOUR)  ..  'h', .75
+	elseif t < HOURISH then
+		return color_code(1, 1, 1) .. round(t / MINUTE)  ..  'm', 1
+	elseif t < MINUTEISH then
+		return color_code(1, 1, .1) .. round(t), 1
+	elseif t < SOONISH then
+		return color_code(1, .1, .1) .. round(t), 1.5
 	end
 end
