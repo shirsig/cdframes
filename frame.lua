@@ -53,7 +53,7 @@ function method:CreateFrames()
 			this:StopMovingOrSizing()
 			local scale = self.settings.scale
 			local x, y = self.frame.cd_frames[1]:GetCenter()
-			__(self.settings.position) [1] (x * scale) [2] (y * scale)
+			init[self.settings.position] = temp-A(x * scale, y * scale)
 		end)
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
@@ -84,76 +84,200 @@ function method:CreateFrames()
 	end
 end
 
+--local Justify = {
+--	Count = "RIGHT",
+--	Duration = "CENTER",
+--}
+---- Point
+--local Point = {
+--	Count = "BOTTOMRIGHT",
+--	Duration = "TOP",
+--}
+--
+---- Relative Point
+--local RelPoint = {
+--	Count = "BOTTOMRIGHT",
+--	Duration = "BOTTOM",
+--}
+
 do
 	local apply = {
 		blizzard = function()
 			icon:SetWidth(30)
 			icon:SetHeight(30)
 			icon:SetTexCoord(.07, .93, .07, .93)
+
 			border:ClearAllPoints()
 			border:SetPoint('CENTER', .5, -.5)
-			border:SetWidth(56); border:SetHeight(56)
+			border:SetWidth(56)
+			border:SetHeight(56)
 			border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
-			gloss:SetTexture(nil)
+
+			status:SetWidth(60)
+			status:SetHeight(60)
+			status:SetPoint('CENTER', .5, .5)
+			status:SetTexture([[Interface\Buttons\UI-ActionButton-Border]])
+			status:SetBlendMode('ADD')
+
 			cooldown:SetScale(32/36)
+
+--			Count = {
+--				Width = 32,
+--				Height = 10,
+--				OffsetX = -3,
+--				OffsetY = 6,
+--			},
+
+--			Duration = {
+--				Width = 36,
+--				Height = 10,
+--				OffsetY = -2,
+--			},
+		end,
+		zoomed = function()
+			icon:SetWidth(36)
+			icon:SetHeight(36)
+			icon:SetTexCoord(.07, .93, .07, .93)
+
+			status:SetWidth(66)
+			status:SetHeight(66)
+			status:SetPoint('CENTER', .5, .5)
+			status:SetTexture([[Interface\Buttons\UI-ActionButton-Border]])
+			status:SetBlendMode('ADD')
+
+			cooldown:SetScale(1)
+
+			--			Count = {
+			--				Width = 36,
+			--				Height = 10,
+			--				OffsetX = -2,
+			--				OffsetY = 4,
+			--			},
+
+			--			Duration = {
+			--				Width = 36,
+			--				Height = 10,
+			--				OffsetY = -3,
+			--			},
 		end,
 		fade = function()
 			icon:SetWidth(32)
 			icon:SetHeight(32)
 			icon:SetTexCoord(.08, .92, .08, .92)
-			border:SetAllPoints()
+
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
 			border:SetVertexColor(0, 0, 0, 1)
+
+			status:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
+
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
 			gloss:SetBlendMode('ADD')
+
 			cooldown:SetScale(32/36)
-		end,
-		thinnerest = function()
-			icon:SetWidth(34)
-			icon:SetHeight(34)
-			icon:SetTexCoord(.08, .92, .08, .92)
-			border:SetAllPoints()
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Normal]])
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Thinnerest\Gloss]])
-			gloss:SetBlendMode('ADD')
-			cooldown:SetScale(32/36)
-		end,
-		caith = function()
-			icon:SetWidth(36)
-			icon:SetHeight(36)
-			icon:SetTexCoord(0, 1, 0, 1)
-			border:SetAllPoints()
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
-			border:SetVertexColor(.3, .3, .3)
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Gloss]])
-			gloss:SetBlendMode('BLEND')
-			cooldown:SetScale(1)
 		end,
 		newsom = function()
 			icon:SetWidth(30)
 			icon:SetHeight(30)
 			icon:SetTexCoord(.07,.93,.07,.93)
-			border:SetAllPoints()
+
+			border:ClearAllPoints()
+			border:SetWidth(36)
+			border:SetHeight(36)
+			border:SetPoint('CENTER', 0, 0)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
-			border:SetTexCoord(0.14,0.86,0.14,0.86)
-			border:SetVertexColor(.3, .3, .3)
+			border:SetTexCoord(.14, .86, .14, .86)
+
+			status:SetWidth(35)
+			status:SetHeight(35)
+			status:SetPoint('CENTER', 0, 0)
+			status:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Border]])
+			status:SetTexCoord(.14, .86, .14, .86)
+			status:SetBlendMode('ADD')
+
+			gloss:ClearAllPoints()
+			gloss:SetWidth(36)
+			gloss:SetHeight(36)
+			gloss:SetPoint('CENTER', 0, 0)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
 			gloss:SetBlendMode('BLEND')
-			gloss:SetTexCoord(0.14,0.86,0.14,0.86)
+			gloss:SetTexCoord(.14, .86, .14, .86)
 
-			cooldown:SetScale(1)
+			cooldown:SetScale(30/36)
+
+--			Count = {
+--				Width = 32,
+--				Height = 10,
+--				OffsetX = -1,
+--				OffsetY = 6,
+--			},
 		end,
 		imoen = function()
 			icon:SetWidth(32)
 			icon:SetHeight(32)
-			icon:SetTexCoord(.06,.94,.06,.94)
-			border:SetAllPoints()
+			icon:SetTexCoord(.06, .94, .06, .94)
+
+			border:ClearAllPoints()
+			border:SetWidth(64)
+			border:SetHeight(64)
+			border:SetPoint('CENTER', 0, 0)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Normal]])
-			border:SetVertexColor(.3, .3, .3)
+
+			status:ClearAllPoints()
+			status:SetWidth(64)
+			status:SetHeight(64)
+			status:SetPoint('CENTER', 0, 0)
+			status:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Highlight]])
+			status:SetBlendMode('ADD')
+			status:SetVertexColor(1, 1, 1, .5)
+
+			gloss:ClearAllPoints()
+			gloss:SetWidth(64)
+			gloss:SetHeight(64)
+			gloss:SetPoint('CENTER', 0, 0)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Gloss]])
-			gloss:SetBlendMode('BLEND')
 			gloss:SetVertexColor(1, 1, 1, .3)
-			cooldown:SetScale(1)
+
+			cooldown:SetScale(32/36)
+
+--			Count = {
+--				Width = 32,
+--				Height = 10,
+--				OffsetX = -2,
+--				OffsetY = 3,
+--			},
+		end,
+		darion = function()
+			icon:SetWidth(34)
+			icon:SetHeight(34)
+
+			border:ClearAllPoints()
+			border:SetWidth(40)
+			border:SetHeight(40)
+			border:SetPoint('CENTER', 0, 0)
+			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
+			border:SetVertexColor(0, 0, 0)
+
+			status:ClearAllPoints()
+			status:SetWidth(40)
+			status:SetHeight(40)
+			status:SetPoint('CENTER', 0, 0)
+			status:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Border]])
+			status:SetBlendMode('DISABLE')
+
+			gloss:ClearAllPoints()
+			gloss:SetWidth(40)
+			gloss:SetHeight(40)
+			gloss:SetPoint('CENTER', 0, 0)
+			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
+
+			cooldown:SetScale(34/36)
+
+--			Count = {
+--				Width = 32,
+--				Height = 10,
+--				OffsetX = -4,
+--				OffsetY = 5,
+--			},
 		end,
 	}
 	function private.skin(frame, skin)
@@ -173,21 +297,12 @@ function method:CDFrame()
 	frame.border = frame:CreateTexture(nil, 'BORDER')
 	frame.border:SetAllPoints()
 
---	do local border = frame:CreateTexture(nil, 'ARTWORK')
---		border:SetAllPoints()
---		border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
---		border:SetVertexColor(0, 0, 0, 1)
---		frame.border = border
---	end
---	do
---		local flash = frame:CreateTexture(nil, 'ARTWORK')
---		flash:SetAllPoints()
---		flash:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Overlay]])
---		flash:SetVertexColor(.5, 0, 1, .6)
---	end
+	frame.status = frame:CreateTexture(nil, 'ARTWORK')
+	frame.status:SetAllPoints()
+	frame.status:Hide()
 
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
-	frame.gloss:SetAlpha(.3)
+--	frame.gloss:SetAlpha(1)
 	frame.gloss:SetAllPoints()
 
 	do local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
@@ -211,29 +326,28 @@ function method:CDFrame()
 		frame.text = text_frame:CreateFontString()
 	end
 	frame.tooltip = t
-	skin(frame, 'blizzard')
+	skin(frame, 'imoen')
 	return frame
 end
 
---	● × TODO aux
 --M(public) -- TODO
 --__(public)
 --public()
 
 --interface = false
 --
---import '{aux} kek as moo, kuk'
 
 function method:SetDummyStyle(frame, index)
 	frame:EnableMouse(false)
 	frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 --	frame.icon:SetTexture(unpack(self.color))
-	frame.text:SetWidth(36)
+	frame.text:SetWidth(32)
 	frame.text:SetHeight(10)
 	frame.text:ClearAllPoints()
 	frame.text:SetFont([[Fonts\ARIALN.ttf]], 10)
 	frame.text:SetTextColor(1, 1, 1)
 	frame.text:SetPoint('BOTTOMRIGHT', -3, 6)
+	frame.text:SetJustifyV('MIDDLE')
 	frame.text:SetJustifyH('RIGHT')
 	frame.text:SetText('#'..index)
 	return frame
@@ -365,9 +479,7 @@ function method:Update()
 					frame.text:SetTextColor(ret(color))
 				end
 				frame.icon:SetTexture(cooldown.icon)
-				__(frame.tooltip) [1] (cooldown.name) [2] (cooldown.info)
---				V(frame.tooltip) (1,2,3) .kek .kuck [1] (cooldown.name) [2] (cooldown.info) TODO maybe use it for arrays/sets too
---				x=         __(tt).A(1, 2, 3, 4)         for v in temp-KV(1, 2, 3, 4, 5) do end           for v in -temp-keys/values/pairs(1, 2, 3, 4, 5) do end
+				init[frame.tooltip] = temp-A(cooldown.name, cooldown.info)
 				frame:Show()
 
 				i = i + 1
