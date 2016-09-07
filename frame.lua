@@ -76,7 +76,7 @@ function method:CreateFrames()
 			cd_frame.text:SetPoint('CENTER', 1, 0)
 			cd_frame.text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
 		elseif self.settings.text == 2 then
-			cd_frame.text:SetPoint('CENTER', 0, 1)
+			cd_frame.text:SetPoint('CENTER', 0, 0)
 			cd_frame.text:SetFont(STANDARD_TEXT_FONT, 18, 'OUTLINE')
 		elseif cd_frame.text:GetText() then
 			cd_frame.text:SetText('')
@@ -113,9 +113,9 @@ do
 			border:SetHeight(56)
 			border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
 
+			status:SetPoint('CENTER', .5, .5)
 			status:SetWidth(60)
 			status:SetHeight(60)
-			status:SetPoint('CENTER', .5, .5)
 			status:SetTexture([[Interface\Buttons\UI-ActionButton-Border]])
 			status:SetBlendMode('ADD')
 
@@ -137,7 +137,7 @@ do
 		zoomed = function()
 			icon:SetWidth(36)
 			icon:SetHeight(36)
-			icon:SetTexCoord(.07, .93, .07, .93)
+			icon:SetTexCoord(.08, .92, .08, .92)
 
 			status:SetWidth(66)
 			status:SetHeight(66)
@@ -165,11 +165,17 @@ do
 			icon:SetHeight(32)
 			icon:SetTexCoord(.08, .92, .08, .92)
 
+			border:SetWidth(42)
+			border:SetHeight(42)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
 			border:SetVertexColor(0, 0, 0, 1)
 
+			status:SetWidth(42)
+			status:SetHeight(42)
 			status:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
 
+			gloss:SetWidth(42)
+			gloss:SetHeight(42)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
 			gloss:SetBlendMode('ADD')
 
@@ -180,24 +186,19 @@ do
 			icon:SetHeight(30)
 			icon:SetTexCoord(.07,.93,.07,.93)
 
-			border:ClearAllPoints()
 			border:SetWidth(36)
 			border:SetHeight(36)
-			border:SetPoint('CENTER', 0, 0)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
 			border:SetTexCoord(.14, .86, .14, .86)
 
 			status:SetWidth(35)
 			status:SetHeight(35)
-			status:SetPoint('CENTER', 0, 0)
 			status:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Border]])
 			status:SetTexCoord(.14, .86, .14, .86)
 			status:SetBlendMode('ADD')
 
-			gloss:ClearAllPoints()
 			gloss:SetWidth(36)
 			gloss:SetHeight(36)
-			gloss:SetPoint('CENTER', 0, 0)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
 			gloss:SetBlendMode('BLEND')
 			gloss:SetTexCoord(.14, .86, .14, .86)
@@ -216,24 +217,18 @@ do
 			icon:SetHeight(32)
 			icon:SetTexCoord(.06, .94, .06, .94)
 
-			border:ClearAllPoints()
 			border:SetWidth(64)
 			border:SetHeight(64)
-			border:SetPoint('CENTER', 0, 0)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Normal]])
 
-			status:ClearAllPoints()
 			status:SetWidth(64)
 			status:SetHeight(64)
-			status:SetPoint('CENTER', 0, 0)
 			status:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Highlight]])
 			status:SetBlendMode('ADD')
 			status:SetVertexColor(1, 1, 1, .5)
 
-			gloss:ClearAllPoints()
 			gloss:SetWidth(64)
 			gloss:SetHeight(64)
-			gloss:SetPoint('CENTER', 0, 0)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Gloss]])
 			gloss:SetVertexColor(1, 1, 1, .3)
 
@@ -250,24 +245,18 @@ do
 			icon:SetWidth(34)
 			icon:SetHeight(34)
 
-			border:ClearAllPoints()
 			border:SetWidth(40)
 			border:SetHeight(40)
-			border:SetPoint('CENTER', 0, 0)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
 			border:SetVertexColor(0, 0, 0)
 
-			status:ClearAllPoints()
 			status:SetWidth(40)
 			status:SetHeight(40)
-			status:SetPoint('CENTER', 0, 0)
 			status:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Border]])
 			status:SetBlendMode('DISABLE')
 
-			gloss:ClearAllPoints()
 			gloss:SetWidth(40)
 			gloss:SetHeight(40)
-			gloss:SetPoint('CENTER', 0, 0)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
 
 			cooldown:SetScale(34/36)
@@ -288,22 +277,22 @@ end
 
 function method:CDFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(42)
-	frame:SetHeight(42)
+	frame:SetWidth(36)
+	frame:SetHeight(36)
 
 	frame.icon = frame:CreateTexture(nil, 'BACKGROUND')
 	frame.icon:SetPoint('CENTER', 0, 0)
 
 	frame.border = frame:CreateTexture(nil, 'BORDER')
-	frame.border:SetAllPoints()
+	frame.border:SetPoint('CENTER', 0, 0)
 
 	frame.status = frame:CreateTexture(nil, 'ARTWORK')
-	frame.status:SetAllPoints()
+	frame.status:SetPoint('CENTER', 0, 0)
 	frame.status:Hide()
 
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
 --	frame.gloss:SetAlpha(1)
-	frame.gloss:SetAllPoints()
+	frame.gloss:SetPoint('CENTER', 0, 0)
 
 	do local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
@@ -326,7 +315,7 @@ function method:CDFrame()
 		frame.text = text_frame:CreateFontString()
 	end
 	frame.tooltip = t
-	skin(frame, 'imoen')
+	skin(frame, 'blizzard') -- newsom, imoen, darion, blizzard, fade, zoomed
 	return frame
 end
 
@@ -349,7 +338,7 @@ function method:SetDummyStyle(frame, index)
 	frame.text:SetPoint('BOTTOMRIGHT', -3, 6)
 	frame.text:SetJustifyV('MIDDLE')
 	frame.text:SetJustifyH('RIGHT')
-	frame.text:SetText('#'..index)
+--	frame.text:SetText('#'..index)
 	return frame
 end
 
@@ -468,15 +457,15 @@ function method:Update()
 					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
 				end
 				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
-				local text, color
+				local text, scale
 				if self.settings.text == 1 then
-					text, color = time_format1(timeLeft)
+					text, scale = time_format1(timeLeft)
 				elseif self.settings.text == 2 then
-					text, color = time_format2(timeLeft)
+					text, scale = time_format2(timeLeft)
 				end
 				if self.settings.text ~= 0 then
 					frame.text:SetText(text)
-					frame.text:SetTextColor(ret(color))
+					frame.text:SetFont(STANDARD_TEXT_FONT, 18 * (scale or 1), 'OUTLINE')
 				end
 				frame.icon:SetTexture(cooldown.icon)
 				init[frame.tooltip] = temp-A(cooldown.name, cooldown.info)
@@ -561,9 +550,9 @@ local DAYISH, HOURISH, MINUTEISH, SOONISH = HOUR * 23.5, MINUTE * 59.5, 59.5, 5.
 local HalfDayish, HalfHourish, HalfMinuteish = DAY/2 + .5, HOUR/2 + .5, MINUTE/2 + .5
 local round = function(x) return floor(x + .5) end
 
-local color_code = function(r, g, b) return format('|c%02X%02X%02X%02X', a, r*255, g*255, b*255) end
+local color_code = function(r, g, b) return format('|cFF%02X%02X%02X', r*255, g*255, b*255) end
 
-function private.time_format1(t) -- TODO ¼ ½ ¾
+function private.time_format1(t) -- ECDC TODO ¼ ½ ¾
 	if t > HOUR then
 		return color_code(.7, .7, .7) .. ceil((t / HOUR) * 10) / 10
 	elseif t > MINUTE then
@@ -573,16 +562,17 @@ function private.time_format1(t) -- TODO ¼ ½ ¾
 	end
 end
 
-function private.time_format2(t)
-	if t > 86400 then
-		return color_code(.7, .7, .7) .. round(t / DAY)  ..  'd', .75
-	elseif t < DAYISH then
-		return color_code(.7, .7, .7) .. round(t / HOUR)  ..  'h', .75
-	elseif t < HOURISH then
-		return color_code(1, 1, 1) .. round(t / MINUTE)  ..  'm', 1
+function private.time_format2(t) -- OmniCC
+	if t < SOONISH then
+		local t = round(t)
+		return color_code(1, .1, .1) .. (t > 0 and t or ''), 1.5
 	elseif t < MINUTEISH then
 		return color_code(1, 1, .1) .. round(t), 1
-	elseif t < SOONISH then
-		return color_code(1, .1, .1) .. round(t), 1.5
+	elseif t < HOURISH then
+		return color_code(1, 1, 1) .. round(t / MINUTE)  ..  'm', 1
+	elseif t < DAYISH then
+		return color_code(.7, .7, .7) .. round(t / HOUR)  ..  'h', .75
+	else
+		return color_code(.7, .7, .7) .. round(t / DAY)  ..  'd', .75
 	end
 end
