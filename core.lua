@@ -63,13 +63,13 @@ end
 function private.SLASH(str)
 	str = strupper(str)
 	local parameters, frames = tokenize(str), tt
-	if contains(parameters[1], 'PLAYER') then
+	if contains(parameters[1] or '', 'PLAYER') then
 		frames[CDFrames.player.frame] = true
 	end
-	if contains(parameters[1], 'TARGET') then
+	if contains(parameters[1] or '', 'TARGET') then
 		frames[CDFrames.enemy.targetFrame] = true
 	end
-	if contains(parameters[1], 'TARGETTARGET') then
+	if contains(parameters[1] or '', 'TARGETTARGET') then
 		frames[CDFrames.enemy.targetTargetFrame] = true
 	end
 	if getn(frames) == 0 then

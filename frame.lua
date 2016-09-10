@@ -48,12 +48,10 @@ function method:CreateFrames()
 		frame:SetClampedToScreen(true)
 		frame:RegisterForDrag('LeftButton')
 		frame:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
-		frame:SetScript('OnDragStart', function() self.frame:StartMoving() end)
+		frame:SetScript('OnDragStart', function() this:StartMoving() end)
 		frame:SetScript('OnDragStop', function()
 			this:StopMovingOrSizing()
-			local scale = self.settings.scale
-			local x, y = self.frame.cd_frames[1]:GetCenter()
-			init[self.settings.position] = temp-A(x * scale, y * scale)
+			init[self.settings.position] = temp-A(this:GetCenter())
 		end)
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
@@ -91,7 +89,7 @@ do
 			border:SetHeight(56)
 			border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
 
-			cooldown:SetScale(32/36)
+			cooldown:SetScale(32.5/36)
 		end,
 		zoomed = function()
 			icon:SetWidth(36)
@@ -100,22 +98,17 @@ do
 
 			cooldown:SetScale(1)
 		end,
-		fade = function()
-			icon:SetWidth(32)
-			icon:SetHeight(32)
-			icon:SetTexCoord(.08, .92, .08, .92)
+		caith = function()
+			icon:SetWidth(36)
+			icon:SetHeight(36)
+			icon:SetTexCoord(.02, .98, .02, .98)
 
 			border:SetWidth(42)
 			border:SetHeight(42)
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
-			border:SetVertexColor(0, 0, 0, 1)
+			border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
+			border:SetVertexColor(.3, .3, .3)
 
-			gloss:SetWidth(42)
-			gloss:SetHeight(42)
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Gloss]])
-			gloss:SetBlendMode('ADD')
-
-			cooldown:SetScale(32/36)
+			cooldown:SetScale(1)
 		end,
 		newsom = function()
 			icon:SetWidth(30)
@@ -142,7 +135,6 @@ do
 			border:SetWidth(40)
 			border:SetHeight(40)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
---			border:SetVertexColor(0, 0, 0)
 			border:SetVertexColor(.2, .2, .2)
 
 			gloss:SetWidth(40)
@@ -163,25 +155,23 @@ function method:CDFrame()
 	frame:SetWidth(36)
 	frame:SetHeight(36)
 
-	frame.icon = frame:CreateTexture(nil, 'BACKGROUND')
+	frame.icon = frame:CreateTexture(nil, 'BORDER')
 	frame.icon:SetPoint('CENTER', 0, 0)
 
-	frame.border = frame:CreateTexture(nil, 'BORDER')
+	frame.background = frame:CreateTexture(nil, 'BACKGROUND')
+	frame.background:SetAllPoints(frame.icon)
+	frame.background:SetTexture(unpack(self.color))
+
+	frame.border = frame:CreateTexture(nil, 'ARTWORK')
 	frame.border:SetPoint('CENTER', 0, 0)
 
-	frame.status = frame:CreateTexture(nil, 'ARTWORK')
-	frame.status:SetPoint('CENTER', 0, 0)
-	frame.status:SetVertexColor(1, 1, 0)
---	frame.status:Hide()
-
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
---	frame.gloss:SetAlpha(1)
 	frame.gloss:SetPoint('CENTER', 0, 0)
 
 	do
 		local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
-		cooldown:SetPoint('CENTER', frame.icon, 'CENTER', 0, -1)
+		cooldown:SetPoint('CENTER', frame.icon, 'CENTER', .5, -.5)
 		cooldown:SetWidth(36)
 		cooldown:SetHeight(36)
 		cooldown:SetScript('OnAnimFinished', nil)
@@ -198,29 +188,12 @@ function method:CDFrame()
 		local text_frame = CreateFrame('Frame', nil, frame)
 		text_frame:SetFrameLevel(4)
 		text_frame:SetAllPoints()
-		local text = text_frame:CreateFontString()
-		text:SetPoint('CENTER', 0, 0)
-		text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
-		frame.text = text
+		frame.text = text_frame:CreateFontString()
+		frame.text:SetPoint('CENTER', .5, 0)
+		frame.text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
 	end
 	frame.tooltip = t
-	skin(frame, 'darion') -- newsom, darion, blizzard, fade, zoomed
-	return frame
-end
-
-function method:SetDummyStyle(frame, index)
-	frame:EnableMouse(false)
-	frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
---	frame.icon:SetTexture(unpack(self.color))
-	frame.text:SetWidth(32)
-	frame.text:SetHeight(10)
-	frame.text:ClearAllPoints()
-	frame.text:SetFont([[Fonts\ARIALN.ttf]], 10)
-	frame.text:SetTextColor(1, 1, 1)
-	frame.text:SetPoint('BOTTOMRIGHT', -3, 6)
-	frame.text:SetJustifyV('MIDDLE')
-	frame.text:SetJustifyH('RIGHT')
---	frame.text:SetText('#'..index)
+	skin(frame, 'blizzard') -- blizzard, zoomed, caith, newsom, darion
 	return frame
 end
 
@@ -235,7 +208,7 @@ function method:PlaceFrames()
 	local scale = self.settings.scale
 	self.frame:SetScale(scale)
 	local orientation = self.settings.orientation
-	local axis1, axis2 = unpack(strfind(orientation, '^[LR]') and temp-A('x', 'y') or temp-A('y', 'x'))
+	local axis1, axis2 = ret(strfind(orientation, '^[LR]') and A('x', 'y') or A('y', 'x'))
 	local sign = temp-T(
 		'x', (strfind(orientation, 'R') and 1 or -1),
 		'y', (strfind(orientation, 'U') and 1 or -1)
@@ -245,13 +218,8 @@ function method:PlaceFrames()
 	local spacing = self.settings.spacing * 36
 	local slotSize = 36 + spacing
 
-	local size = temp-T(
-		axis1, min(self.settings.size, self.settings.line) * slotSize - spacing,
-		axis2, ceil(self.settings.size / self.settings.line) * slotSize - spacing
-	)
-
-	self.frame:SetWidth(size.x)
-	self.frame:SetHeight(size.y)
+	self.frame:SetWidth(36)
+	self.frame:SetHeight(36)
 	
 	for i = 1, self.settings.size do
 		local frame = self.frame.cd_frames[i]
@@ -263,21 +231,32 @@ function method:PlaceFrames()
 		frame:SetPoint(anchor, offset.x, offset.y)
 	end
 
-	local x, y = unpack(self.settings.position)
 	self.frame:ClearAllPoints()
-	self.frame:SetPoint(anchor, UIParent, 'BOTTOMLEFT', x/scale - sign.x * (slotSize-spacing)/2, y/scale - sign.y * (slotSize-spacing)/2)
+	self.frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', unpack(self.settings.position))
 end
 
 function method:Lock()
 	self.frame:EnableMouse(false)
-	for i = 1, self.settings.size do self.frame.cd_frames[i]:Hide() end
+	for i = 1, self.settings.size do
+		self.frame.cd_frames[i].background:Hide()
+		self.frame.cd_frames[i]:Hide()
+	end
 end
 
 function method:Unlock()
 	self.frame:EnableMouse(true)
 	for i = 1, self.settings.size do
-		self:SetDummyStyle(self.frame.cd_frames[i], i)
-		self.frame.cd_frames[i]:Show()
+		local frame = self.frame.cd_frames[i]
+		frame:EnableMouse(false)
+		frame.background:Show()
+		if i == 1 then
+			frame.icon:SetAlpha(0)
+		else
+			frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
+			frame.icon:SetAlpha(.8)
+			frame:SetAlpha(.5)
+		end
+		frame:Show()
 	end
 end
 
@@ -335,7 +314,8 @@ function method:Update()
 		if timeLeft > 0 then
 			if i <= self.settings.size and not self:Ignored(cooldown.name) then
 				local frame = self.frame.cd_frames[i]
-				do local alpha = timeLeft <= self.settings.blink and blink_alpha1(tm) or 1
+				do
+					local alpha = timeLeft <= self.settings.blink and blink_alpha1(tm) or 1
 					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
 				end
 				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
