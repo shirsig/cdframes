@@ -93,9 +93,9 @@ function private.SLASH(str)
 		elseif parameters[1] == 'SPACING' then
 			frame.settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = parse_number{input=parameters[2], min=21/37, max=5, default=1}
+			frame.settings.scale = parse_number{input=parameters[2], min=.5, max=2, default=1}
 		elseif parameters[1] == 'TEXT' then
-			frame.settings.text = parse_number{input=parameters[2], min=0, max=2, default=1, integer=true}
+			frame.settings.text = not frame.settings.text
 		elseif parameters[1] == 'BLINK' then
 			frame.settings.blink = parse_number{input=parameters[2], min=0, default=7}
 		elseif parameters[1] == 'ANIMATION' then

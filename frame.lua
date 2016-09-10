@@ -91,24 +91,12 @@ do
 			border:SetHeight(56)
 			border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
 
-			status:SetPoint('CENTER', .5, .5)
-			status:SetWidth(60)
-			status:SetHeight(60)
-			status:SetTexture([[Interface\Buttons\UI-ActionButton-Border]])
-			status:SetBlendMode('ADD')
-
 			cooldown:SetScale(32/36)
 		end,
 		zoomed = function()
 			icon:SetWidth(36)
 			icon:SetHeight(36)
 			icon:SetTexCoord(.08, .92, .08, .92)
-
-			status:SetWidth(66)
-			status:SetHeight(66)
-			status:SetPoint('CENTER', .5, .5)
-			status:SetTexture([[Interface\Buttons\UI-ActionButton-Border]])
-			status:SetBlendMode('ADD')
 
 			cooldown:SetScale(1)
 		end,
@@ -121,10 +109,6 @@ do
 			border:SetHeight(42)
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Normal]])
 			border:SetVertexColor(0, 0, 0, 1)
-
-			status:SetWidth(42)
-			status:SetHeight(42)
-			status:SetTexture([[Interface\Addons\CDFrames\Textures\Fade\Border]])
 
 			gloss:SetWidth(42)
 			gloss:SetHeight(42)
@@ -143,12 +127,6 @@ do
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
 			border:SetTexCoord(.14, .86, .14, .86)
 
-			status:SetWidth(35)
-			status:SetHeight(35)
-			status:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Border]])
-			status:SetTexCoord(.14, .86, .14, .86)
-			status:SetBlendMode('ADD')
-
 			gloss:SetWidth(36)
 			gloss:SetHeight(36)
 			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
@@ -156,28 +134,6 @@ do
 			gloss:SetTexCoord(.14, .86, .14, .86)
 
 			cooldown:SetScale(30/36)
-		end,
-		imoen = function()
-			icon:SetWidth(32)
-			icon:SetHeight(32)
-			icon:SetTexCoord(.06, .94, .06, .94)
-
-			border:SetWidth(64)
-			border:SetHeight(64)
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Normal]])
-
-			status:SetWidth(64)
-			status:SetHeight(64)
-			status:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Highlight]])
-			status:SetBlendMode('ADD')
-			status:SetVertexColor(1, 1, 1, .5)
-
-			gloss:SetWidth(64)
-			gloss:SetHeight(64)
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\imoen\Gloss]])
-			gloss:SetVertexColor(1, 1, 1, .3)
-
-			cooldown:SetScale(32/36)
 		end,
 		darion = function()
 			icon:SetWidth(34)
@@ -188,11 +144,6 @@ do
 			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
 --			border:SetVertexColor(0, 0, 0)
 			border:SetVertexColor(.2, .2, .2)
-
-			status:SetWidth(40)
-			status:SetHeight(40)
-			status:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Border]])
-			status:SetBlendMode('DISABLE')
 
 			gloss:SetWidth(40)
 			gloss:SetHeight(40)
@@ -220,7 +171,8 @@ function method:CDFrame()
 
 	frame.status = frame:CreateTexture(nil, 'ARTWORK')
 	frame.status:SetPoint('CENTER', 0, 0)
-	frame.status:Hide()
+	frame.status:SetVertexColor(1, 1, 0)
+--	frame.status:Hide()
 
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
 --	frame.gloss:SetAlpha(1)
@@ -229,7 +181,7 @@ function method:CDFrame()
 	do
 		local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
-		cooldown:SetPoint('BOTTOMLEFT', frame.icon, 'BOTTOMLEFT', 0, -1)
+		cooldown:SetPoint('CENTER', frame.icon, 'CENTER', 0, -1)
 		cooldown:SetWidth(36)
 		cooldown:SetHeight(36)
 		cooldown:SetScript('OnAnimFinished', nil)
@@ -247,12 +199,12 @@ function method:CDFrame()
 		text_frame:SetFrameLevel(4)
 		text_frame:SetAllPoints()
 		local text = text_frame:CreateFontString()
-		text:SetPoint('CENTER', .5, 0)
+		text:SetPoint('CENTER', 0, 0)
 		text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
 		frame.text = text
 	end
 	frame.tooltip = t
-	skin(frame, 'darion') -- newsom, imoen, darion, blizzard, fade, zoomed
+	skin(frame, 'darion') -- newsom, darion, blizzard, fade, zoomed
 	return frame
 end
 
