@@ -62,7 +62,7 @@ function public.setup()
 	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or t
 	public.frame = CDFrames.frame.new('Player Cooldowns', {.2, .8, .2}, CDFrames_Settings.PLAYER)
 	do local frame = CreateFrame('Frame')
-		frame:SetScript('OnEvent', function() M[event]() end)
+		frame:SetScript('OnEvent', function() _E[event]() end)
 		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
 		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 	end

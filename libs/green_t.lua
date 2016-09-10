@@ -1,5 +1,4 @@
 green_t = module
-
 local next, getn, setn, tremove, type, setmetatable = next, getn, table.setn, tremove, type, setmetatable
 
 -- TODO recursive releasing with specified depth, maybe allow setting "release structure" on creation for easier releasing, mandatory operation table mandate + comply/fulfill functions to ensure something is being released?
@@ -136,7 +135,7 @@ do
 
 	function vararg(f)
 		local chunk = loadstring(code)
-		setfenv(chunk, { f=f, setn=setn, acquire=acquire, set_auto_release=set_auto_release })
+		setfenv(chunk, {f=f, setn=setn, acquire=acquire, set_auto_release=set_auto_release})
 		return chunk()
 	end
 	public.vararg = vararg

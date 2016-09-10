@@ -1,97 +1,88 @@
-if module then return end
-local setfenv, getmetatable, setmetatable, type, unpack, next, _G = setfenv, getmetatable, setmetatable, type, unpack, next, getfenv(0)
+if getmetatable(getfenv(0)) == false then return end
+local tinsert, tremove, getn, setn, strfind, type, setmetatable, setfenv, _G = tinsert, tremove, getn, table.setn, strfind, type, setmetatable, setfenv, getfenv(0)
 
-local PUBLIC, PRIVATE = 1, 2
-local CALL, INDEX, NEWINDEX = 1, 2, 3
+local PUBLIC, FIELD, ACCESSOR, MUTATOR = 1, 2, 4, 6
+local READ, WRITE = '', '='
+local OPERATION = { [FIELD]=READ, [ACCESSOR]=READ, [MUTATOR]=WRITE }
 
 local function error(msg, ...) return _G.error(format(msg or '', unpack(arg)) .. '\n' .. debugstack(), 0) end
-local function import_error() error('Import error.') end
-local function declaration_error() error('Declaration error.') end
-local function collision_error(key) error('"%s" already exists.', key) end
-local function nil_error(key) if key then error('"%s" is nil.', key) else error('Callee is nil') end end
 
 local nop, id = function() end, function(v) return v end
 
-local function prototype() local eq = function() return true end
-return setmetatable({ __metatable=false, __eq=eq }, { __metatable=false, __eq=eq, __call=function(self, t) return setmetatable(t, self) end })
+local interface_eq = function() return true end
+local INTERFACE = setmetatable({}, { __eq=interface_eq })
+
+local function proxy_mt(fields, mutators, eq)
+	return { __metatable=false, __index=fields, __newindex=function(_, k, v) return mutators[k](v) end, __eq=eq }
 end
 
-local INTERFACE, ENVIRONMENT, DECLARATOR = prototype(), prototype(), prototype()
+local _module, _modifiers = {}, {}
 
-local state = {}
-
-function INTERFACE:__index(key) self=state[self]
-if self.access[key] == PUBLIC then return self[CALL][key] or (self[INDEX][key] or nop)() end
+local definition_helper_mt = { __metatable=false }
+function definition_helper_mt:__index(k)
+	tinsert(_modifiers[self], k)
+	return self
 end
-function INTERFACE:__newindex(key, value) self=state[self]
-if self.access[key] == PUBLIC then (self[NEWINDEX][key] or nop)(value) end
-end
-
-function ENVIRONMENT:__index(key) self=state[self]
-local f = self[CALL][key]; if f then return f end
-local getter = self[INDEX][key]; if getter then return getter() end
-return _G[key] or self.declarator[key]
-end
-function ENVIRONMENT:__newindex(key, value) self=state[self]
-if self.access[key] then (self[NEWINDEX][key] or collision_error(key))(value) else self.declarator[key] = value end
-end
-ENVIRONMENT.__call = nop -- TODO
-
 do
-	local ACCESS, EVENT = { public=PUBLIC, private=PRIVATE }, { call=CALL, get=INDEX, set=NEWINDEX }
-	local function declare(self, access, name, handlers)
-		self.access[name] = (not self.access[name] or collision_error(name)) and access or self.default_access or declaration_error()
-		for event, handler in handlers do local handler = handler
-		self[event][name] = type(handler) == 'function' and handler or (event == INDEX and function() return handler end or declaration_error())
-		end
+	local PUBLIC, META = { public=PUBLIC, private=0 }, { get=ACCESSOR, set=MUTATOR }
+	function definition_helper_mt:__newindex(k, v) local module, modifiers = _module[self], _modifiers[self]
+		local public = PUBLIC[tremove(modifiers, 1)] or error('Invalid definition.')
+		local name = META[k] and (tremove(modifiers) or error('Invalid definition.')) or k
+		if type(name) ~= 'string' or not strfind(name, '^[_%a][_%w]*') then error('Invalid definition.') end
+		local type = META[k] or FIELD
+		module.defined[name..OPERATION[type]] = module.defined[name..OPERATION[type]] and error('"%s" already exists.', name) or true
+		for i = getn(modifiers), 1, -1 do v = module[FIELD][modifiers[i]](v) end
+		module[type][name], module[public+type][name] = v, v
+		setn(modifiers, 0)
 	end
-	function DECLARATOR:__index(key) self=state[self]; local name, access = self.declaration_name, self.declaration_access
-	if ACCESS[key] and (not access or declaration_error() and not name or nil_error(name)) then
-		self.declaration_access = ACCESS[key]
-	elseif not name or nil_error(name) then
-		self.declaration_name = (type(key) == 'string' or access and declaration_error() or nil_error(name)) and key
-	end
-	return self.declarator
-	end
-	function DECLARATOR:__newindex(key, value) self=state[self]; local name, access = self.declaration_name, self.declaration_access
-	if name then declare(self, access, name, { [EVENT[key] or nil_error(name)]=value })
-	elseif access or self.default_access then declare(self, access, key, { [type(value) == 'function' and CALL or INDEX]=value })
-	else _G[key] = (_G[key] == nil or _G.error(nil)) and value end --	G.error(nil) TODO silent error?
-	self.declaration_access, self.declaration_name = nil, nil
-	end
-	function DECLARATOR:__call(v) self=state[self]; local name, access = self.declaration_name, self.declaration_access
-	if name then
-		if type(v) ~= 'table' or getmetatable(v) ~= nil then (access and declaration_error() or nil_error)(name) end
-		local f, getter, setter; f, getter, setter, v.call, v.get, v.set = v.call, v.get, v.set, nil, nil, nil
-		if next(v) or f ~= nil and getter ~= nil then (access and declaration_error() or nil_error)(name) end
-		declare(self, access, name, { [CALL]=f, [INDEX]=getter, [NEWINDEX]=setter })
-	elseif access or nil_error() then self.default_access = access end
-	self.declaration_access, self.declaration_name = nil, nil
-	end
-	DECLARATOR.__tostring = function() return 'nil table' end
 end
 
-local function import(self, interface)
-	local module = (interface == INTERFACE or import_error()) and state[interface]
-	for k, v in module.access do
-		if v == PUBLIC and not self.access[k] then
-			self.access[k], self[CALL][k], self[INDEX][k], self[NEWINDEX][k] = PRIVATE, module[CALL][k], module[INDEX][k], module[NEWINDEX][k]
+local import
+do
+	local TYPES = { FIELD, ACCESSOR, MUTATOR }
+	function import(self, interface)
+		local module = (interface == INTERFACE or error('Import error.')) and _module[interface]
+		for _, type in TYPES do
+			for k, v in module[PUBLIC+type] do
+				if not self.defined[k..OPERATION[type]] then
+					self.defined[k..OPERATION[type]], self[type][k] = true, v
+				end
+			end
 		end
 	end
 end
 
-local mt = {}; setmetatable(_G, mt)
-function mt:__index(key)
+local nop_default_mt = { __index=function() return nop end }
+
+local global_mt = { __metatable=false }
+function global_mt:__index(key)
 	if key ~= 'module' then return end
-	local interface, environment, declarator = INTERFACE {}, ENVIRONMENT {}, DECLARATOR {}
-	self = {
-		access = { _G=PRIVATE, I=PRIVATE, M=PRIVATE, public=PRIVATE, private=PRIVATE, import=PRIVATE, _=PRIVATE, error=PRIVATE, nop=PRIVATE, id=PRIVATE },
-		[CALL] = { _G=_G, I=interface, M=environment, import=function(interface) import(self, interface) end, error=error, nop=nop, id=id },
-		[INDEX] = { public=function() return declarator.public end, private=function() return declarator.private end },
-		[NEWINDEX] = { _=nop },
-		declarator = declarator,
+	local module, environment, interface, definition_helper, accessors, mutators, fields, public_accessors, public_mutators, public_fields
+	environment, interface, definition_helper = {}, {}, setmetatable({}, definition_helper_mt)
+	accessors = { private=function() return definition_helper.private end, public=function() return definition_helper.public end }
+	mutators = setmetatable({}, { __index=function(_, k) return function(v) if v == interface and (_G[k] == nil or error(nil)) then _G[k] = v end end end})
+	fields = setmetatable(
+		{ _E=environment, _I=interface, _G=_G, import=function(interface) import(module, interface) end, error=error, nop=nop, id=id },
+		{ __index=function(_, key) local accessor = accessors[key]; if accessor then return accessor() else return _G[key] end end }
+	)
+	public_accessors = setmetatable({}, nop_default_mt)
+	public_mutators = setmetatable({}, nop_default_mt)
+	public_fields = setmetatable({}, { __index=function(_, key) return public_accessors[key]() end })
+	setmetatable(environment, proxy_mt(fields, mutators))
+	setmetatable(interface, proxy_mt(public_fields, public_mutators, interface_eq))
+	module = {
+		defined = { _E=true, _I=true, _G=true, import=true, error=true, _=true, nop=true, id=true, public=true, private=true },
+		[ACCESSOR] = accessors,
+		[MUTATOR] = mutators,
+		[FIELD] = fields,
+		[PUBLIC+ACCESSOR] = public_accessors,
+		[PUBLIC+MUTATOR] = public_mutators,
+		[PUBLIC+FIELD] = public_fields,
+		interface = interface,
 	}
-	state[interface], state[environment], state[declarator] = self, self, self
+	_module[definition_helper], _module[interface] = module, module
+	_modifiers[definition_helper] = {}
 	setfenv(2, environment)
 	return interface
 end
+setmetatable(_G, global_mt)

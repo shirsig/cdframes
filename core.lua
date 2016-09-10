@@ -1,14 +1,14 @@
 do  local modules = {}
-	local mt = {__metatable=false, __index=function(_, key) return modules[key].I end, __newindex=error}
+	local mt = {__metatable=false, __index=function(_, key) return modules[key]._I end, __newindex=error}
 	CDFrames = function(name)
 		if not modules[name] then
 			(function()
-				modules[name] = module and M
+				modules[name] = module and _E
 				import (green_t)
 				private.CDFrames = setmetatable(t, mt)
 			end)()
 		end
-		modules[name].import (modules.core.I)
+		modules[name].import (modules.core._I)
 		setfenv(2, modules[name])
 	end
 end
@@ -16,7 +16,7 @@ end
 CDFrames 'core'
 
 do local frame = CreateFrame('Frame')
-	frame:SetScript('OnEvent', function() M[event]() end)
+	frame:SetScript('OnEvent', function() _E[event]() end)
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
@@ -43,7 +43,7 @@ function public.contains(list, str)
 	end
 end
 
-function ADDON_LOADED()
+function private.ADDON_LOADED()
 	if arg1 ~= 'CDFrames' then return end
 
 	_G.SLASH_CDFrames1 = '/cdframes'

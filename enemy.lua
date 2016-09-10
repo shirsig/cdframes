@@ -266,7 +266,7 @@ function public.setup()
 
 	private.events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
-	events:SetScript('OnEvent', function() M[event]() end)
+	events:SetScript('OnEvent', function() _E[event]() end)
 	for _, event in COMBAT_LOG_EVENTS do
 		private[event] = OnCombatLogEvent
 		events:RegisterEvent(event)
