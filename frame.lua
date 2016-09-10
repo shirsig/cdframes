@@ -70,9 +70,6 @@ function method:CreateFrames()
 		local cd_frame = self.frame.cd_frames[i]
 		cd_frame:EnableMouse(not self.settings.clickThrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
-		if not self.settings.text then
-			cd_frame.text:SetText('')
-		end
 	end
 end
 
@@ -190,10 +187,10 @@ function method:CDFrame()
 		text_frame:SetAllPoints()
 		frame.text = text_frame:CreateFontString()
 		frame.text:SetPoint('CENTER', .5, 0)
-		frame.text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
+		frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 	end
 	frame.tooltip = t
-	skin(frame, 'blizzard') -- blizzard, zoomed, caith, newsom, darion
+	skin(frame, 'caith') -- blizzard, zoomed, caith, newsom, darion
 	return frame
 end
 
@@ -319,10 +316,7 @@ function method:Update()
 					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
 				end
 				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
-				if self.settings.text then
-					frame.text:SetText(time_text(timeLeft))
-					frame.text:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
-				end
+				frame.text:SetText(self.settings.text and time_text(timeLeft) or '')
 				frame.icon:SetTexture(cooldown.icon)
 				init[frame.tooltip] = temp-A(cooldown.name, cooldown.info)
 				frame:Show()
