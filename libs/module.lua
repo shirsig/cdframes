@@ -26,7 +26,7 @@ function definition_helper_mt:__index(k)
 	tinsert(_modifiers[self], k)
 	return self
 end
-function definition_helper_mt:__newindex(k, v) local module, modifiers = _module[self], _modifiers[self]
+	function definition_helper_mt:__newindex(k, v) local module, modifiers = _module[self], _modifiers[self]
 	local access = ACCESS[tremove(modifiers, 1)] or error('Invalid definition.')
 	local name = META[k] and (tremove(modifiers) or error('Invalid definition.')) or k
 	if type(name) ~= 'string' or not strfind(name, '^[_%a][_%w]*') then error('Invalid definition.') end
@@ -56,7 +56,7 @@ function global_mt:__index(key)
 	local module, environment, interface, definition_helper, accessors, mutators, fields, public_accessors, public_mutators, public_fields
 	environment, interface, definition_helper = {}, {}, setmetatable({}, definition_helper_mt)
 	accessors = { private=function() return definition_helper.private end, public=function() return definition_helper.public end }
-	mutators = setmetatable({}, { __index=function(_, k) return function(v) if v == interface and (_G[k] == nil or error(nil)) then _G[k] = v else definition_helper.private[k] = v end end end})
+	mutators = setmetatable({}, { __index=function(_, k) return function(v) if v == interface and (_G[k] == nil or _G.error(nil)) then _G[k] = v else definition_helper.private[k] = v end end end})
 	fields = setmetatable(
 		{ _E=environment, _I=interface, _G=_G, import=function(interface) import(module, interface) end, error=error, nop=nop, id=id },
 		{ __index=function(_, key) local accessor = accessors[key]; if accessor then return accessor() else return _G[key] end end }
