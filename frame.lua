@@ -185,9 +185,8 @@ do
 
 			border:SetWidth(40)
 			border:SetHeight(40)
---			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
+			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
 --			border:SetVertexColor(0, 0, 0)
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal_Clean]])
 			border:SetVertexColor(.2, .2, .2)
 
 			status:SetWidth(40)
@@ -197,8 +196,7 @@ do
 
 			gloss:SetWidth(40)
 			gloss:SetHeight(40)
---			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss_Clean]])
+			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
 
 			cooldown:SetScale(34/36)
 		end,
@@ -430,23 +428,19 @@ function private.blink_alpha2(t)
 	return (sin(t * 240) + 1) / 2 * .7 + .3
 end
 
-local tenthsDuration, mmSSDuration = 0, 180
+do
+	local DAY, HOUR, MINUTE = 86400, 3600, 60
+	local color_code = function(r, g, b) return format('|cFF%02X%02X%02X', r*255, g*255, b*255) end
 
-local DAY, HOUR, MINUTE = 86400, 3600, 60
-local DAYISH, HOURISH, MINUTEISH, SOONISH = HOUR * 23.5, MINUTE * 59.5, 59.5, 5.5
-local HalfDayish, HalfHourish, HalfMinuteish = DAY/2 + .5, HOUR/2 + .5, MINUTE/2 + .5
-local round = function(x) return floor(x + .5) end
-
-local color_code = function(r, g, b) return format('|cFF%02X%02X%02X', r*255, g*255, b*255) end
-
-function private.time_text(t) -- ECDC TODO ¼ ½ ¾
-	if t > HOUR then
-		return color_code(.7, .7, .7) .. ceil((t / HOUR) * 10) / 10
-	elseif t > MINUTE then
-		return color_code(0, 1, 0) .. ceil((t / MINUTE) * 10) / 10
-	elseif t > 5 then
-		return color_code(1, 1, 0) .. ceil(t)
-	else
-		return color_code(1, 0, 0) .. ceil(t)
+	function private.time_text(t) -- TODO ¼ ½ ¾
+		if t > HOUR then
+			return color_code(.7, .7, .7) .. ceil((t / HOUR) * 10) / 10
+		elseif t > MINUTE then
+			return color_code(0, 1, 0) .. ceil((t / MINUTE) * 10) / 10
+		elseif t > 5 then
+			return color_code(1, 1, 0) .. ceil(t)
+		else
+			return color_code(1, 0, 0) .. ceil(t)
+		end
 	end
 end
