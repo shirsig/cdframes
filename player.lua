@@ -68,6 +68,8 @@ function public.setup()
 		frame:SetScript('OnEvent', function() _E[event]() end)
 		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
 		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+		frame:RegisterEvent('SPELLCAST_START')
+		frame:RegisterEvent('SPELLCAST_STOP')
 	end
 	BAG_UPDATE_COOLDOWN()
 	SPELL_UPDATE_COOLDOWN()
@@ -90,43 +92,64 @@ function private.link_name(link)
 end
 
 do
-	local orig = UseContainerItem
-	_G.UseContainerItem = function(...)
-		last_used = link_name(GetContainerItemLink(unpack(arg)) or '')
-		return orig(unpack(arg))
-	end
-end
+	local casting
 
-do
-	local orig = UseInventoryItem
-	_G.UseInventoryItem = function(...)
-		last_used = link_name(GetInventoryItemLink('player', arg[1]) or '')
-		return orig(unpack(arg))
+	function private.SPELLCAST_START()
+		casting = true
 	end
-end
-
-do
-	local orig = CastSpellByName
-	_G.CastSpellByName = function(...)
-		last_used = arg[1]
-		return orig(unpack(arg))
+	function private.SPELLCAST_STOP()
+		casting = false
 	end
-end
 
-do
-	local orig = CastSpell
-	_G.CastSpell = function(...)
-		last_used = GetSpellName(unpack(arg))
-		return orig(unpack(arg))
+	do
+		local orig = UseContainerItem
+		_G.UseContainerItem = function(...)
+			if not casting then
+				last_used = link_name(GetContainerItemLink(unpack(arg)) or '')
+			end
+			return orig(unpack(arg))
+		end
 	end
-end
 
-do
-	local orig = UseAction
-	_G.UseAction = function(...)
-		cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
-		cooldowns_Tooltip:SetAction(arg[1])
-		last_used = cooldowns_TooltipTextLeft1:GetText()
-		return orig(unpack(arg))
+	do
+		local orig = UseInventoryItem
+		_G.UseInventoryItem = function(...)
+			if not casting then
+				last_used = link_name(GetInventoryItemLink('player', arg[1]) or '')
+			end
+			return orig(unpack(arg))
+		end
+	end
+
+	do
+		local orig = CastSpellByName
+		_G.CastSpellByName = function(...)
+			if not casting then
+				last_used = arg[1]
+			end
+			return orig(unpack(arg))
+		end
+	end
+
+	do
+		local orig = CastSpell
+		_G.CastSpell = function(...)
+			if not casting then
+				last_used = GetSpellName(unpack(arg))
+			end
+			return orig(unpack(arg))
+		end
+	end
+
+	do
+		local orig = UseAction
+		_G.UseAction = function(...)
+			if not casting then
+				cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
+				cooldowns_Tooltip:SetAction(arg[1])
+				last_used = cooldowns_TooltipTextLeft1:GetText()
+			end
+			return orig(unpack(arg))
+		end
 	end
 end
