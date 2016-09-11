@@ -18,7 +18,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cooldowns line x** (maximum number of timers per line, **x** between 1 and 100, default 8)<br/>
 **/cooldowns scale x** (**x** between 0.5 and 2, default 1)<br/>
 **/cooldowns spacing x** (**x** between 0 and 1, default 0, represents fraction of icon size)<br/>
-**/cooldowns skin** (changes the style. available skins: blizzard, zoomed, newsom, darion)<br/>
+**/cooldowns skin** (changes the style. available skins: blizzard, zoomed, elvui, darion)<br/>
 **/cooldowns blink x** (starts blinking at **x** seconds, default 0)<br/>
 **/cooldowns animation** (cooldown shadow animation, default off)<br/>
 **/cooldowns text** (toggles the countdown, default on)<br/>
