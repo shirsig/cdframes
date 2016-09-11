@@ -274,14 +274,13 @@ function public.setup()
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 	private.targeted_enemies = t
-	private.active_cooldowns = t
 end
 
 function private.OnCombatLogEvent()
 	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldown_name in string.gfind(arg1, pattern) do
 			for _, enemy in targeted_enemies do
-				if COOLDOWNS[cooldown_name] and not active(enemy.name, cooldown_name) and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
+				if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
 					start_cooldown(enemy.name, cooldown_name, GetTime()); break
 				end
 			end
@@ -295,27 +294,20 @@ function private.OnCombatLogEvent()
 	end
 end
 
-function private.Key(player, cooldown_name)
-	return player .. '|' .. cooldown_name
-end
-
 function private.expired(cooldown)
 	return cooldown.started + COOLDOWNS[cooldown.name].cooldown <= GetTime()
 end
 
-function private.active(player, cooldown_name)
-	local key = Key(player, cooldown_name)
-	if active_cooldowns[key] and expired(active_cooldowns[key]) then active_cooldowns[key] = nil end
-	return active_cooldowns[key]
-end
-
-function private.cooldowns()
-	local cooldowns = tt
-	for _, cooldown in active_cooldowns do tinsert(cooldowns, cooldown) end
-	for _, cooldown in cooldowns do
-		if expired(cooldown) then active_cooldowns[Key(cooldown.player, cooldown.name)] = nil end
+do
+	local active_cooldowns = t
+	function private.active_cooldowns.get()
+		for k, v in active_cooldowns do
+			if expired(v) then
+				active_cooldowns[k] = nil
+			end
+		end
+		return active_cooldowns
 	end
-	return active_cooldowns
 end
 
 function private.show_cooldown(frame, key)
@@ -344,7 +336,7 @@ end
 function private.start_cooldown(player, cooldown_name, started)
 	triggers(player, cooldown_name)
 
-	local key = Key(player, cooldown_name)
+	local key = player .. '|' .. cooldown_name
 	if active_cooldowns[key] then
 		hide_cooldown(targetFrame, key)
 		hide_cooldown(targetTargetFrame, key)
@@ -360,7 +352,7 @@ end
 
 function private.stop_cooldowns(player, ...)
 	for i=1,arg.n do
-		local key = Key(player, arg[i])
+		local key = player .. '|' .. arg[i]
 		if active_cooldowns[key] then
 			hide_cooldown(targetFrame, key)
 			hide_cooldown(targetTargetFrame, key)
