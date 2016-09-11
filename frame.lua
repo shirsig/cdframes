@@ -217,7 +217,7 @@ function method:CDFrame()
 		text_frame:SetFrameLevel(4)
 		text_frame:SetAllPoints()
 		frame.text = text_frame:CreateFontString()
-		frame.text:SetPoint('CENTER', 1, 0)
+		frame.text:SetPoint('CENTER', .7, 0)
 	end
 	frame.tooltip = t
 	return frame
