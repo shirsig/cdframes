@@ -259,10 +259,10 @@ private.COMBAT_LOG_PATTERNS_PARTIAL = {
 }
 
 function public.setup()
-	cooldowns_Settings.TARGET = cooldowns_Settings.TARGET or t
-	cooldowns_Settings.TARGETTARGET = cooldowns_Settings.TARGETTARGET or {active=false}
-	public.targetFrame = cooldowns.frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_Settings.TARGET)
-	public.targetTargetFrame = cooldowns.frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_Settings.TARGETTARGET)
+	cooldowns_settings.TARGET = cooldowns_settings.TARGET or t
+	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or {active=false}
+	public.targetFrame = cooldowns.frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
+	public.targetTargetFrame = cooldowns.frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
@@ -397,7 +397,7 @@ do
 		if skip ~= 0 then return end
 		skip = mod(skip - 1, 6)
 
-		if cooldowns_Settings.TARGETTARGET.active then
+		if cooldowns_settings.TARGETTARGET.active then
 			update_frame(targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
 		end
 	end

@@ -23,7 +23,7 @@ do local frame = CreateFrame('Frame')
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.cooldowns_Settings = t
+_G.cooldowns_settings = t
 
 function public.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
@@ -67,7 +67,7 @@ function private.SLASH(str)
 	str = strupper(str)
 	local parameters, frames = tokenize(str), tt
 	if parameters[1] == 'USED' then
-		cooldowns_Settings.used = not cooldowns_Settings.used
+		cooldowns_settings.used = not cooldowns_settings.used
 		return
 	end
 	if contains(parameters[1] or '', 'PLAYER') then
@@ -136,7 +136,7 @@ function private.SLASH(str)
 		else
 			return
 		end
-		frame:LoadSettings(frame.settings)
+		frame:Loadsettings(frame.settings)
 	end
 end
 

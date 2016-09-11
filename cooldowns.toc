@@ -1,7 +1,7 @@
 ## Interface: 11200
-## Title: CDFrames
+## Title: cooldowns
 ## Author: shirsig
-## SavedVariables: CDFrames_Settings
+## SavedVariables: cooldowns_settings
 libs\module.lua
 libs\green_t.lua
 core.lua

@@ -27,13 +27,13 @@ function public.new(title, color, settings)
 	self.color = color
 	self.cooldowns = t
 	self.iconFramePool = t
-	self:LoadSettings(settings)
+	self:Loadsettings(settings)
 	return self
 end
 
 private.method = t
 
-function method:LoadSettings(settings)
+function method:Loadsettings(settings)
 	for k, v in DEFAULT_SETTINGS do
 		if settings[k] == nil then settings[k] = v end
 	end

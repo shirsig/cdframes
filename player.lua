@@ -61,8 +61,8 @@ function private.SPELL_UPDATE_COOLDOWN()
 end
 
 function public.setup()
-	cooldowns_Settings.PLAYER = cooldowns_Settings.PLAYER or t
-	public.frame = cooldowns.frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_Settings.PLAYER)
+	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or t
+	public.frame = cooldowns.frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
 	do
 		local frame = CreateFrame('Frame')
 		frame:SetScript('OnEvent', function() _E[event]() end)
@@ -76,7 +76,7 @@ end
 do
 	local cooldowns = t
 	function private.start_cd(name, texture, started, duration)
-		if cooldowns_Settings.used and name ~= last_used then return end
+		if cooldowns_settings.used and name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
 		cooldowns[name] = frame:StartCD(name, '', texture, started, duration)
 	end
