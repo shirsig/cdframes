@@ -91,8 +91,15 @@ end
 do
 	local orig = UseContainerItem
 	_G.UseContainerItem = function(...)
-		local bag, slot = unpack(arg)
-		last_used = link_name(GetContainerItemLink(bag, slot))
+		last_used = link_name(GetContainerItemLink(unpack(arg)))
+		return orig(unpack(arg))
+	end
+end
+
+do
+	local orig = UseInventoryItem
+	_G.UseInventoryItem = function(...)
+		last_used = link_name(GetInventoryItemLink('player', arg[1]))
 		return orig(unpack(arg))
 	end
 end
@@ -105,9 +112,10 @@ do
 	end
 end
 
---do
---	local orig = CastSpell
---	_G.UseContainerItem = function(...)
---		return orig(unpack(arg))
---	end
---end
+do
+	local orig = CastSpell
+	_G.CastSpell = function(...)
+		last_used = GetSpellName(unpack(arg))
+		return orig(unpack(arg))
+	end
+end

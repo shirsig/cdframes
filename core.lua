@@ -64,6 +64,10 @@ end
 function private.SLASH(str)
 	str = strupper(str)
 	local parameters, frames = tokenize(str), tt
+	if parameters[1] == 'USED' then
+		CDFrames_Settings.used = not CDFrames_Settings.used
+		return
+	end
 	if contains(parameters[1] or '', 'PLAYER') then
 		frames[CDFrames.player.frame] = true
 	end
@@ -98,6 +102,8 @@ function private.SLASH(str)
 			frame.settings.x = frame.settings.x * frame.settings.scale / scale
 			frame.settings.y = frame.settings.y * frame.settings.scale / scale
 			frame.settings.scale = scale
+		elseif parameters[1] == 'SKIN' then
+			frame.settings.skin = (temp-S('blizzard', 'zoomed', 'newsom', 'darion'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'blizzard'
 		elseif parameters[1] == 'TEXT' then
 			frame.settings.text = not frame.settings.text
 		elseif parameters[1] == 'BLINK' then

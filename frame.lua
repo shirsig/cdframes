@@ -5,12 +5,14 @@ private.ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 private.DEFAULT_SETTINGS = T(
 	'active', true,
 	'locked', false,
-	'x', 0, 'y', 0,
+	'x', UIParent:GetCenter(),
+	'y', (temp-A(UIParent:GetCenter()))[2],
 	'scale', 1,
 	'size', 16,
 	'line', 8,
 	'spacing', 0,
 	'orientation', 'RU',
+	'skin', 'blizzard',
 	'text', true,
 	'blink', 7,
 	'animation', false,
@@ -68,6 +70,7 @@ function method:CreateFrames()
 	end
 	for i = 1, self.settings.size do
 		local cd_frame = self.frame.cd_frames[i]
+		skin(cd_frame, self.settings.skin)
 		cd_frame:EnableMouse(not self.settings.clickThrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
 	end
@@ -75,82 +78,104 @@ end
 
 do
 	local apply = {
-		blizzard = function()
-			icon:SetWidth(30)
-			icon:SetHeight(30)
-			icon:SetTexCoord(.07, .93, .07, .93)
+		blizzard = function(frame)
+			frame:SetWidth(33.5)
+			frame:SetHeight(33.5)
 
-			border:ClearAllPoints()
-			border:SetPoint('CENTER', .5, -.5)
-			border:SetWidth(56)
-			border:SetHeight(56)
-			border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
+			frame.icon:SetWidth(30)
+			frame.icon:SetHeight(30)
+			frame.icon:SetTexCoord(.07, .93, .07, .93)
 
-			cooldown:SetScale(32.5/36)
+			frame.border:Show()
+			frame.border:SetPoint('CENTER', .5, -.5)
+			frame.border:SetWidth(56)
+			frame.border:SetHeight(56)
+			frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
+			frame.border:SetTexCoord(0, 1, 0, 1)
+			frame.border:SetVertexColor(1, 1, 1)
+
+			frame.gloss:Hide()
+
+			frame.cooldown:SetScale(32.5/36)
+
+			frame.text:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
-		zoomed = function()
-			icon:SetWidth(36)
-			icon:SetHeight(36)
-			icon:SetTexCoord(.08, .92, .08, .92)
+		zoomed = function(frame)
+			frame:SetWidth(36)
+			frame:SetHeight(36)
 
-			cooldown:SetScale(1)
+			frame.icon:SetWidth(36)
+			frame.icon:SetHeight(36)
+			frame.icon:SetTexCoord(.08, .92, .08, .92)
+
+			frame.border:Hide()
+
+			frame.gloss:Hide()
+
+			frame.cooldown:SetScale(1.01)
+
+			frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
-		caith = function()
-			icon:SetWidth(36)
-			icon:SetHeight(36)
-			icon:SetTexCoord(.02, .98, .02, .98)
+		newsom = function(frame)
+			frame:SetWidth(30.5)
+			frame:SetHeight(30.5)
 
-			border:SetWidth(42)
-			border:SetHeight(42)
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\caith\Normal]])
-			border:SetVertexColor(.3, .3, .3)
+			frame.icon:SetWidth(30)
+			frame.icon:SetHeight(30)
+			frame.icon:SetTexCoord(.07,.93,.07,.93)
 
-			cooldown:SetScale(1)
+			frame.border:Show()
+			frame.border:SetPoint('CENTER', 0, 0)
+			frame.border:SetWidth(36)
+			frame.border:SetHeight(36)
+			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
+			frame.border:SetTexCoord(.14, .86, .14, .86)
+			frame.border:SetVertexColor(1, 1, 1)
+
+			frame.gloss:Show()
+			frame.gloss:SetWidth(36)
+			frame.gloss:SetHeight(36)
+			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
+			frame.gloss:SetTexCoord(.14, .86, .14, .86)
+
+			frame.cooldown:SetScale(30/36)
+
+			frame.text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
 		end,
-		newsom = function()
-			icon:SetWidth(30)
-			icon:SetHeight(30)
-			icon:SetTexCoord(.07,.93,.07,.93)
+		darion = function(frame)
+			frame:SetWidth(34.5)
+			frame:SetHeight(34.5)
 
-			border:SetWidth(36)
-			border:SetHeight(36)
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
-			border:SetTexCoord(.14, .86, .14, .86)
+			frame.icon:SetWidth(33)
+			frame.icon:SetHeight(33)
+			frame.icon:SetTexCoord(0, 1, 0, 1)
 
-			gloss:SetWidth(36)
-			gloss:SetHeight(36)
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
-			gloss:SetBlendMode('BLEND')
-			gloss:SetTexCoord(.14, .86, .14, .86)
+			frame.border:Show()
+			frame.border:SetPoint('CENTER', 0, 0)
+			frame.border:SetWidth(40)
+			frame.border:SetHeight(40)
+			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
+			frame.border:SetTexCoord(0, 1, 0, 1)
+			frame.border:SetVertexColor(.2, .2, .2)
 
-			cooldown:SetScale(30/36)
-		end,
-		darion = function()
-			icon:SetWidth(34)
-			icon:SetHeight(34)
+			frame.gloss:Show()
+			frame.gloss:SetWidth(40)
+			frame.gloss:SetHeight(40)
+			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
+			frame.gloss:SetTexCoord(0, 1, 0, 1)
 
-			border:SetWidth(40)
-			border:SetHeight(40)
-			border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
-			border:SetVertexColor(.2, .2, .2)
+			frame.cooldown:SetScale(34/36)
 
-			gloss:SetWidth(40)
-			gloss:SetHeight(40)
-			gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
-
-			cooldown:SetScale(34/36)
+			frame.text:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 	}
 	function private.skin(frame, skin)
-		local apply = apply[skin]
-		setfenv(apply, frame); apply()
+		apply[skin](frame)
 	end
 end
 
 function method:CDFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetWidth(36)
-	frame:SetHeight(36)
 
 	frame.icon = frame:CreateTexture(nil, 'BORDER')
 	frame.icon:SetPoint('CENTER', 0, 0)
@@ -187,10 +212,8 @@ function method:CDFrame()
 		text_frame:SetAllPoints()
 		frame.text = text_frame:CreateFontString()
 		frame.text:SetPoint('CENTER', .5, 0)
-		frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 	end
 	frame.tooltip = t
-	skin(frame, 'blizzard') -- blizzard, zoomed, caith, newsom, darion
 	return frame
 end
 
@@ -212,11 +235,13 @@ function method:PlaceFrames()
 	)
 	local anchor = (strfind(orientation, 'D') and 'TOP' or 'BOTTOM') .. (strfind(orientation, 'R') and 'LEFT' or 'RIGHT')
 
-	local spacing = self.settings.spacing * 36
-	local slotSize = 36 + spacing
+	local size = self.frame.cd_frames[1]:GetWidth()
 
-	self.frame:SetWidth(36)
-	self.frame:SetHeight(36)
+	local spacing = self.settings.spacing * size
+	local slotSize = size + spacing
+
+	self.frame:SetWidth(size)
+	self.frame:SetHeight(size)
 	
 	for i = 1, self.settings.size do
 		local frame = self.frame.cd_frames[i]
@@ -235,8 +260,11 @@ end
 function method:Lock()
 	self.frame:EnableMouse(false)
 	for i = 1, self.settings.size do
-		self.frame.cd_frames[i].background:Hide()
-		self.frame.cd_frames[i]:Hide()
+		local frame = self.frame.cd_frames[i]
+		frame.background:Hide()
+		frame.icon:SetAlpha(1)
+		frame:SetAlpha(1)
+		frame:Hide()
 	end
 end
 
@@ -246,12 +274,13 @@ function method:Unlock()
 		local frame = self.frame.cd_frames[i]
 		frame:EnableMouse(false)
 		frame.background:Show()
+		frame.text:SetText('')
+		frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 		if i == 1 then
-			frame.icon:SetAlpha(0)
-		else
-			frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 			frame.icon:SetAlpha(.8)
-			frame:SetAlpha(.5)
+		else
+			frame.icon:SetAlpha(.8)
+			frame:SetAlpha(.4)
 		end
 		frame:Show()
 	end
