@@ -92,7 +92,7 @@ end
 do
 	local orig = UseContainerItem
 	_G.UseContainerItem = function(...)
-		last_used = link_name(GetContainerItemLink(unpack(arg)))
+		last_used = link_name(GetContainerItemLink(unpack(arg)) or '')
 		return orig(unpack(arg))
 	end
 end
@@ -100,7 +100,7 @@ end
 do
 	local orig = UseInventoryItem
 	_G.UseInventoryItem = function(...)
-		last_used = link_name(GetInventoryItemLink('player', arg[1]))
+		last_used = link_name(GetInventoryItemLink('player', arg[1]) or '')
 		return orig(unpack(arg))
 	end
 end
