@@ -1,0 +1,10 @@
+## Interface: 11200
+## Title: cooldowns
+## Author: shirsig
+## SavedVariables: cooldowns_settings
+libs\module.lua
+libs\green_t.lua
+core.lua
+frame.lua
+player.lua
+enemy.lua

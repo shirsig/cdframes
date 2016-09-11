@@ -1,99 +1,90 @@
-local interface, m, public, private = unpack(CDFrames_Module())
-CDFrames = interface
-
-CDFrames_Settings = {}
-
-function public.module(name)
-	local module = CDFrames_Module()
-	public[name] = tremove(module, 1)
-	return unpack(module)
-end
-
-private.events = CreateFrame('Frame')
-m.events:SetScript('OnEvent', function() this[event]() end)
-m.events:RegisterEvent('ADDON_LOADED')
-
-function public.Log(msg)
-	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE..'[CDFrames] '..msg)
-end
-
-function public.Present(...)
-	local called
-	return function()
-		if not called then
-			called = true
-			return unpack(arg)
+do
+	local modules = {}
+	local mt = {__metatable=false, __index=function(_, key) return modules[key]._I end, __newindex=error}
+	cooldowns = function(name)
+		if not modules[name] then
+			(function()
+				modules[name] = module and _E
+				import (green_t)
+				private.cooldowns = setmetatable(t, mt)
+			end)()
 		end
+		modules[name].import (modules.core._I)
+		setfenv(2, modules[name])
 	end
 end
 
-function public.List(first, ...)
-	for i=1,arg.n do
-		first = first..','..arg[i]
-	end
+cooldowns 'core'
+
+CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
+
+do local frame = CreateFrame('Frame')
+	frame:SetScript('OnEvent', function() _E[event]() end)
+	frame:RegisterEvent('ADDON_LOADED')
+end
+
+_G.cooldowns_settings = t
+
+function public.print(msg)
+	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
+end
+
+function public.list(first, ...)
+	for i = 1, arg.n do first = first .. ',' .. arg[i] end
 	return first or ''
 end
 
-function public.Elems(list)
-	local elems = {}
-	for elem in string.gfind(list, '[^,]+') do
-		tinsert(elems, elem)
-	end
+function public.elems(list)
+	local elems = t
+	for elem in string.gfind(list, '[^,]+') do tinsert(elems, elem) end
 	return elems
 end
 
-function public.In(list, str)
+function public.contains(list, str)
 	for element in string.gfind(list, '[^,]+') do
-		if element == str then
-			return true
-		end
+		if element == str then return true end
 	end
 end
 
-function m.events.ADDON_LOADED()
-	if arg1 ~= 'CDFrames' then
-		return
-	end
+function private.ADDON_LOADED()
+	if arg1 ~= 'cooldowns' then return end
 
-	SLASH_CDFrames1 = '/cdframes'
-	SlashCmdList.CDFrames = m.SlashHandler
+	_G.SLASH_COOLDOWNS1 = '/cooldowns'
+	_G.SlashCmdList.COOLDOWNS = SLASH
 
-	m.player.Setup()
-	m.enemy.Setup()
+	cooldowns.player.setup()
+	cooldowns.enemy.setup()
 end
 
-function private.ParseNumber(params)
+function private.parse_number(params)
 	local number = tonumber(params.input) or params.default
-	if params.min then
-		number = max(params.min, number)
-	end
-	if params.max then
-		number = min(params.max, number)
-	end
+	if params.min then number = max(params.min, number) end
+	if params.max then number = min(params.max, number) end
 	return params.integer and floor(number + .5) or number
 end
 
-function private.SlashHandler(str)
+function private.SLASH(str)
 	str = strupper(str)
-	local parameters = m.Tokenize(str)
-
-	local frames = {}
-	if m.In(parameters[1], 'PLAYER') then
-		tinsert(frames, m.player.frame)
+	local parameters, frames = tokenize(str), tt
+	if parameters[1] == 'USED' then
+		cooldowns_settings.used = not cooldowns_settings.used
+		return
 	end
-	if m.In(parameters[1], 'TARGET') then
-		tinsert(frames, m.enemy.targetFrame)
+	if contains(parameters[1] or '', 'PLAYER') then
+		frames[cooldowns.player.frame] = true
 	end
-	if m.In(parameters[1], 'TARGETTARGET') then
-		tinsert(frames, m.enemy.targetTargetFrame)
+	if contains(parameters[1] or '', 'TARGET') then
+		frames[cooldowns.enemy.targetFrame] = true
+	end
+	if contains(parameters[1] or '', 'TARGETTARGET') then
+		frames[cooldowns.enemy.targetTargetFrame] = true
 	end
 	if getn(frames) == 0 then
-		frames = {m.player.frame, m.enemy.targetFrame, m.enemy.targetTargetFrame}
+		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame)
 	else
 		tremove(parameters, 1)
 	end
-
-	for _, frame in frames do
+	for frame in frames do
 		if parameters[1] == 'ON' then
 			frame.settings.active = true
 		elseif parameters[1] == 'OFF' then
@@ -103,58 +94,54 @@ function private.SlashHandler(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = m.ParseNumber{input=parameters[2], min=1, max=100, default=16, integer=true}
+			frame.settings.size = parse_number{ input=parameters[2], min=1, max=100, default=16, integer=true }
 		elseif parameters[1] == 'LINE' then
-			frame.settings.line = m.ParseNumber{input=parameters[2], min=1, max=100, default=8, integer=true}
+			frame.settings.line = parse_number{ input=parameters[2], min=1, max=100, default=8, integer=true }
 		elseif parameters[1] == 'SPACING' then
-			frame.settings.spacing = m.ParseNumber{input=parameters[2], min=0, max=1, default=0}
+			frame.settings.spacing = parse_number{ input=parameters[2], min=0, max=1, default=0 }
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = m.ParseNumber{input=parameters[2], min=21/37/m.frame.BASE_SCALE, max=2, default=1}
+			local scale = parse_number{ input=parameters[2], min=.5, max=2, default=1 }
+			frame.settings.x = frame.settings.x * frame.settings.scale / scale
+			frame.settings.y = frame.settings.y * frame.settings.scale / scale
+			frame.settings.scale = scale
+		elseif parameters[1] == 'SKIN' then
+			frame.settings.skin = (temp-S('blizzard', 'zoomed', 'newsom', 'darion'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'blizzard'
 		elseif parameters[1] == 'TEXT' then
-			frame.settings.text = m.ParseNumber{input=parameters[2], min=0, max=2, default=1, integer=true}
+			frame.settings.text = not frame.settings.text
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = m.ParseNumber{input=parameters[2], min=0, default=7}
+			frame.settings.blink = parse_number{ input=parameters[2], min=0, default=7 }
 		elseif parameters[1] == 'ANIMATION' then
 			frame.settings.animation = not frame.settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then
 			frame.settings.clickThrough = not frame.settings.clickThrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
-			local _, _, list = strfind(str, '[^,]*ADD%s+(.-)%s*$')
-			local names = {}
-			for _, name in m.Elems(list) do
-				if not m.In(frame.settings.ignoreList, name) then
-					tinsert(names, name)
-				end
+			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
+			local names = tt
+			for _, name in temp-elems(match) do
+				if not contains(frame.settings.ignoreList, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = frame.settings.ignoreList == '' and m.List(unpack(names)) or frame.settings.ignoreList..','..m.List(unpack(names))
+			frame.settings.ignoreList = frame.settings.ignoreList == '' and list(unpack(names)) or frame.settings.ignoreList .. ',' .. list(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
-			local _, _, list = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
-			local names = {}
-			for _, name in m.Elems(frame.settings.ignoreList) do
-				if not m.In(list, name) then
-					tinsert(names, name)
-				end
+			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
+			local names = tt
+			for _, name in temp-elems(frame.settings.ignoreList) do
+				if not contains(match, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = m.List(unpack(names))
+			frame.settings.ignoreList = list(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			m.Log(frame.key..':')
-			for _, name in m.Elems(frame.settings.ignoreList) do
-				m.Log(name)
-			end
+			print(frame.key .. ':')
+			for _, name in temp-elems(frame.settings.ignoreList) do print(name) end
 		elseif parameters[1] == 'RESET' then
-			frame:Reset()
+			wipe(frame.settings)
 		else
 			return
 		end
-
-		frame:Configure()
+		frame:Loadsettings(frame.settings)
 	end
 end
 
-function private.Tokenize(str)
-	local tokens = {}
-	for token in string.gfind(str, '%S+') do
-		tinsert(tokens, token)
-	end
+function private.tokenize(str)
+	local tokens = t
+	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
 	return tokens
 end
