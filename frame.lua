@@ -8,7 +8,7 @@ private.DEFAULT_SETTINGS = T(
 	'x', UIParent:GetCenter(),
 	'y', (temp-A(UIParent:GetCenter()))[2],
 	'scale', 1,
-	'size', 16,
+	'size', 15,
 	'line', 8,
 	'spacing', 0,
 	'orientation', 'RU',
