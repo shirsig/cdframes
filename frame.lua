@@ -371,11 +371,13 @@ function method:StartCD(name, info, icon, started, duration)
 	return self:CDID(cooldown)
 end
 
-function method:CancelCD(CDID) local cooldowns = self.cooldowns
+function method:CancelCD(CDID)
+	local cooldowns = self.cooldowns
 	cooldowns[CDID] = cooldowns[CDID] and release(cooldowns[CDID])
 end
 
-function private.blink_alpha1(t) local x = t * 4/3
+function private.blink_alpha1(t)
+	local x = t * 4/3
 	return (mod(floor(x), 2) == 0 and x - floor(x) or 1 - x + floor(x)) * .7 + .3
 end
 
