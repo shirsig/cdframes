@@ -1,4 +1,4 @@
-CDFrames 'frame'
+cooldowns 'frame'
 
 private.ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 
@@ -128,14 +128,14 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(36)
 			frame.border:SetHeight(36)
-			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Normal]])
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\newsom\Normal]])
 			frame.border:SetTexCoord(.14, .86, .14, .86)
 			frame.border:SetVertexColor(1, 1, 1)
 
 			frame.gloss:Show()
 			frame.gloss:SetWidth(36)
 			frame.gloss:SetHeight(36)
-			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\newsom\Gloss]])
+			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\newsom\Gloss]])
 			frame.gloss:SetTexCoord(.14, .86, .14, .86)
 
 			frame.cooldown:SetScale(30/36)
@@ -154,14 +154,14 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(40)
 			frame.border:SetHeight(40)
-			frame.border:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Normal]])
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Normal]])
 			frame.border:SetTexCoord(0, 1, 0, 1)
 			frame.border:SetVertexColor(.2, .2, .2)
 
 			frame.gloss:Show()
 			frame.gloss:SetWidth(40)
 			frame.gloss:SetHeight(40)
-			frame.gloss:SetTexture([[Interface\Addons\CDFrames\Textures\darion\Gloss]])
+			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Gloss]])
 			frame.gloss:SetTexCoord(0, 1, 0, 1)
 
 			frame.cooldown:SetScale(34/36)

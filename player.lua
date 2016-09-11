@@ -1,4 +1,4 @@
-CDFrames 'player'
+cooldowns 'player'
 
 local last_used
 
@@ -61,8 +61,8 @@ function private.SPELL_UPDATE_COOLDOWN()
 end
 
 function public.setup()
-	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or t
-	public.frame = CDFrames.frame.new('Player Cooldowns', A(.2, .8, .2), CDFrames_Settings.PLAYER)
+	cooldowns_Settings.PLAYER = cooldowns_Settings.PLAYER or t
+	public.frame = cooldowns.frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_Settings.PLAYER)
 	do
 		local frame = CreateFrame('Frame')
 		frame:SetScript('OnEvent', function() _E[event]() end)
@@ -76,7 +76,7 @@ end
 do
 	local cooldowns = t
 	function private.start_cd(name, texture, started, duration)
-		if CDFrames_Settings.used and name ~= last_used then return end
+		if cooldowns_Settings.used and name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
 		cooldowns[name] = frame:StartCD(name, '', texture, started, duration)
 	end
@@ -124,9 +124,9 @@ end
 do
 	local orig = UseAction
 	_G.UseAction = function(...)
-		CDFrames_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
-		CDFrames_Tooltip:SetAction(arg[1])
-		last_used = CDFrames_TooltipTextLeft1:GetText()
+		cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
+		cooldowns_Tooltip:SetAction(arg[1])
+		last_used = cooldowns_TooltipTextLeft1:GetText()
 		return orig(unpack(arg))
 	end
 end

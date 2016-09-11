@@ -1,12 +1,12 @@
 do
 	local modules = {}
 	local mt = {__metatable=false, __index=function(_, key) return modules[key]._I end, __newindex=error}
-	CDFrames = function(name)
+	cooldowns = function(name)
 		if not modules[name] then
 			(function()
 				modules[name] = module and _E
 				import (green_t)
-				private.CDFrames = setmetatable(t, mt)
+				private.cooldowns = setmetatable(t, mt)
 			end)()
 		end
 		modules[name].import (modules.core._I)
@@ -14,19 +14,19 @@ do
 	end
 end
 
-CDFrames 'core'
+cooldowns 'core'
 
-CreateFrame('GameTooltip', 'CDFrames_Tooltip', nil, 'GameTooltipTemplate')
+CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 
 do local frame = CreateFrame('Frame')
 	frame:SetScript('OnEvent', function() _E[event]() end)
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.CDFrames_Settings = t
+_G.cooldowns_Settings = t
 
 function public.print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[CDFrames] ' .. msg)
+	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
 end
 
 function public.list(first, ...)
@@ -47,13 +47,13 @@ function public.contains(list, str)
 end
 
 function private.ADDON_LOADED()
-	if arg1 ~= 'CDFrames' then return end
+	if arg1 ~= 'cooldowns' then return end
 
-	_G.SLASH_CDFrames1 = '/cdframes'
-	_G.SlashCmdList.CDFrames = SLASH
+	_G.SLASH_COOLDOWNS1 = '/cooldowns'
+	_G.SlashCmdList.COOLDOWNS = SLASH
 
-	CDFrames.player.setup()
-	CDFrames.enemy.setup()
+	cooldowns.player.setup()
+	cooldowns.enemy.setup()
 end
 
 function private.parse_number(params)
@@ -67,20 +67,20 @@ function private.SLASH(str)
 	str = strupper(str)
 	local parameters, frames = tokenize(str), tt
 	if parameters[1] == 'USED' then
-		CDFrames_Settings.used = not CDFrames_Settings.used
+		cooldowns_Settings.used = not cooldowns_Settings.used
 		return
 	end
 	if contains(parameters[1] or '', 'PLAYER') then
-		frames[CDFrames.player.frame] = true
+		frames[cooldowns.player.frame] = true
 	end
 	if contains(parameters[1] or '', 'TARGET') then
-		frames[CDFrames.enemy.targetFrame] = true
+		frames[cooldowns.enemy.targetFrame] = true
 	end
 	if contains(parameters[1] or '', 'TARGETTARGET') then
-		frames[CDFrames.enemy.targetTargetFrame] = true
+		frames[cooldowns.enemy.targetTargetFrame] = true
 	end
 	if getn(frames) == 0 then
-		frames = temp-S(CDFrames.player.frame, CDFrames.enemy.targetFrame, CDFrames.enemy.targetTargetFrame)
+		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame)
 	else
 		tremove(parameters, 1)
 	end

@@ -1,4 +1,4 @@
-CDFrames 'enemy'
+cooldowns 'enemy'
 
 private.COOLDOWNS = {
 
@@ -259,10 +259,10 @@ private.COMBAT_LOG_PATTERNS_PARTIAL = {
 }
 
 function public.setup()
-	CDFrames_Settings.TARGET = CDFrames_Settings.TARGET or t
-	CDFrames_Settings.TARGETTARGET = CDFrames_Settings.TARGETTARGET or {active=false}
-	public.targetFrame = CDFrames.frame.new('Target Cooldowns', A(.8, .2, .2), CDFrames_Settings.TARGET)
-	public.targetTargetFrame = CDFrames.frame.new('Target Target Cooldowns', A(.2, .2, .8), CDFrames_Settings.TARGETTARGET)
+	cooldowns_Settings.TARGET = cooldowns_Settings.TARGET or t
+	cooldowns_Settings.TARGETTARGET = cooldowns_Settings.TARGETTARGET or {active=false}
+	public.targetFrame = cooldowns.frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_Settings.TARGET)
+	public.targetTargetFrame = cooldowns.frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_Settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
@@ -397,7 +397,7 @@ do
 		if skip ~= 0 then return end
 		skip = mod(skip - 1, 6)
 
-		if CDFrames_Settings.TARGETTARGET.active then
+		if cooldowns_Settings.TARGETTARGET.active then
 			update_frame(targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
 		end
 	end
