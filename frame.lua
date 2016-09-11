@@ -14,7 +14,7 @@ private.DEFAULT_SETTINGS = T(
 	'orientation', 'RU',
 	'skin', 'blizzard',
 	'text', true,
-	'blink', 10,
+	'blink', 0,
 	'animation', false,
 	'clickThrough', false,
 	'ignoreList', ''
