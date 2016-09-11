@@ -116,31 +116,27 @@ do
 
 			frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
-		newsom = function(frame)
-			frame:SetWidth(30.5)
-			frame:SetHeight(30.5)
+		elvui = function(frame)
+			frame:SetWidth(36.5)
+			frame:SetHeight(36.5)
 
-			frame.icon:SetWidth(30)
-			frame.icon:SetHeight(30)
+			frame.icon:SetWidth(36)
+			frame.icon:SetHeight(36)
 			frame.icon:SetTexCoord(.07,.93,.07,.93)
 
 			frame.border:Show()
 			frame.border:SetPoint('CENTER', 0, 0)
-			frame.border:SetWidth(36)
-			frame.border:SetHeight(36)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\newsom\Normal]])
-			frame.border:SetTexCoord(.14, .86, .14, .86)
-			frame.border:SetVertexColor(1, 1, 1)
+			frame.border:SetWidth(38)
+			frame.border:SetHeight(38)
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\elvui\Normal]])
+			frame.border:SetTexCoord(0, 1, 0, 1)
+			frame.border:SetVertexColor(0, 0, 0)
 
-			frame.gloss:Show()
-			frame.gloss:SetWidth(36)
-			frame.gloss:SetHeight(36)
-			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\newsom\Gloss]])
-			frame.gloss:SetTexCoord(.14, .86, .14, .86)
+			frame.gloss:Hide()
 
-			frame.cooldown:SetScale(30/36)
+			frame.cooldown:SetScale(38/36)
 
-			frame.text:SetFont([[Fonts\ARIALN.ttf]], 14, 'THICKOUTLINE')
+			frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
 		darion = function(frame)
 			frame:SetWidth(34.5)

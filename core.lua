@@ -105,7 +105,7 @@ function private.SLASH(str)
 			frame.settings.y = frame.settings.y * frame.settings.scale / scale
 			frame.settings.scale = scale
 		elseif parameters[1] == 'SKIN' then
-			frame.settings.skin = (temp-S('blizzard', 'zoomed', 'newsom', 'darion'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'blizzard'
+			frame.settings.skin = (temp-S('blizzard', 'zoomed', 'elvui', 'darion'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'blizzard'
 		elseif parameters[1] == 'TEXT' then
 			frame.settings.text = not frame.settings.text
 		elseif parameters[1] == 'BLINK' then
