@@ -362,7 +362,7 @@ function private.stop_cooldowns(player, ...)
 end
 
 function private.update_frame(frame, playerName, playerClass)
-	for key, cooldown in cooldowns() do
+	for key, cooldown in active_cooldowns do
 		if playerName == cooldown.player then
 			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, playerClass) then
 				stop_cooldowns(cooldown.player, cooldown.name)
