@@ -79,7 +79,7 @@ function private.SLASH(str)
 	if contains(parameters[1] or '', 'TARGETTARGET') then
 		frames[cooldowns.enemy.targetTargetFrame] = true
 	end
-	if getn(frames) == 0 then
+	if not next(frames) then
 		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame)
 	else
 		tremove(parameters, 1)
