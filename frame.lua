@@ -5,7 +5,7 @@ private.ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 private.DEFAULT_SETTINGS = T(
 	'active', true,
 	'locked', false,
-	'position', A(0, 0),
+	'x', 0, 'y', 0,
 	'scale', 1,
 	'size', 16,
 	'line', 8,
@@ -51,7 +51,7 @@ function method:CreateFrames()
 		frame:SetScript('OnDragStart', function() this:StartMoving() end)
 		frame:SetScript('OnDragStop', function()
 			this:StopMovingOrSizing()
-			init[self.settings.position] = temp-A(this:GetCenter())
+			self.settings.x, self.settings.y = this:GetCenter()
 		end)
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
@@ -190,7 +190,7 @@ function method:CDFrame()
 		frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 	end
 	frame.tooltip = t
-	skin(frame, 'caith') -- blizzard, zoomed, caith, newsom, darion
+	skin(frame, 'blizzard') -- blizzard, zoomed, caith, newsom, darion
 	return frame
 end
 
@@ -229,7 +229,7 @@ function method:PlaceFrames()
 	end
 
 	self.frame:ClearAllPoints()
-	self.frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', unpack(self.settings.position))
+	self.frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', self.settings.x, self.settings.y)
 end
 
 function method:Lock()

@@ -1,4 +1,5 @@
-do  local modules = {}
+do
+	local modules = {}
 	local mt = {__metatable=false, __index=function(_, key) return modules[key]._I end, __newindex=error}
 	CDFrames = function(name)
 		if not modules[name] then
@@ -87,17 +88,20 @@ function private.SLASH(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = parse_number{input=parameters[2], min=1, max=100, default=16, integer=true}
+			frame.settings.size = parse_number{ input=parameters[2], min=1, max=100, default=16, integer=true }
 		elseif parameters[1] == 'LINE' then
-			frame.settings.line = parse_number{input=parameters[2], min=1, max=100, default=8, integer=true}
+			frame.settings.line = parse_number{ input=parameters[2], min=1, max=100, default=8, integer=true }
 		elseif parameters[1] == 'SPACING' then
-			frame.settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
+			frame.settings.spacing = parse_number{ input=parameters[2], min=0, max=1, default=0 }
 		elseif parameters[1] == 'SCALE' then
-			frame.settings.scale = parse_number{input=parameters[2], min=.5, max=2, default=1}
+			local scale = parse_number{ input=parameters[2], min=.5, max=2, default=1 }
+			frame.settings.x = frame.settings.x * frame.settings.scale / scale
+			frame.settings.y = frame.settings.y * frame.settings.scale / scale
+			frame.settings.scale = scale
 		elseif parameters[1] == 'TEXT' then
 			frame.settings.text = not frame.settings.text
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = parse_number{input=parameters[2], min=0, default=7}
+			frame.settings.blink = parse_number{ input=parameters[2], min=0, default=7 }
 		elseif parameters[1] == 'ANIMATION' then
 			frame.settings.animation = not frame.settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then
@@ -120,11 +124,11 @@ function private.SLASH(str)
 			print(frame.key .. ':')
 			for _, name in temp-elems(frame.settings.ignoreList) do print(name) end
 		elseif parameters[1] == 'RESET' then
-			frame:Reset()
+			wipe(frame.settings)
 		else
 			return
 		end
-		frame:Configure()
+		frame:LoadSettings(frame.settings)
 	end
 end
 

@@ -1,5 +1,7 @@
 CDFrames 'player'
 
+local last_used
+
 function private.BAG_UPDATE_COOLDOWN()
 	for bag=0,4 do
 		if GetBagName(bag) then
@@ -60,7 +62,7 @@ end
 
 function public.setup()
 	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or t
-	public.frame = CDFrames.frame.new('Player Cooldowns', {.2, .8, .2}, CDFrames_Settings.PLAYER)
+	public.frame = CDFrames.frame.new('Player Cooldowns', A(.2, .8, .2), CDFrames_Settings.PLAYER)
 	do local frame = CreateFrame('Frame')
 		frame:SetScript('OnEvent', function() _E[event]() end)
 		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
@@ -70,8 +72,10 @@ function public.setup()
 	SPELL_UPDATE_COOLDOWN()
 end
 
-do local cooldowns = t
+do
+	local cooldowns = t
 	function private.start_cd(name, texture, started, duration)
+		if name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
 		cooldowns[name] = frame:StartCD(name, '', texture, started, duration)
 	end
@@ -83,3 +87,27 @@ end
 function private.link_name(link)
 	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do return name end
 end
+
+do
+	local orig = UseContainerItem
+	_G.UseContainerItem = function(...)
+		local bag, slot = unpack(arg)
+		last_used = link_name(GetContainerItemLink(bag, slot))
+		return orig(unpack(arg))
+	end
+end
+
+do
+	local orig = CastSpellByName
+	_G.CastSpellByName = function(...)
+		last_used = arg[1]
+		return orig(unpack(arg))
+	end
+end
+
+--do
+--	local orig = CastSpell
+--	_G.UseContainerItem = function(...)
+--		return orig(unpack(arg))
+--	end
+--end
