@@ -16,6 +16,8 @@ end
 
 CDFrames 'core'
 
+CreateFrame('GameTooltip', 'CDFrames_Tooltip', nil, 'GameTooltipTemplate')
+
 do local frame = CreateFrame('Frame')
 	frame:SetScript('OnEvent', function() _E[event]() end)
 	frame:RegisterEvent('ADDON_LOADED')

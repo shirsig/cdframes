@@ -63,7 +63,8 @@ end
 function public.setup()
 	CDFrames_Settings.PLAYER = CDFrames_Settings.PLAYER or t
 	public.frame = CDFrames.frame.new('Player Cooldowns', A(.2, .8, .2), CDFrames_Settings.PLAYER)
-	do local frame = CreateFrame('Frame')
+	do
+		local frame = CreateFrame('Frame')
 		frame:SetScript('OnEvent', function() _E[event]() end)
 		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
 		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
@@ -75,7 +76,7 @@ end
 do
 	local cooldowns = t
 	function private.start_cd(name, texture, started, duration)
-		if name ~= last_used then return end
+		if CDFrames_Settings.used and name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
 		cooldowns[name] = frame:StartCD(name, '', texture, started, duration)
 	end
@@ -116,6 +117,16 @@ do
 	local orig = CastSpell
 	_G.CastSpell = function(...)
 		last_used = GetSpellName(unpack(arg))
+		return orig(unpack(arg))
+	end
+end
+
+do
+	local orig = UseAction
+	_G.UseAction = function(...)
+		CDFrames_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
+		CDFrames_Tooltip:SetAction(arg[1])
+		last_used = CDFrames_TooltipTextLeft1:GetText()
 		return orig(unpack(arg))
 	end
 end
