@@ -113,7 +113,7 @@ function private.SLASH(str)
 		elseif parameters[1] == 'ANIMATION' then
 			frame.settings.animation = not frame.settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then
-			frame.settings.clickThrough = not frame.settings.clickThrough
+			frame.settings.clickthrough = not frame.settings.clickthrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
 			local names = tt

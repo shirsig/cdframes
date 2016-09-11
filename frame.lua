@@ -16,7 +16,7 @@ private.DEFAULT_SETTINGS = T(
 	'text', true,
 	'blink', 0,
 	'animation', false,
-	'clickThrough', false,
+	'clickthrough', false,
 	'ignoreList', ''
 )
 
@@ -71,7 +71,7 @@ function method:CreateFrames()
 	for i = 1, self.settings.size do
 		local cd_frame = self.frame.cd_frames[i]
 		skin(cd_frame, self.settings.skin)
-		cd_frame:EnableMouse(not self.settings.clickThrough)
+		cd_frame:EnableMouse(not self.settings.clickthrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
 	end
 end
@@ -176,6 +176,12 @@ end
 
 function method:CDFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
+	frame:SetScript('OnEnter', function()
+		self:CDTooltip()
+	end)
+	frame:SetScript('OnLeave', function()
+		GameTooltip:Hide()
+	end)
 
 	frame.icon = frame:CreateTexture(nil, 'BORDER')
 	frame.icon:SetPoint('CENTER', 0, 0)
