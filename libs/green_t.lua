@@ -1,4 +1,5 @@
 green_t = module
+
 local next, getn, setn, tremove, type, setmetatable = next, getn, table.setn, tremove, type, setmetatable
 
 -- TODO recursive releasing with specified depth, maybe allow setting "release structure" on creation for easier releasing, mandatory operation table mandate + comply/fulfill functions to ensure something is being released?
@@ -66,11 +67,11 @@ public.auto = setmetatable({}, {
 })
 public.temp = setmetatable({}, {
 	__metatable = false,
-	__sub = function(_, v) set_auto_release(v, false); return v end,
+	__sub = function(_, v) set_auto_release(v, true); return v end,
 })
 public.perm = setmetatable({}, {
 	__metatable = false,
-	__sub = function(_, v) set_auto_release(v, true); return v end,
+	__sub = function(_, v) set_auto_release(v, false); return v end,
 })
 
 public.init = setmetatable({}, {
