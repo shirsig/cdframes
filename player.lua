@@ -8,7 +8,7 @@ function private.BAG_UPDATE_COOLDOWN()
 			for slot = 1, GetContainerNumSlots(bag) do
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
 				if enabled == 1 then
-					local name = link_name(GetContainerItemLink(bag, slot))
+					local name = link_name(GetContainerItemLink(bag, slot) or '')
 					if duration > 3 and duration <= 1800 and GetItemInfo(6948) ~= name then
 						start_cd(
 							name,
@@ -26,7 +26,7 @@ function private.BAG_UPDATE_COOLDOWN()
 	for slot=0,19 do
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
-			local name = link_name(GetInventoryItemLink('player', slot))
+			local name = link_name(GetInventoryItemLink('player', slot) or '')
 			if duration > 3 and duration <= 1800 then
 				start_cd(
 					name,
