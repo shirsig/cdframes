@@ -128,7 +128,7 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(38)
 			frame.border:SetHeight(38)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\elvui\Normal]])
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\elvui\Border]])
 			frame.border:SetTexCoord(0, 1, 0, 1)
 			frame.border:SetVertexColor(0, 0, 0)
 
@@ -150,7 +150,7 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(40)
 			frame.border:SetHeight(40)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Normal]])
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Border]])
 			frame.border:SetTexCoord(0, 1, 0, 1)
 			frame.border:SetVertexColor(.2, .2, .2)
 
