@@ -281,7 +281,8 @@ function private.OnCombatLogEvent()
 		for cooldown_name in string.gfind(arg1, pattern) do
 			for _, enemy in targeted_enemies do
 				if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
-					start_cooldown(enemy.name, cooldown_name, GetTime()); break
+					start_cooldown(enemy.name, cooldown_name, GetTime())
+					break
 				end
 			end
 		end
