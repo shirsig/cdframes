@@ -260,7 +260,7 @@ private.COMBAT_LOG_PATTERNS_PARTIAL = {
 
 function public.setup()
 	cooldowns_settings.TARGET = cooldowns_settings.TARGET or t
-	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or {active=false}
+	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or { active=false }
 	public.targetFrame = cooldowns.frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
 	public.targetTargetFrame = cooldowns.frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
 
@@ -335,7 +335,6 @@ end
 
 function private.start_cooldown(player, cooldown_name, started)
 	triggers(player, cooldown_name)
-
 	local key = player .. '|' .. cooldown_name
 	if active_cooldowns[key] then
 		hide_cooldown(targetFrame, key)
@@ -351,7 +350,7 @@ function private.start_cooldown(player, cooldown_name, started)
 end
 
 function private.stop_cooldowns(player, ...)
-	for i=1,arg.n do
+	for i = 1, arg.n do
 		local key = player .. '|' .. arg[i]
 		if active_cooldowns[key] then
 			hide_cooldown(targetFrame, key)
@@ -388,7 +387,6 @@ do
 	function private.UPDATE()
 		if skip ~= 0 then return end
 		skip = mod(skip - 1, 6)
-
 		if cooldowns_settings.TARGETTARGET.active then
 			update_frame(targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
 		end
