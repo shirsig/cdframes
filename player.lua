@@ -3,7 +3,7 @@ cooldowns 'player'
 local last_used
 
 function private.BAG_UPDATE_COOLDOWN()
-	for bag=0,4 do
+	for bag = 0, 4 do
 		if GetBagName(bag) then
 			for slot = 1, GetContainerNumSlots(bag) do
 				local started, duration, enabled = GetContainerItemCooldown(bag, slot)
@@ -23,7 +23,7 @@ function private.BAG_UPDATE_COOLDOWN()
 			end
 		end
 	end
-	for slot=0,19 do
+	for slot = 0, 19 do
 		local started, duration, enabled = GetInventoryItemCooldown('player', slot)
 		if enabled == 1 then
 			local name = link_name(GetInventoryItemLink('player', slot))
