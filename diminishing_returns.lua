@@ -13,11 +13,11 @@ local DIMINISHING_RETURN = {
 	["Intercept Stun"] = { class=1, duration=3, icon='' },
 	["Concussion Blow"] = { class=1, duration=5, icon='' },
 
-	["Fear"] = { class=2, duration=10, icon='' },
+	["Fear"] = { class=2, duration=10, icon=[[Interface\Icons\Spell_Shadow_Possession]] },
 	["Howl of Terror"] = { class=2, duration=10, icon='' },
 	["Seduction"] = { class=2, duration=15, icon='' },
 	["Intimidating Shout"] = { class=2, duration=.999, icon='' },
-	["Psychic Scream"] = { class=2, duration=.999, icon='' },
+	["Psychic Scream"] = { class=2, duration=8, icon=[[Interface\Icons\Spell_Shadow_PsychicScream]] },
 
 	["Polymorph"] = { class=3, duration=15, icon=[[Interface\Icons\Spell_Nature_Polymorph]] },
 	["Sap"] = { class=3, duration=15, icon='' },
@@ -35,6 +35,8 @@ local DIMINISHING_RETURN = {
 	["Kidney Shot"] = { class=8, duration=.999, icon='' },
 
 	["Death Coil"] = { class=9, duration=3, icon='' },
+
+	--frost shock? TODO
 }
 
 local LABEL = { color_code(1, 1, 0) .. '½', color_code(1, .5, 0) .. '¼', color_code(1, 0, 0) .. '0' }
@@ -44,12 +46,13 @@ function public.setup()
 	public.frame = cooldowns.frame.new('Target Diminishing Returns', A(.5, .5, .5), cooldowns_settings.TARGET_DR)
 	do
 		local frame = CreateFrame('Frame')
-		frame:SetScript('OnEvent', event_handler)
+		frame:SetScript('OnEvent', function() _E[event]() end)
 		frame:RegisterEvent('CHAT_MSG_SPELL_SELF_DAMAGE')
+		frame:RegisterEvent('CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE')
+		frame:RegisterEvent('CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE')
+		frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 	end
 end
-
---frost shock? TODO
 
 do
 	local diminishing_returns = t
@@ -86,8 +89,8 @@ function private.start(player, spell)
 	if diminishing_returns[key] then
 		hide(frame, key)
 	end
-	diminishing_returns[key] = diminishing_returns[key] or T('level', 0)
-	if diminishing_returns[key].level <= 3 then
+	diminishing_returns[key] = diminishing_returns[key] or T('player', player, 'level', 0)
+	if diminishing_returns[key].level < 3 then
 		diminishing_returns[key].duration = DIMINISHING_RETURN[spell].duration / 2 ^ diminishing_returns[key].level + 15
 		diminishing_returns[key].started = GetTime()
 		diminishing_returns[key].icon = DIMINISHING_RETURN[spell].icon
@@ -99,10 +102,25 @@ function private.start(player, spell)
 	end
 end
 
-function private.event_handler()
-	for _, pattern in PATTERNS do
-		for spell, player in string.gfind(arg1, pattern) do
-			start(player, spell)
+do
+	local function combat_event_handler()
+		for _, pattern in PATTERNS do
+			for spell, player in string.gfind(arg1, pattern) do
+				start(player == 'you' and UnitName('player') or player, spell)
+			end
 		end
 	end
+	private.CHAT_MSG_SPELL_SELF_DAMAGE = combat_event_handler
+	private.CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE = combat_event_handler
+	private.CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE = combat_event_handler
+end
+
+function private.update_frame(frame, player_name)
+	for key, dr in diminishing_returns do
+		(player_name == dr.player and show or hide)(frame, key)
+	end
+end
+
+function private.PLAYER_TARGET_CHANGED()
+	update_frame(frame, UnitName('target'))
 end
