@@ -2,6 +2,7 @@ cooldowns 'diminishing_returns'
 
 local PATTERNS = {
 	"You cast (.+) on (.+)%.",
+	"Your (.+) hits (.+) for",
 	".+ casts (.+) on (.+)%.",
 }
 
@@ -23,8 +24,8 @@ local DIMINISHING_RETURN = {
 	["Sap"] = { class=3, duration=15, icon='' },
 	["Gouge"] = { class=3, duration=4, icon='' },
 
-	["Entangling Roots"] = { class=4, duration=12, icon='' },
-	["Frost Nova"] = { class=4, duration=8, icon='' },
+	["Entangling Roots"] = { class=4, duration=12, icon=[[Interface\Icons\Spell_Nature_StrangleVines]] },
+	["Frost Nova"] = { class=4, duration=8, icon=[[Interface\Icons\Spell_Frost_FrostNova]] },
 
 	["Blind"] = { class=5, duration=10, icon='' },
 
@@ -59,7 +60,7 @@ do
 	function private.diminishing_returns.get()
 		local time = GetTime()
 		for k, v in diminishing_returns do
-			if time - v.started > 15 then
+			if time > v.started + v.duration then
 				diminishing_returns[k] = nil
 			end
 		end
@@ -117,7 +118,7 @@ end
 
 function private.update_frame(frame, player_name)
 	for key, dr in diminishing_returns do
-		(player_name == dr.player and show or hide)(frame, key)
+		do (player_name == dr.player and show or hide)(frame, key) end
 	end
 end
 
