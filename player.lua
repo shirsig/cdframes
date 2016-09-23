@@ -2,6 +2,21 @@ cooldowns 'player'
 
 local last_used
 
+function public.setup()
+	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or t
+	public.frame = cooldowns.frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
+	do
+		local frame = CreateFrame('Frame')
+		frame:SetScript('OnEvent', function() _E[event]() end)
+		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
+		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+		frame:RegisterEvent('SPELLCAST_START')
+		frame:RegisterEvent('SPELLCAST_STOP')
+	end
+	BAG_UPDATE_COOLDOWN()
+	SPELL_UPDATE_COOLDOWN()
+end
+
 function private.BAG_UPDATE_COOLDOWN()
 	for bag = 0, 4 do
 		if GetBagName(bag) then
@@ -60,21 +75,6 @@ function private.SPELL_UPDATE_COOLDOWN()
 	end
 end
 
-function public.setup()
-	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or t
-	public.frame = cooldowns.frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
-	do
-		local frame = CreateFrame('Frame')
-		frame:SetScript('OnEvent', function() _E[event]() end)
-		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
-		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
-		frame:RegisterEvent('SPELLCAST_START')
-		frame:RegisterEvent('SPELLCAST_STOP')
-	end
-	BAG_UPDATE_COOLDOWN()
-	SPELL_UPDATE_COOLDOWN()
-end
-
 do
 	local cooldowns = t
 	function private.start_cd(name, texture, started, duration)
@@ -103,7 +103,7 @@ do
 
 	do
 		local orig = UseContainerItem
-		_G.UseContainerItem = function(...)
+		UseContainerItem = function(...)
 			if not casting then
 				last_used = link_name(GetContainerItemLink(unpack(arg)) or '')
 			end
@@ -113,7 +113,7 @@ do
 
 	do
 		local orig = UseInventoryItem
-		_G.UseInventoryItem = function(...)
+		UseInventoryItem = function(...)
 			if not casting then
 				last_used = link_name(GetInventoryItemLink('player', arg[1]) or '')
 			end
@@ -123,7 +123,7 @@ do
 
 	do
 		local orig = CastSpellByName
-		_G.CastSpellByName = function(...)
+		CastSpellByName = function(...)
 			if not casting then
 				last_used = arg[1]
 			end
@@ -133,7 +133,7 @@ do
 
 	do
 		local orig = CastSpell
-		_G.CastSpell = function(...)
+		CastSpell = function(...)
 			if not casting then
 				last_used = GetSpellName(unpack(arg))
 			end
@@ -143,7 +143,7 @@ do
 
 	do
 		local orig = UseAction
-		_G.UseAction = function(...)
+		UseAction = function(...)
 			if not casting then
 				cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
 				cooldowns_Tooltip:SetAction(arg[1])

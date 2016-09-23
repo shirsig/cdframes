@@ -13,7 +13,7 @@ private.DEFAULT_SETTINGS = T(
 	'spacing', .1,
 	'orientation', 'RU',
 	'skin', 'darion',
-	'text', true,
+	'count', true,
 	'blink', 0,
 	'animation', false,
 	'clickthrough', false,
@@ -98,7 +98,8 @@ do
 
 			frame.cooldown:SetScale(32.5/36)
 
-			frame.text:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
+			frame.label:SetFont(STANDARD_TEXT_FONT, 20, 'OUTLINE')
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 		zoomed = function(frame)
 			frame:SetWidth(36)
@@ -114,7 +115,8 @@ do
 
 			frame.cooldown:SetScale(1.01)
 
-			frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
+			frame.label:SetFont(STANDARD_TEXT_FONT, 22, 'OUTLINE')
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
 		elvui = function(frame)
 			frame:SetWidth(36.5)
@@ -136,7 +138,8 @@ do
 
 			frame.cooldown:SetScale(38/36)
 
-			frame.text:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
+			frame.label:SetFont(STANDARD_TEXT_FONT, 22, 'OUTLINE')
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
 		darion = function(frame)
 			frame:SetWidth(34.5)
@@ -162,7 +165,8 @@ do
 
 			frame.cooldown:SetScale(34/36)
 
-			frame.text:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
+			frame.label:SetFont(STANDARD_TEXT_FONT, 20, 'OUTLINE')
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 	}
 	function private.skin(frame, skin)
@@ -192,6 +196,17 @@ function method:CDFrame()
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
 	frame.gloss:SetPoint('CENTER', 0, 0)
 
+	frame.label = frame:CreateFontString(nil, 'OVERLAY')
+	frame.label:SetPoint('CENTER', 0, 0)
+
+	do
+		local count_frame = CreateFrame('Frame', nil, frame)
+		count_frame:SetFrameLevel(4)
+		count_frame:SetAllPoints()
+		frame.count = count_frame:CreateFontString()
+		frame.count:SetPoint('CENTER', .7, 0)
+	end
+
 	do
 		local cooldown = CreateFrame('Model', nil, frame, 'CooldownFrameTemplate')
 		cooldown:ClearAllPoints()
@@ -207,13 +222,6 @@ function method:CDFrame()
 		end)
 		cooldown:Show()
 		frame.cooldown = cooldown
-	end
-	do
-		local text_frame = CreateFrame('Frame', nil, frame)
-		text_frame:SetFrameLevel(4)
-		text_frame:SetAllPoints()
-		frame.text = text_frame:CreateFontString()
-		frame.text:SetPoint('CENTER', .7, 0)
 	end
 	frame.tooltip = t
 	return frame
@@ -276,7 +284,7 @@ function method:Unlock()
 		local frame = self.frame.cd_frames[i]
 		frame:EnableMouse(false)
 		frame.background:Show()
-		frame.text:SetText('')
+		frame.count:SetText('')
 		frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 		if i == 1 then
 			frame.icon:SetAlpha(.8)
@@ -346,9 +354,10 @@ function method:Update()
 					local alpha = timeLeft <= self.settings.blink and blink_alpha1(tm) or 1
 					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
 				end
-				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
-				frame.text:SetText(self.settings.text and time_text(timeLeft) or '')
 				frame.icon:SetTexture(cooldown.icon)
+				frame.label:SetText(cooldown.label)
+				frame.count:SetText(self.settings.count and time_text(timeLeft) or '')
+				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
 				init[frame.tooltip] = temp-A(cooldown.name, cooldown.info)
 				frame:Show()
 
@@ -361,13 +370,14 @@ function method:Update()
 	for j = i, self.settings.size do self.frame.cd_frames[j]:Hide() end
 end
 
-function method:StartCD(name, info, icon, started, duration)
+function method:StartCD(name, info, icon, started, duration, label)
 	local cooldown = T(
 		'name', name,
 		'info', info,
 		'icon', icon,
 		'started', started,
-		'duration', duration
+		'duration', duration,
+		'label', label or ''
 	)
 	self.cooldowns[self:CDID(cooldown)] = cooldown
 	return self:CDID(cooldown)
@@ -389,13 +399,12 @@ end
 
 do
 	local DAY, HOUR, MINUTE = 86400, 3600, 60
-	local color_code = function(r, g, b) return format('|cFF%02X%02X%02X', r*255, g*255, b*255) end
 
-	function private.time_text(t) -- TODO ¼ ½ ¾
+	function private.time_text(t)
 		if t > HOUR then
-			return color_code(.7, .7, .7) .. ceil((t / HOUR) * 10) / 10
+			return color_code(.7, .7, .7) .. ceil(t / HOUR * 10) / 10
 		elseif t > MINUTE then
-			return color_code(0, 1, 0) .. ceil((t / MINUTE) * 10) / 10
+			return color_code(0, 1, 0) .. ceil(t / MINUTE * 10) / 10
 		elseif t > 5 then
 			return color_code(1, 1, 0) .. ceil(t)
 		else

@@ -1,7 +1,6 @@
 cooldowns 'enemy'
 
-private.COOLDOWNS = {
-
+local COOLDOWNS = {
 	-- Trinkets & Racials
 	["Will of the Forsaken"] = { duration = 2*60, desc = "Provides immunity to Charm, Fear and Sleep while active. May also be used while already afflicted by Charm, Fear or Sleep. Lasts 5 sec.", icon = "Spell_Shadow_RaiseDead"},
 	["Perception"] = { duration = 3*60, desc = "Dramatically increases stealth detection for 20 sec.", icon = "Spell_Nature_Sleep"},
@@ -216,14 +215,14 @@ private.COOLDOWNS = {
 	["Swiftmend"] = { duration = 15, desc = "Consumes a Rejuvenation or Regrowth effect on a friendly target to instantly heal them an amount equal to 12 sec. of Rejuvenation or 18 sec. of Regrowth.", icon = "Inv_Relics_IdolOfRejuvenation", classes = 'Druid' },
 }
 
-private.COMBAT_LOG_EVENTS = {
+local COMBAT_LOG_EVENTS = {
+	'CHAT_MSG_SPELL_PARTY_DAMAGE',
+	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
+	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PARTY_DAMAGE',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
 	'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
 	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
 	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
@@ -232,7 +231,7 @@ private.COMBAT_LOG_EVENTS = {
 	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
 }
 
-private.COMBAT_LOG_PATTERNS = {
+local COMBAT_LOG_PATTERNS = {
 	"(.+) performs (.+)%.",
 	"(.+) performs (.+) on ",
 	"(.+) casts (.+)%.",
@@ -253,7 +252,7 @@ private.COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
-private.COMBAT_LOG_PATTERNS_PARTIAL = {
+local COMBAT_LOG_PATTERNS_PARTIAL = {
 	"You are afflicted by (.+)%.",
 	"You are afflicted by (.+) %-",
 }
@@ -268,7 +267,7 @@ function public.setup()
 	events:SetScript('OnUpdate', UPDATE)
 	events:SetScript('OnEvent', function() _E[event]() end)
 	for _, event in COMBAT_LOG_EVENTS do
-		private[event] = OnCombatLogEvent
+		private[event] = combat_log_event_handler
 		events:RegisterEvent(event)
 	end
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
@@ -276,12 +275,12 @@ function public.setup()
 	private.targeted_enemies = t
 end
 
-function private.OnCombatLogEvent()
+function private.combat_log_event_handler()
 	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldown_name in string.gfind(arg1, pattern) do
 			for _, enemy in targeted_enemies do
 				if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
-					start_cooldown(enemy.name, cooldown_name, GetTime())
+					start_cooldown(enemy.name, cooldown_name)
 					break
 				end
 			end
@@ -291,7 +290,7 @@ function private.OnCombatLogEvent()
 	for _, pattern in COMBAT_LOG_PATTERNS do
 		for player, cooldown_name in string.gfind(arg1, pattern) do
 			if COOLDOWNS[cooldown_name] then
-				start_cooldown(player, cooldown_name, GetTime())
+				start_cooldown(player, cooldown_name)
 			end
 		end
 	end
@@ -336,7 +335,7 @@ function private.triggers(player, cooldown_name)
 	end
 end
 
-function private.start_cooldown(player, cooldown_name, started)
+function private.start_cooldown(player, cooldown_name)
 	triggers(player, cooldown_name)
 	local key = player .. '|' .. cooldown_name
 	if active_cooldowns[key] then
@@ -346,10 +345,14 @@ function private.start_cooldown(player, cooldown_name, started)
 	active_cooldowns[key] = T(
 		'name', cooldown_name,
 		'player', player,
-		'started', started
+		'started', GetTime()
 	)
-	if player == UnitName('target') then show_cooldown(targetFrame, key) end
-	if player == UnitName('targettarget') then show_cooldown(targetTargetFrame, key) end
+	if player == UnitName('target') then
+		show_cooldown(targetFrame, key)
+	end
+	if player == UnitName('targettarget') then
+		show_cooldown(targetTargetFrame, key)
+	end
 end
 
 function private.stop_cooldowns(player, ...)
@@ -363,10 +366,10 @@ function private.stop_cooldowns(player, ...)
 	end
 end
 
-function private.update_frame(frame, playerName, playerClass)
+function private.update_frame(frame, player_name, player_class)
 	for key, cooldown in active_cooldowns do
-		if playerName == cooldown.player then
-			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, playerClass) then
+		if player_name == cooldown.player then
+			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, player_class) then
 				stop_cooldowns(cooldown.player, cooldown.name)
 			else
 				show_cooldown(frame, key)

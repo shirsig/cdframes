@@ -23,10 +23,14 @@ do local frame = CreateFrame('Frame')
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.cooldowns_settings = t
+cooldowns_settings = t
 
 function public.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
+end
+
+function public.color_code(r, g, b)
+	return format('|cFF%02X%02X%02X', r*255, g*255, b*255)
 end
 
 function public.list(first, ...)
@@ -49,11 +53,12 @@ end
 function private.ADDON_LOADED()
 	if arg1 ~= 'cooldowns' then return end
 
-	_G.SLASH_COOLDOWNS1 = '/cooldowns'
-	_G.SlashCmdList.COOLDOWNS = SLASH
+	SLASH_COOLDOWNS1 = '/cooldowns'
+	SlashCmdList.COOLDOWNS = SLASH
 
 	cooldowns.player.setup()
 	cooldowns.enemy.setup()
+	cooldowns.diminishing_returns.setup()
 end
 
 function private.parse_number(params)
@@ -79,8 +84,11 @@ function private.SLASH(str)
 	if contains(parameters[1] or '', 'TARGETTARGET') then
 		frames[cooldowns.enemy.targetTargetFrame] = true
 	end
+	if contains(parameters[1] or '', 'DR') then
+		frames[cooldowns.diminishing_returns.frame] = true
+	end
 	if not next(frames) then
-		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame)
+		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame, cooldowns.diminishing_returns.frame)
 	else
 		tremove(parameters, 1)
 	end
@@ -106,8 +114,8 @@ function private.SLASH(str)
 			frame.settings.scale = scale
 		elseif parameters[1] == 'SKIN' then
 			frame.settings.skin = (temp-S('darion', 'blizzard', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'darion'
-		elseif parameters[1] == 'TEXT' then
-			frame.settings.text = not frame.settings.text
+		elseif parameters[1] == 'COUNT' then
+			frame.settings.count = not frame.settings.count
 		elseif parameters[1] == 'BLINK' then
 			frame.settings.blink = parse_number{ input=parameters[2], min=0, default=7 }
 		elseif parameters[1] == 'ANIMATION' then
