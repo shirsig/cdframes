@@ -2,38 +2,39 @@ cooldowns 'diminishing_returns'
 
 local PATTERNS = {
 	"You cast (.+) on (.+)%.",
+	".+ casts (.+) on (.+)%.",
 }
 
-local CLASS = {
-	["Bash"] = 1,
-	["Hammer of Justice"] = 1,
-	["Cheap Shot"] = 1,
-	["Charge Stun"] = 1,
-	["Intercept Stun"] = 1,
-	["Concussion Blow"] = 1,
+local DIMINISHING_RETURN = {
+	["Bash"] = { class=1, duration=.999, icon='' },
+	["Hammer of Justice"] = { class=1, duration=.999, icon='' },
+	["Cheap Shot"] = { class=1, duration=.999, icon='' },
+	["Charge Stun"] = { class=1, duration=4, icon='' },
+	["Intercept Stun"] = { class=1, duration=3, icon='' },
+	["Concussion Blow"] = { class=1, duration=5, icon='' },
 
-	["Fear"] = 2,
-	["Howl of Terror"] = 2,
-	["Seduction"] = 2,
-	["Intimidating Shout"] = 2,
-	["Psychic Scream"] = 2,
+	["Fear"] = { class=2, duration=10, icon='' },
+	["Howl of Terror"] = { class=2, duration=10, icon='' },
+	["Seduction"] = { class=2, duration=15, icon='' },
+	["Intimidating Shout"] = { class=2, duration=.999, icon='' },
+	["Psychic Scream"] = { class=2, duration=.999, icon='' },
 
-	["Polymorph"] = 3,
-	["Sap"] = 3,
-	["Gouge"] = 3,
+	["Polymorph"] = { class=3, duration=15, icon=[[Interface\Icons\Spell_Nature_Polymorph]] },
+	["Sap"] = { class=3, duration=15, icon='' },
+	["Gouge"] = { class=3, duration=4, icon='' },
 
-	["Entangling Roots"] = 4,
-	["Frost Nova"] = 4,
+	["Entangling Roots"] = { class=4, duration=12, icon='' },
+	["Frost Nova"] = { class=4, duration=8, icon='' },
 
-	["Blind"] = 5,
+	["Blind"] = { class=5, duration=10, icon='' },
 
-	["Hibernate"] = 6,
+	["Hibernate"] = { class=6, duration=20, icon='' },
 
-	["Mind Control"] = 7,
+	["Mind Control"] = { class=7, duration=.999, icon='' },
 
-	["Kidney Shot"] = 8,
+	["Kidney Shot"] = { class=8, duration=.999, icon='' },
 
-	["Death Coil"] = 9,
+	["Death Coil"] = { class=9, duration=3, icon='' },
 }
 
 local LABEL = { color_code(1, 1, 0) .. '½', color_code(1, .5, 0) .. '¼', color_code(1, 0, 0) .. '0' }
@@ -66,7 +67,7 @@ end
 function private.show(frame, key)
 	local dr = diminishing_returns[key]
 	if not dr[frame] then
-		dr[frame] = frame:StartCD('', '', [[Interface\Icons\INV_Misc_QuestionMark]], dr.started, 15, LABEL[dr.level])
+		dr[frame] = frame:StartCD('', '', dr.icon, dr.started, dr.duration, LABEL[min(3, dr.level)])
 	end
 end
 
@@ -78,29 +79,30 @@ function private.hide(frame, key)
 	end
 end
 
-function private.start(player, class)
+function private.start(player, spell)
+	if not DIMINISHING_RETURN[spell] then return end
 	local diminishing_returns = diminishing_returns
-	local key = class .. player
-	p(key)
+	local key = DIMINISHING_RETURN[spell].class .. player
 	if diminishing_returns[key] then
 		hide(frame, key)
 	end
 	diminishing_returns[key] = diminishing_returns[key] or T('level', 0)
-	diminishing_returns[key].level = min(3, diminishing_returns[key].level + 1)
-	diminishing_returns[key].started = GetTime()
+	if diminishing_returns[key].level <= 3 then
+		diminishing_returns[key].duration = DIMINISHING_RETURN[spell].duration / 2 ^ diminishing_returns[key].level + 15
+		diminishing_returns[key].started = GetTime()
+		diminishing_returns[key].icon = DIMINISHING_RETURN[spell].icon
+	end
+	diminishing_returns[key].level = diminishing_returns[key].level + 1
+
 	if player == UnitName('target') then
 		show(frame, key)
 	end
 end
 
 function private.event_handler()
-	p(event)
 	for _, pattern in PATTERNS do
 		for spell, player in string.gfind(arg1, pattern) do
-			local class = CLASS[spell]
-			if class then
-				start(player, class)
-			end
+			start(player, spell)
 		end
 	end
 end
