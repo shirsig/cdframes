@@ -4,7 +4,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 
 ![Alt text](http://i.imgur.com/WJgmTT0.png)
 
-![Alt text](http://i.imgur.com/wAQz8pO.png)
+![Alt text](http://i.imgur.com/xNKjlus.png)
 
 ### Commands
 
