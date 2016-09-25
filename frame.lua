@@ -284,6 +284,7 @@ function method:Unlock()
 		local frame = self.frame.cd_frames[i]
 		frame:EnableMouse(false)
 		frame.background:Show()
+		frame.label:SetText('')
 		frame.count:SetText('')
 		frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 		if i == 1 then
