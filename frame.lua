@@ -61,7 +61,6 @@ function method:CreateFrames()
 		frame:SetScript('OnUpdate', function() return self.settings.locked and self:Update() end)
 		frame.cd_frames = t
 	end
-
 	for i = getn(self.frame.cd_frames) + 1, self.settings.size do
 		tinsert(self.frame.cd_frames, self:CDFrame())
 	end
@@ -73,6 +72,14 @@ function method:CreateFrames()
 		skin(cd_frame, self.settings.skin)
 		cd_frame:EnableMouse(not self.settings.clickthrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
+	end
+	if not self.frame.arrow then
+		local arrow = self.frame.cd_frames[1]:CreateTexture(nil, 'OVERLAY')
+		arrow:SetTexture([[Interface\Buttons\UI-SortArrow]])
+		arrow:SetPoint('CENTER', 0, 0)
+		arrow:SetWidth(9)
+		arrow:SetHeight(8)
+		self.frame.arrow = arrow
 	end
 end
 
@@ -186,10 +193,6 @@ function method:CDFrame()
 	frame.icon = frame:CreateTexture(nil, 'BORDER')
 	frame.icon:SetPoint('CENTER', 0, 0)
 
-	frame.background = frame:CreateTexture(nil, 'BACKGROUND')
-	frame.background:SetAllPoints(frame.icon)
-	frame.background:SetTexture(unpack(self.color))
-
 	frame.border = frame:CreateTexture(nil, 'ARTWORK')
 	frame.border:SetPoint('CENTER', 0, 0)
 
@@ -269,31 +272,39 @@ end
 
 function method:Lock()
 	self.frame:EnableMouse(false)
+	self.frame.arrow:Hide()
 	for i = 1, self.settings.size do
 		local frame = self.frame.cd_frames[i]
-		frame.background:Hide()
-		frame.icon:SetAlpha(1)
-		frame:SetAlpha(1)
 		frame:Hide()
 	end
 end
 
-function method:Unlock()
-	self.frame:EnableMouse(true)
-	for i = 1, self.settings.size do
-		local frame = self.frame.cd_frames[i]
-		frame:EnableMouse(false)
-		frame.background:Show()
-		frame.label:SetText('')
-		frame.count:SetText('')
-		frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
-		if i == 1 then
-			frame.icon:SetAlpha(.8)
-		else
-			frame.icon:SetAlpha(.8)
-			frame:SetAlpha(.4)
+do
+	ROTATIONS = {
+		D = 0,
+		R = 1,
+		U = 2,
+		L = 3,
+	}
+	function method:Unlock()
+		self.frame:EnableMouse(true)
+		self.frame.arrow:Show()
+		self.frame.arrow:SetTexCoord(0, .5625, 0, 1)
+		rotate(self.frame.arrow, ROTATIONS[strsub(self.settings.orientation, 1, 1)])
+		for i = 1, self.settings.size do
+			local frame = self.frame.cd_frames[i]
+			frame:EnableMouse(false)
+			frame.icon:SetAlpha(.5)
+			frame.label:SetText('')
+			frame.count:SetText('')
+			frame.cooldown:SetAlpha(0)
+			if i == 1 then
+				frame.icon:SetTexture(unpack(self.color))
+			else
+				frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
+			end
+			frame:Show()
 		end
-		frame:Show()
 	end
 end
 
@@ -324,11 +335,10 @@ function method:OnClick()
 				break
 			end
 		end
-		self:PlaceFrames()
 	elseif arg1 == 'RightButton' then
 		self.settings.locked = true
-		self:Configure()
 	end
+	self:Configure()
 end
 
 function method:Ignored(name)
@@ -387,6 +397,13 @@ end
 function method:CancelCD(CDID)
 	local cooldowns = self.cooldowns
 	cooldowns[CDID] = cooldowns[CDID] and release(cooldowns[CDID])
+end
+
+function private.rotate(tex, n)
+	for i = 1, n do
+	    local x1, y1, x2, y2, x3, y3, x4, y4 = tex:GetTexCoord()
+	    tex:SetTexCoord(x3, y3, x1, y1, x4, y4, x2, y2)
+    end
 end
 
 function private.blink_alpha1(t)
