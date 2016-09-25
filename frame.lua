@@ -193,6 +193,11 @@ function method:CDFrame()
 	frame.icon = frame:CreateTexture(nil, 'BORDER')
 	frame.icon:SetPoint('CENTER', 0, 0)
 
+	frame.background = frame:CreateTexture(nil, 'BACKGROUND')
+	frame.background:SetAllPoints(frame.icon)
+	frame.background:SetTexture(unpack(self.color))
+	frame.background:SetAlpha(.6)
+
 	frame.border = frame:CreateTexture(nil, 'ARTWORK')
 	frame.border:SetPoint('CENTER', 0, 0)
 
@@ -275,6 +280,7 @@ function method:Lock()
 	self.frame.arrow:Hide()
 	for i = 1, self.settings.size do
 		local frame = self.frame.cd_frames[i]
+		frame.background:Hide()
 		frame:Hide()
 	end
 end
@@ -294,14 +300,15 @@ do
 		for i = 1, self.settings.size do
 			local frame = self.frame.cd_frames[i]
 			frame:EnableMouse(false)
-			frame.icon:SetAlpha(.5)
+			frame.background:Show()
 			frame.label:SetText('')
 			frame.count:SetText('')
 			frame.cooldown:SetAlpha(0)
 			if i == 1 then
-				frame.icon:SetTexture(unpack(self.color))
+				frame.icon:SetTexture('')
 			else
 				frame.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
+				frame.icon:SetAlpha(.6)
 			end
 			frame:Show()
 		end
