@@ -7,37 +7,37 @@ local PATTERNS = {
 }
 
 local DIMINISHING_RETURN = {
-	["Bash"] = { class=1, duration=.999, icon='' },
-	["Hammer of Justice"] = { class=1, duration=.999, icon='' },
-	["Cheap Shot"] = { class=1, duration=.999, icon='' },
-	["Charge Stun"] = { class=1, duration=4, icon='' },
-	["Intercept Stun"] = { class=1, duration=3, icon='' },
-	["Concussion Blow"] = { class=1, duration=5, icon='' },
+	-- ["Bash"] = { class=1, duration=.999, icon='' },
+	-- ["Hammer of Justice"] = { class=1, duration=.999, icon='' },
+	-- ["Cheap Shot"] = { class=1, duration=.999, icon='' },
+	-- ["Charge Stun"] = { class=1, duration=4, icon='' },
+	-- ["Intercept Stun"] = { class=1, duration=3, icon='' },
+	-- ["Concussion Blow"] = { class=1, duration=5, icon='' },
 
-	["Fear"] = { class=2, duration=10, icon=[[Interface\Icons\Spell_Shadow_Possession]] },
-	["Howl of Terror"] = { class=2, duration=10, icon='' },
-	["Seduction"] = { class=2, duration=15, icon='' },
-	["Intimidating Shout"] = { class=2, duration=.999, icon='' },
+	["Fear"] = { class=2, duration=20, icon=[[Interface\Icons\Spell_Shadow_Possession]] },
+	-- ["Howl of Terror"] = { class=2, duration=10, icon='' },
+	["Seduction"] = { class=2, duration=15, icon=[[Interface\Icons\Spell_Shadow_MindSteal]] },
+	-- ["Intimidating Shout"] = { class=2, duration=.999, icon='' },
 	["Psychic Scream"] = { class=2, duration=8, icon=[[Interface\Icons\Spell_Shadow_PsychicScream]] },
 
 	["Polymorph"] = { class=3, duration=15, icon=[[Interface\Icons\Spell_Nature_Polymorph]] },
-	["Sap"] = { class=3, duration=15, icon='' },
-	["Gouge"] = { class=3, duration=4, icon='' },
+	-- ["Sap"] = { class=3, duration=15, icon='' },
+	-- ["Gouge"] = { class=3, duration=4, icon='' },
 
 	["Entangling Roots"] = { class=4, duration=12, icon=[[Interface\Icons\Spell_Nature_StrangleVines]] },
 	["Frost Nova"] = { class=4, duration=8, icon=[[Interface\Icons\Spell_Frost_FrostNova]] },
 
-	["Blind"] = { class=5, duration=10, icon='' },
+	-- ["Blind"] = { class=5, duration=10, icon='' },
 
-	["Hibernate"] = { class=6, duration=20, icon='' },
+	-- ["Hibernate"] = { class=6, duration=20, icon='' },
 
-	["Mind Control"] = { class=7, duration=.999, icon='' },
+	-- ["Mind Control"] = { class=7, duration=.999, icon='' },
 
-	["Kidney Shot"] = { class=8, duration=.999, icon='' },
+	-- ["Kidney Shot"] = { class=8, duration=.999, icon='' },
 
-	["Death Coil"] = { class=9, duration=3, icon='' },
+	-- ["Death Coil"] = { class=9, duration=3, icon='' },
 
-	--frost shock? TODO
+	--frost shock? freezing trap? TODO
 }
 
 local LABEL = { color_code(1, 1, 0) .. '½', color_code(1, .5, 0) .. '¼', color_code(1, 0, 0) .. '0' }
