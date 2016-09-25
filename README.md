@@ -2,7 +2,7 @@
 
 This addOn adds frames with icons and countdowns for enemies' as well as your own cooldowns.
 
-![Alt text](http://i.imgur.com/TzA8EUk.png)
+![Alt text](http://i.imgur.com/WJgmTT0.png)
 
 ![Alt text](http://i.imgur.com/wAQz8pO.png)
 
