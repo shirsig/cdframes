@@ -21,7 +21,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cooldowns skin** (changes the style. available skins: blizzard, zoomed, elvui, darion)<br/>
 **/cooldowns blink x** (starts blinking at **x** seconds, default 0)<br/>
 **/cooldowns animation** (cooldown shadow animation, default off)<br/>
-**/cooldowns text** (toggles the countdown, default on)<br/>
+**/cooldowns count** (toggles the countdown, default on)<br/>
 **/cooldowns ignore add list** (**list** is a comma separated list of skill names to ignore, no spaces except within the name, case insensitive. example: **mortal strike,blink,shadow word: pain**)<br/>
 **/cooldowns ignore remove list**<br/>
 **/cooldowns ignore** (shows the current ignore lists)<br/>
