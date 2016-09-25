@@ -43,7 +43,7 @@ local DIMINISHING_RETURN = {
 local LABEL = { color_code(1, 1, 0) .. '½', color_code(1, .5, 0) .. '¼', color_code(1, 0, 0) .. '0' }
 
 function public.setup()
-	cooldowns_settings.TARGET_DR = cooldowns_settings.TARGET_DR or T('animation', true)
+	cooldowns_settings.TARGET_DR = cooldowns_settings.TARGET_DR or T('animation', true, 'active', false)
 	public.frame = cooldowns.frame.new('Target Diminishing Returns', A(.5, .5, .5), cooldowns_settings.TARGET_DR)
 	do
 		local frame = CreateFrame('Frame')
