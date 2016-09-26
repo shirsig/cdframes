@@ -54,11 +54,11 @@ function private.ADDON_LOADED()
 	if arg1 ~= 'cooldowns' then return end
 
 	SLASH_COOLDOWNS1 = '/cooldowns'
+	SLASH_COOLDOWNS2 = '/cds'
 	SlashCmdList.COOLDOWNS = SLASH
 
 	cooldowns.player.setup()
 	cooldowns.enemy.setup()
-	cooldowns.diminishing_returns.setup()
 end
 
 function private.parse_number(params)
@@ -84,11 +84,8 @@ function private.SLASH(str)
 	if contains(parameters[1] or '', 'TARGETTARGET') then
 		frames[cooldowns.enemy.targetTargetFrame] = true
 	end
-	if contains(parameters[1] or '', 'DR') then
-		frames[cooldowns.diminishing_returns.frame] = true
-	end
 	if not next(frames) then
-		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame, cooldowns.diminishing_returns.frame)
+		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame)
 	else
 		tremove(parameters, 1)
 	end

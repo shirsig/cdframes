@@ -8,4 +8,3 @@ core.lua
 frame.lua
 player.lua
 enemy.lua
-diminishing_returns.lua

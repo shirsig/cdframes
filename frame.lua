@@ -105,7 +105,6 @@ do
 
 			frame.cooldown:SetScale(32.5/36)
 
-			frame.label:SetFont(STANDARD_TEXT_FONT, 20, 'OUTLINE')
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 		zoomed = function(frame)
@@ -122,7 +121,6 @@ do
 
 			frame.cooldown:SetScale(1.01)
 
-			frame.label:SetFont(STANDARD_TEXT_FONT, 22, 'OUTLINE')
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
 		elvui = function(frame)
@@ -145,7 +143,6 @@ do
 
 			frame.cooldown:SetScale(38/36)
 
-			frame.label:SetFont(STANDARD_TEXT_FONT, 22, 'OUTLINE')
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
 		end,
 		darion = function(frame)
@@ -172,7 +169,6 @@ do
 
 			frame.cooldown:SetScale(34/36)
 
-			frame.label:SetFont(STANDARD_TEXT_FONT, 20, 'OUTLINE')
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 	}
@@ -203,9 +199,6 @@ function method:CDFrame()
 
 	frame.gloss = frame:CreateTexture(nil, 'OVERLAY')
 	frame.gloss:SetPoint('CENTER', 0, 0)
-
-	frame.label = frame:CreateFontString(nil, 'OVERLAY')
-	frame.label:SetPoint('CENTER', 0, 0)
 
 	do
 		local count_frame = CreateFrame('Frame', nil, frame)
@@ -301,7 +294,6 @@ do
 			local frame = self.frame.cd_frames[i]
 			frame:EnableMouse(false)
 			frame.background:Show()
-			frame.label:SetText('')
 			frame.count:SetText('')
 			frame.cooldown:SetAlpha(0)
 			if i == 1 then
@@ -373,7 +365,6 @@ function method:Update()
 					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
 				end
 				frame.icon:SetTexture(cooldown.icon)
-				frame.label:SetText(cooldown.label)
 				frame.count:SetText(self.settings.count and time_text(timeLeft) or '')
 				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
 				init[frame.tooltip] = temp-A(cooldown.name, cooldown.info)
@@ -388,14 +379,13 @@ function method:Update()
 	for j = i, self.settings.size do self.frame.cd_frames[j]:Hide() end
 end
 
-function method:StartCD(name, info, icon, started, duration, label)
+function method:StartCD(name, info, icon, started, duration)
 	local cooldown = T(
 		'name', name,
 		'info', info,
 		'icon', icon,
 		'started', started,
-		'duration', duration,
-		'label', label or ''
+		'duration', duration
 	)
 	self.cooldowns[self:CDID(cooldown)] = cooldown
 	return self:CDID(cooldown)
