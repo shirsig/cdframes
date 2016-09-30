@@ -1,4 +1,7 @@
-cooldowns 'enemy'
+cooldowns_enemy = module
+
+include (green_t)
+include (cooldowns_core)
 
 local COOLDOWNS = {
 	-- Trinkets & Racials
@@ -260,12 +263,12 @@ local COMBAT_LOG_PATTERNS_PARTIAL = {
 function public.setup()
 	cooldowns_settings.TARGET = cooldowns_settings.TARGET or t
 	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or { active=false }
-	public.targetFrame = cooldowns.frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
-	public.targetTargetFrame = cooldowns.frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
+	public.targetFrame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
+	public.targetTargetFrame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
 
 	private.events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
-	events:SetScript('OnEvent', function() _E[event]() end)
+	events:SetScript('OnEvent', function() _M[event]() end)
 	for _, event in COMBAT_LOG_EVENTS do
 		private[event] = combat_log_event_handler
 		events:RegisterEvent(event)

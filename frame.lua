@@ -1,4 +1,7 @@
-cooldowns 'frame'
+cooldowns_frame = module
+
+include (green_t)
+include (cooldowns_core)
 
 private.ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 
@@ -27,13 +30,13 @@ function public.new(title, color, settings)
 	self.color = color
 	self.cooldowns = t
 	self.iconFramePool = t
-	self:Loadsettings(settings)
+	self:LoadSettings(settings)
 	return self
 end
 
 private.method = t
 
-function method:Loadsettings(settings)
+function method:LoadSettings(settings)
 	for k, v in DEFAULT_SETTINGS do
 		if settings[k] == nil then settings[k] = v end
 	end

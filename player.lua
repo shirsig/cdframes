@@ -1,13 +1,16 @@
-cooldowns 'player'
+cooldowns_player = module
+
+include (green_t)
+include (cooldowns_core)
 
 local last_used
 
 function public.setup()
 	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or t
-	public.frame = cooldowns.frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
+	public.frame = cooldowns_frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
 	do
 		local frame = CreateFrame('Frame')
-		frame:SetScript('OnEvent', function() _E[event]() end)
+		frame:SetScript('OnEvent', function() _M[event]() end)
 		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
 		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 		frame:RegisterEvent('SPELLCAST_START')

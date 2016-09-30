@@ -136,12 +136,11 @@ do
 
 	function vararg(f)
 		local chunk = loadstring(code)
-		setfenv(chunk, {f=f, setn=setn, acquire=acquire, set_auto_release=set_auto_release})
+		setfenv(chunk, { f=f, setn=setn, acquire=acquire, set_auto_release=set_auto_release })
 		return chunk()
 	end
 	public.vararg = setmetatable({}, {
 		__metatable = false,
-		__call = function(_, v) return vararg(v) end,
 		__sub = function(_, v) return vararg(v) end,
 	})
 end

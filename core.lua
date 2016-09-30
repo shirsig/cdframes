@@ -1,25 +1,11 @@
-do
-	local modules = {}
-	local mt = {__metatable=false, __index=function(_, key) return modules[key]._I end, __newindex=error}
-	cooldowns = function(name)
-		if not modules[name] then
-			(function()
-				modules[name] = module and _E
-				import (green_t)
-				private.cooldowns = setmetatable(t, mt)
-			end)()
-		end
-		modules[name].import (modules.core._I)
-		setfenv(2, modules[name])
-	end
-end
+cooldowns_core = module
 
-cooldowns 'core'
+include (green_t)
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 
 do local frame = CreateFrame('Frame')
-	frame:SetScript('OnEvent', function() _E[event]() end)
+	frame:SetScript('OnEvent', function() _M[event]() end)
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
@@ -57,8 +43,8 @@ function private.ADDON_LOADED()
 	SLASH_COOLDOWNS2 = '/cds'
 	SlashCmdList.COOLDOWNS = SLASH
 
-	cooldowns.player.setup()
-	cooldowns.enemy.setup()
+	cooldowns_player.setup()
+	cooldowns_enemy.setup()
 end
 
 function private.parse_number(params)
@@ -76,16 +62,16 @@ function private.SLASH(str)
 		return
 	end
 	if contains(parameters[1] or '', 'PLAYER') then
-		frames[cooldowns.player.frame] = true
+		frames[cooldowns_player.frame] = true
 	end
 	if contains(parameters[1] or '', 'TARGET') then
-		frames[cooldowns.enemy.targetFrame] = true
+		frames[cooldowns_enemy.targetFrame] = true
 	end
 	if contains(parameters[1] or '', 'TARGETTARGET') then
-		frames[cooldowns.enemy.targetTargetFrame] = true
+		frames[cooldowns_enemy.targetTargetFrame] = true
 	end
 	if not next(frames) then
-		frames = temp-S(cooldowns.player.frame, cooldowns.enemy.targetFrame, cooldowns.enemy.targetTargetFrame)
+		frames = temp-S(cooldowns_player.frame, cooldowns_enemy.targetFrame, cooldowns_enemy.targetTargetFrame)
 	else
 		tremove(parameters, 1)
 	end
@@ -141,7 +127,7 @@ function private.SLASH(str)
 		else
 			return
 		end
-		frame:Loadsettings(frame.settings)
+		frame:LoadSettings(frame.settings)
 	end
 end
 
