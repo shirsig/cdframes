@@ -1,6 +1,9 @@
-cooldowns_core = module
+module 'cooldowns'
 
-include (green_t)
+include 'green_t'
+
+local cooldowns_player = require 'cooldowns.player'
+local cooldowns_enemy = require 'cooldowns.enemy'
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 

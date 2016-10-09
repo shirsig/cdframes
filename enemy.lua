@@ -1,7 +1,9 @@
-cooldowns_enemy = module
+module 'cooldowns.enemy'
 
-include (green_t)
-include (cooldowns_core)
+include 'green_t'
+include 'cooldowns'
+
+local cooldowns_frame = require 'cooldowns.frame'
 
 local COOLDOWNS = {
 	-- Trinkets & Racials

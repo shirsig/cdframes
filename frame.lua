@@ -1,7 +1,7 @@
-cooldowns_frame = module
+module 'cooldowns.frame'
 
-include (green_t)
-include (cooldowns_core)
+include 'green_t'
+include 'cooldowns'
 
 private.ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 

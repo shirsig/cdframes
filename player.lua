@@ -1,7 +1,9 @@
-cooldowns_player = module
+module 'cooldowns.player'
 
-include (green_t)
-include (cooldowns_core)
+include 'green_t'
+include 'cooldowns'
+
+local cooldowns_frame = require 'cooldowns.frame'
 
 local last_used
 
