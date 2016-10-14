@@ -12,7 +12,7 @@ do local frame = CreateFrame('Frame')
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-cooldowns_settings = t
+_G.cooldowns_settings = t
 
 function public.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
@@ -39,25 +39,25 @@ function public.contains(list, str)
 	end
 end
 
-function private.ADDON_LOADED()
+function ADDON_LOADED()
 	if arg1 ~= 'cooldowns' then return end
 
-	SLASH_COOLDOWNS1 = '/cooldowns'
-	SLASH_COOLDOWNS2 = '/cds'
-	SlashCmdList.COOLDOWNS = SLASH
+	_G.SLASH_COOLDOWNS1 = '/cooldowns'
+	_G.SLASH_COOLDOWNS2 = '/cds'
+	_G.SlashCmdList.COOLDOWNS = SLASH
 
 	cooldowns_player.setup()
 	cooldowns_enemy.setup()
 end
 
-function private.parse_number(params)
+function parse_number(params)
 	local number = tonumber(params.input) or params.default
 	if params.min then number = max(params.min, number) end
 	if params.max then number = min(params.max, number) end
 	return params.integer and floor(number + .5) or number
 end
 
-function private.SLASH(str)
+function SLASH(str)
 	str = strupper(str)
 	local parameters, frames = tokenize(str), tt
 	if parameters[1] == 'USED' then
@@ -134,7 +134,7 @@ function private.SLASH(str)
 	end
 end
 
-function private.tokenize(str)
+function tokenize(str)
 	local tokens = t
 	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
 	return tokens

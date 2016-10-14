@@ -3,9 +3,9 @@ module 'cooldowns.frame'
 include 'green_t'
 include 'cooldowns'
 
-private.ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
+ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 
-private.DEFAULT_SETTINGS = T(
+DEFAULT_SETTINGS = T(
 	'active', true,
 	'locked', false,
 	'x', UIParent:GetCenter(),
@@ -34,7 +34,7 @@ function public.new(title, color, settings)
 	return self
 end
 
-private.method = t
+method = t
 
 function method:LoadSettings(settings)
 	for k, v in DEFAULT_SETTINGS do
@@ -175,7 +175,7 @@ do
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 	}
-	function private.skin(frame, skin)
+	function skin(frame, skin)
 		apply[skin](frame)
 	end
 end
@@ -399,26 +399,26 @@ function method:CancelCD(CDID)
 	cooldowns[CDID] = cooldowns[CDID] and release(cooldowns[CDID])
 end
 
-function private.rotate(tex, n)
+function rotate(tex, n)
 	for i = 1, n do
 	    local x1, y1, x2, y2, x3, y3, x4, y4 = tex:GetTexCoord()
 	    tex:SetTexCoord(x3, y3, x1, y1, x4, y4, x2, y2)
     end
 end
 
-function private.blink_alpha1(t)
+function blink_alpha1(t)
 	local x = t * 4/3
 	return (mod(floor(x), 2) == 0 and x - floor(x) or 1 - x + floor(x)) * .7 + .3
 end
 
-function private.blink_alpha2(t)
+function blink_alpha2(t)
 	return (sin(t * 240) + 1) / 2 * .7 + .3
 end
 
 do
 	local DAY, HOUR, MINUTE = 86400, 3600, 60
 
-	function private.time_text(t)
+	function time_text(t)
 		if t > HOUR then
 			return color_code(.7, .7, .7) .. ceil(t / HOUR * 10) / 10
 		elseif t > MINUTE then

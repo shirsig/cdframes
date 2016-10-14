@@ -268,19 +268,19 @@ function public.setup()
 	public.targetFrame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
 	public.targetTargetFrame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
 
-	private.events = CreateFrame('Frame')
+	events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
 	events:SetScript('OnEvent', function() _M[event]() end)
 	for _, event in COMBAT_LOG_EVENTS do
-		private[event] = combat_log_event_handler
+		_M[event] = combat_log_event_handler
 		events:RegisterEvent(event)
 	end
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	private.targeted_enemies = t
+	targeted_enemies = t
 end
 
-function private.combat_log_event_handler()
+function combat_log_event_handler()
 	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldown_name in string.gfind(arg1, pattern) do
 			for _, enemy in targeted_enemies do
@@ -301,13 +301,13 @@ function private.combat_log_event_handler()
 	end
 end
 
-function private.expired(cooldown)
+function expired(cooldown)
 	return cooldown.started + COOLDOWNS[cooldown.name].duration <= GetTime()
 end
 
 do
 	local active_cooldowns = t
-	function private.active_cooldowns.get()
+	function get_active_cooldowns()
 		for k, v in active_cooldowns do
 			if expired(v) then
 				active_cooldowns[k] = nil
@@ -317,14 +317,14 @@ do
 	end
 end
 
-function private.show_cooldown(frame, key)
+function show_cooldown(frame, key)
 	local cooldown = active_cooldowns[key]
 	if not cooldown[frame] then
 		cooldown[frame] = frame:StartCD(cooldown.name, COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]] .. COOLDOWNS[cooldown.name].icon, cooldown.started, COOLDOWNS[cooldown.name].duration)
 	end
 end
 
-function private.hide_cooldown(frame, key)
+function hide_cooldown(frame, key)
 	local cooldown = active_cooldowns[key]
 	if cooldown[frame] then
 		frame:CancelCD(cooldown[frame])
@@ -332,7 +332,7 @@ function private.hide_cooldown(frame, key)
 	end
 end
 
-function private.triggers(player, cooldown_name)
+function triggers(player, cooldown_name)
 	if cooldown_name == 'Preparation' then
 		stop_cooldowns(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
 	elseif cooldown_name == 'Cold Snap' then
@@ -340,7 +340,7 @@ function private.triggers(player, cooldown_name)
 	end
 end
 
-function private.start_cooldown(player, cooldown_name)
+function start_cooldown(player, cooldown_name)
 	triggers(player, cooldown_name)
 	local key = player .. '|' .. cooldown_name
 	if active_cooldowns[key] then
@@ -360,7 +360,7 @@ function private.start_cooldown(player, cooldown_name)
 	end
 end
 
-function private.stop_cooldowns(player, ...)
+function stop_cooldowns(player, ...)
 	for i = 1, arg.n do
 		local key = player .. '|' .. arg[i]
 		if active_cooldowns[key] then
@@ -371,7 +371,7 @@ function private.stop_cooldowns(player, ...)
 	end
 end
 
-function private.update_frame(frame, player_name, player_class)
+function update_frame(frame, player_name, player_class)
 	for key, cooldown in active_cooldowns do
 		if player_name == cooldown.player then
 			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, player_class) then
@@ -385,7 +385,7 @@ function private.update_frame(frame, player_name, player_class)
 	end
 end
 
-function private.PLAYER_TARGET_CHANGED()
+function PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
 		tinsert(targeted_enemies, 1, T('name', UnitName('target'), 'class', UnitClass('target')))
 		if getn(targeted_enemies) > 100 then release(tremove(targeted_enemies)) end
@@ -395,7 +395,7 @@ end
 
 do
 	local skip = 0
-	function private.UPDATE()
+	function UPDATE()
 		if skip ~= 0 then return end
 		skip = mod(skip - 1, 6)
 		if cooldowns_settings.TARGETTARGET.active then
