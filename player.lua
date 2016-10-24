@@ -7,9 +7,9 @@ local cooldowns_frame = require 'cooldowns.frame'
 
 local last_used
 
-function public.setup()
+function M.setup()
 	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or t
-	public.frame = cooldowns_frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
+	M.frame = cooldowns_frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
 	do
 		local frame = CreateFrame('Frame')
 		frame:SetScript('OnEvent', function() _M[event]() end)

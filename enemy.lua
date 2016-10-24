@@ -262,11 +262,11 @@ local COMBAT_LOG_PATTERNS_PARTIAL = {
 	"You are afflicted by (.+) %-",
 }
 
-function public.setup()
+function M.setup()
 	cooldowns_settings.TARGET = cooldowns_settings.TARGET or t
 	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or { active=false }
-	public.targetFrame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
-	public.targetTargetFrame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
+	M.targetFrame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
+	M.targetTargetFrame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
 
 	events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)

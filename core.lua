@@ -14,26 +14,26 @@ end
 
 _G.cooldowns_settings = t
 
-function public.print(msg)
+function M.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
 end
 
-function public.color_code(r, g, b)
+function M.color_code(r, g, b)
 	return format('|cFF%02X%02X%02X', r*255, g*255, b*255)
 end
 
-function public.list(first, ...)
+function M.list(first, ...)
 	for i = 1, arg.n do first = first .. ',' .. arg[i] end
 	return first or ''
 end
 
-function public.elems(list)
+function M.elems(list)
 	local elems = t
 	for elem in string.gfind(list, '[^,]+') do tinsert(elems, elem) end
 	return elems
 end
 
-function public.contains(list, str)
+function M.contains(list, str)
 	for element in string.gfind(list, '[^,]+') do
 		if element == str then return true end
 	end

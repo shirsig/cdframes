@@ -23,7 +23,7 @@ DEFAULT_SETTINGS = T(
 	'ignoreList', ''
 )
 
-function public.new(title, color, settings)
+function M.new(title, color, settings)
 	local self = t
 	for k, v in method do self[k] = v end
 	self.title = title
