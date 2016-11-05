@@ -370,7 +370,8 @@ function method:Update()
 				frame.icon:SetTexture(cooldown.icon)
 				frame.count:SetText(self.settings.count and time_text(timeLeft) or '')
 				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
-				init[frame.tooltip] = temp-A(cooldown.name, cooldown.info)
+				release(frame.tooltip)
+				frame.tooltip = A(cooldown.name, cooldown.info)
 				frame:Show()
 
 				i = i + 1
