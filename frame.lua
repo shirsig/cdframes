@@ -1,11 +1,11 @@
 module 'cooldowns.frame'
 
-include 'green_t'
+include 'T'
 include 'cooldowns'
 
 ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
 
-DEFAULT_SETTINGS = T(
+DEFAULT_SETTINGS = O(
 	'active', true,
 	'locked', false,
 	'x', UIParent:GetCenter(),
@@ -24,17 +24,17 @@ DEFAULT_SETTINGS = T(
 )
 
 function M.new(title, color, settings)
-	local self = t
+	local self = T
 	for k, v in method do self[k] = v end
 	self.title = title
 	self.color = color
-	self.cooldowns = t
-	self.iconFramePool = t
+	self.cooldowns = T
+	self.iconFramePool = T
 	self:LoadSettings(settings)
 	return self
 end
 
-method = t
+method = T
 
 function method:LoadSettings(settings)
 	for k, v in DEFAULT_SETTINGS do
@@ -62,7 +62,7 @@ function method:CreateFrames()
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
 		frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
 		frame:SetScript('OnUpdate', function() return self.settings.locked and self:Update() end)
-		frame.cd_frames = t
+		frame.cd_frames = T
 	end
 	for i = getn(self.frame.cd_frames) + 1, self.settings.size do
 		tinsert(self.frame.cd_frames, self:CDFrame())
@@ -227,7 +227,7 @@ function method:CDFrame()
 		cooldown:Show()
 		frame.cooldown = cooldown
 	end
-	frame.tooltip = t
+	frame.tooltip = T
 	return frame
 end
 
@@ -243,7 +243,7 @@ function method:PlaceFrames()
 	self.frame:SetScale(scale)
 	local orientation = self.settings.orientation
 	local axis1, axis2 = ret(strfind(orientation, '^[LR]') and A('x', 'y') or A('y', 'x'))
-	local sign = temp-T(
+	local sign = temp-O(
 		'x', (strfind(orientation, 'R') and 1 or -1),
 		'y', (strfind(orientation, 'U') and 1 or -1)
 	)
@@ -260,7 +260,7 @@ function method:PlaceFrames()
 	for i = 1, self.settings.size do
 		local frame = self.frame.cd_frames[i]
 		frame:ClearAllPoints()
-		local offset = temp-T(
+		local offset = temp-O(
 			axis1, sign[axis1] * mod(i - 1, self.settings.line) * slotSize,
 			axis2, sign[axis2] * floor((i - 1) / self.settings.line) * slotSize
 		)
@@ -352,7 +352,7 @@ function method:CDID(cooldown) return tostring(cooldown) end
 function method:Update()
 	local tm = GetTime()
 
-	local cooldownList = tt
+	local cooldownList = temp-T
 	for _, cooldown in self.cooldowns do tinsert(cooldownList, cooldown) end
 	sort(cooldownList, function(a, b) local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm return ta < tb or tb == ta and a.name < b.name end)
 
@@ -384,7 +384,7 @@ function method:Update()
 end
 
 function method:StartCD(name, info, icon, started, duration)
-	local cooldown = T(
+	local cooldown = O(
 		'name', name,
 		'info', info,
 		'icon', icon,

@@ -1,6 +1,6 @@
 module 'cooldowns.enemy'
 
-include 'green_t'
+include 'T'
 include 'cooldowns'
 
 local cooldowns_frame = require 'cooldowns.frame'
@@ -263,7 +263,7 @@ local COMBAT_LOG_PATTERNS_PARTIAL = {
 }
 
 function M.setup()
-	cooldowns_settings.TARGET = cooldowns_settings.TARGET or t
+	cooldowns_settings.TARGET = cooldowns_settings.TARGET or T
 	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or { active=false }
 	M.targetFrame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
 	M.targetTargetFrame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
@@ -277,7 +277,7 @@ function M.setup()
 	end
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	targeted_enemies = t
+	targeted_enemies = T
 end
 
 function combat_log_event_handler()
@@ -306,7 +306,7 @@ function expired(cooldown)
 end
 
 do
-	local active_cooldowns = t
+	local active_cooldowns = T
 	function get_active_cooldowns()
 		for k, v in active_cooldowns do
 			if expired(v) then
@@ -347,7 +347,7 @@ function start_cooldown(player, cooldown_name)
 		hide_cooldown(targetFrame, key)
 		hide_cooldown(targetTargetFrame, key)
 	end
-	active_cooldowns[key] = T(
+	active_cooldowns[key] = O(
 		'name', cooldown_name,
 		'player', player,
 		'started', GetTime()
@@ -387,7 +387,7 @@ end
 
 function PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
-		tinsert(targeted_enemies, 1, T('name', UnitName('target'), 'class', UnitClass('target')))
+		tinsert(targeted_enemies, 1, O('name', UnitName('target'), 'class', UnitClass('target')))
 		if getn(targeted_enemies) > 100 then release(tremove(targeted_enemies)) end
 	end
 	update_frame(targetFrame, UnitName('target'), UnitClass('target'))

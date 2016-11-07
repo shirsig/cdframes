@@ -1,4 +1,4 @@
-library 'green_t'
+library 'T'
 
 local next, getn, setn, tremove, type, setmetatable = next, getn, table.setn, tremove, type, setmetatable
 
@@ -21,7 +21,7 @@ do
 		for t in is_auto_release do release(t) end
 		wipe(is_auto_release)
 	end)
-	
+
 	function acquire()
 		if pool_size > 0 then
 			pool_size = pool_size - 1
@@ -62,13 +62,7 @@ do
 	M.dep_release = dep_release
 end
 
-M.get_t = acquire
-
-function M.get_tt()
-	local t = acquire()
-	auto_release(t, true)
-	return t
-end
+M.get_T = acquire
 
 M.temp = setmetatable({}, {
 	__metatable = false,
@@ -152,7 +146,7 @@ M.S = vararg(function(arg)
 	end
 	return t
 end)
-M.T = vararg(function(arg)
+M.O = vararg(function(arg)
 	local t = acquire()
 	for i = 1, getn(arg), 2 do
 		t[arg[i]] = arg[i + 1]

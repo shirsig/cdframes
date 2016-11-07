@@ -1,6 +1,6 @@
 module 'cooldowns.player'
 
-include 'green_t'
+include 'T'
 include 'cooldowns'
 
 local cooldowns_frame = require 'cooldowns.frame'
@@ -8,7 +8,7 @@ local cooldowns_frame = require 'cooldowns.frame'
 local last_used
 
 function M.setup()
-	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or t
+	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or T
 	M.frame = cooldowns_frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
 	do
 		local frame = CreateFrame('Frame')
@@ -81,7 +81,7 @@ function SPELL_UPDATE_COOLDOWN()
 end
 
 do
-	local cooldowns = t
+	local cooldowns = T
 	function start_cd(name, texture, started, duration)
 		if cooldowns_settings.used and name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end

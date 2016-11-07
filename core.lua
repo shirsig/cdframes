@@ -1,6 +1,6 @@
 module 'cooldowns'
 
-include 'green_t'
+include 'T'
 
 local cooldowns_player = require 'cooldowns.player'
 local cooldowns_enemy = require 'cooldowns.enemy'
@@ -12,7 +12,7 @@ do local frame = CreateFrame('Frame')
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.cooldowns_settings = t
+_G.cooldowns_settings = T
 
 function M.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
@@ -28,7 +28,7 @@ function M.list(first, ...)
 end
 
 function M.elems(list)
-	local elems = t
+	local elems = T
 	for elem in string.gfind(list, '[^,]+') do tinsert(elems, elem) end
 	return elems
 end
@@ -59,7 +59,7 @@ end
 
 function SLASH(str)
 	str = strupper(str)
-	local parameters, frames = tokenize(str), tt
+	local parameters, frames = tokenize(str), temp-T
 	if parameters[1] == 'USED' then
 		cooldowns_settings.used = not cooldowns_settings.used
 		return
@@ -110,14 +110,14 @@ function SLASH(str)
 			frame.settings.clickthrough = not frame.settings.clickthrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
-			local names = tt
+			local names = temp-T
 			for _, name in temp-elems(match) do
 				if not contains(frame.settings.ignoreList, name) then tinsert(names, name) end
 			end
 			frame.settings.ignoreList = frame.settings.ignoreList == '' and list(unpack(names)) or frame.settings.ignoreList .. ',' .. list(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
-			local names = tt
+			local names = temp-T
 			for _, name in temp-elems(frame.settings.ignoreList) do
 				if not contains(match, name) then tinsert(names, name) end
 			end
@@ -135,7 +135,7 @@ function SLASH(str)
 end
 
 function tokenize(str)
-	local tokens = t
+	local tokens = T
 	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
 	return tokens
 end

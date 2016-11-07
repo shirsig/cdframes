@@ -3,7 +3,7 @@
 ## Author: shirsig
 ## SavedVariables: cooldowns_settings
 libs\module.lua
-libs\green_t.lua
+libs\T.lua
 core.lua
 frame.lua
 player.lua
