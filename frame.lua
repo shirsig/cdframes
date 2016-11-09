@@ -20,7 +20,7 @@ DEFAULT_SETTINGS = O(
 	'blink', 0,
 	'animation', false,
 	'clickthrough', false,
-	'ignoreList', ''
+	'ignore_list', ''
 )
 
 function M.new(title, color, settings)
@@ -328,7 +328,7 @@ end
 
 function method:OnClick()
 	if arg1 == 'LeftButton' then
-		for i, orientation in ORIENTATIONS do
+		for i, orientation in ipairs(ORIENTATIONS) do
 			if orientation == self.settings.orientation then
 				for _ = 1, (self.settings.size <= self.settings.line and 2 or 1) do
 					i = mod(i, getn(ORIENTATIONS)) + 1
@@ -344,7 +344,7 @@ function method:OnClick()
 end
 
 function method:Ignored(name)
-	return contains(strupper(self.settings.ignoreList), strupper(name))
+	return contains(strupper(self.settings.ignore_list), strupper(name))
 end
 
 function method:CDID(cooldown) return tostring(cooldown) end
@@ -352,12 +352,12 @@ function method:CDID(cooldown) return tostring(cooldown) end
 function method:Update()
 	local tm = GetTime()
 
-	local cooldownList = temp-T
-	for _, cooldown in self.cooldowns do tinsert(cooldownList, cooldown) end
-	sort(cooldownList, function(a, b) local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm return ta < tb or tb == ta and a.name < b.name end)
+	local cooldown_list = temp-T
+	for _, cooldown in self.cooldowns do tinsert(cooldown_list, cooldown) end
+	sort(cooldown_list, function(a, b) local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm return ta < tb or tb == ta and a.name < b.name end)
 
 	local i = 1
-	for _, cooldown in cooldownList do
+	for _, cooldown in ipairs(cooldown_list) do
 		local timeLeft = cooldown.started + cooldown.duration - tm
 
 		if timeLeft > 0 then

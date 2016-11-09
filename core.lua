@@ -88,13 +88,13 @@ function SLASH(str)
 		elseif parameters[1] == 'UNLOCK' then
 			frame.settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = parse_number{ input=parameters[2], min=1, max=100, default=16, integer=true }
+			frame.settings.size = parse_number{input=parameters[2], min=1, max=100, default=16, integer=true}
 		elseif parameters[1] == 'LINE' then
-			frame.settings.line = parse_number{ input=parameters[2], min=1, max=100, default=8, integer=true }
+			frame.settings.line = parse_number{input=parameters[2], min=1, max=100, default=8, integer=true}
 		elseif parameters[1] == 'SPACING' then
-			frame.settings.spacing = parse_number{ input=parameters[2], min=0, max=1, default=0 }
+			frame.settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
 		elseif parameters[1] == 'SCALE' then
-			local scale = parse_number{ input=parameters[2], min=.5, max=2, default=1 }
+			local scale = parse_number{input=parameters[2], min=.5, max=2, default=1}
 			frame.settings.x = frame.settings.x * frame.settings.scale / scale
 			frame.settings.y = frame.settings.y * frame.settings.scale / scale
 			frame.settings.scale = scale
@@ -103,7 +103,7 @@ function SLASH(str)
 		elseif parameters[1] == 'COUNT' then
 			frame.settings.count = not frame.settings.count
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = parse_number{ input=parameters[2], min=0, default=7 }
+			frame.settings.blink = parse_number{input=parameters[2], min=0, default=7}
 		elseif parameters[1] == 'ANIMATION' then
 			frame.settings.animation = not frame.settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then
@@ -112,19 +112,19 @@ function SLASH(str)
 			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
 			local names = temp-T
 			for _, name in temp-elems(match) do
-				if not contains(frame.settings.ignoreList, name) then tinsert(names, name) end
+				if not contains(frame.settings.ignore_list, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = frame.settings.ignoreList == '' and list(unpack(names)) or frame.settings.ignoreList .. ',' .. list(unpack(names))
+			frame.settings.ignore_list = frame.settings.ignore_list == '' and list(unpack(names)) or frame.settings.ignore_list .. ',' .. list(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
 			local names = temp-T
-			for _, name in temp-elems(frame.settings.ignoreList) do
+			for _, name in temp-elems(frame.settings.ignore_list) do
 				if not contains(match, name) then tinsert(names, name) end
 			end
-			frame.settings.ignoreList = list(unpack(names))
+			frame.settings.ignore_list = list(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
 			print(frame.key .. ':')
-			for _, name in temp-elems(frame.settings.ignoreList) do print(name) end
+			for _, name in temp-elems(frame.settings.ignore_list) do print(name) end
 		elseif parameters[1] == 'RESET' then
 			wipe(frame.settings)
 		else
