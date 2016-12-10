@@ -123,7 +123,7 @@ function SLASH(str)
 			end
 			frame.settings.ignore_list = list(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			print(frame.key .. ':')
+			print(frame.title .. ':')
 			for _, name in temp-elems(frame.settings.ignore_list) do print(name) end
 		elseif parameters[1] == 'RESET' then
 			wipe(frame.settings)
