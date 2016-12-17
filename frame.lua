@@ -354,7 +354,7 @@ function method:Update()
 
 	local cooldown_list = temp-T
 	for _, cooldown in self.cooldowns do tinsert(cooldown_list, cooldown) end
-	sort(cooldown_list, function(a, b) local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm return ta < tb or tb == ta and a.name < b.name end)
+	sort(cooldown_list, function(a, b) local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm return tb < ta or tb == ta and a.name < b.name end)
 
 	local i = 1
 	for _, cooldown in ipairs(cooldown_list) do
