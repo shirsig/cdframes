@@ -12,7 +12,7 @@ do local frame = CreateFrame('Frame')
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.cooldowns_settings = T
+_G.cooldowns_settings = {used=true}
 
 function M.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
