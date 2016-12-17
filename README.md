@@ -8,7 +8,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 
 ### Commands
 
-**/cooldowns used** (experimental feature: shows player cooldowns only for the spells used, ignoring shared cooldowns)<br/>
+**/cooldowns used** (shows player cooldowns only for the spells used, ignoring shared cooldowns, default on)<br/>
 
 **/cooldowns on** (activates frames, default on)<br/>
 **/cooldowns off** (deactivates frames)<br/>
