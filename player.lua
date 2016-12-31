@@ -62,9 +62,9 @@ function BAG_UPDATE_COOLDOWN()
 end
 
 function SPELL_UPDATE_COOLDOWN()
-	local _, _, offset, spellCount = GetSpellTabInfo(GetNumSpellTabs())
-	local totalSpells = offset + spellCount
-	for id = 1, totalSpells do
+	local _, _, offset, spell_count = GetSpellTabInfo(GetNumSpellTabs())
+	local total_spells = offset + spell_count
+	for id = 1, total_spells do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
 		if enabled == 1 and duration > 2.5 then
@@ -78,12 +78,27 @@ function SPELL_UPDATE_COOLDOWN()
 			stop_cd(name)
 		end
 	end
+	for id = 1, HasPetSpells() or 0 do
+		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_PET)
+		local name = GetSpellName(id, BOOKTYPE_PET)
+		if enabled == 1 and duration > 2.5 then
+			start_cd(
+				name,
+				GetSpellTexture(id, BOOKTYPE_PET),
+				started,
+				duration,
+				true
+			)
+		elseif duration == 0 then
+			stop_cd(name)
+		end
+	end
 end
 
 do
 	local cooldowns = T
-	function start_cd(name, texture, started, duration)
-		if cooldowns_settings.used and name ~= last_used then return end
+	function start_cd(name, texture, started, duration, pet)
+		if cooldowns_settings.used and not pet and name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end
 		cooldowns[name] = frame:StartCD(name, '', texture, started, duration)
 	end
@@ -149,7 +164,7 @@ do
 	do
 		local orig = UseAction
 		function _G.UseAction(...)
-			if not casting then
+			if not casting and HasAction(arg[1]) and not GetActionText(arg[1]) then
 				cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
 				cooldowns_Tooltip:SetAction(arg[1])
 				last_used = cooldowns_TooltipTextLeft1:GetText()
