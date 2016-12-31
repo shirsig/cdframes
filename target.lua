@@ -155,7 +155,7 @@ local COOLDOWNS = {
 	["Raptor Strike"] = {duration = 6, desc = "A strong attack that increases melee damage by 140.", icon = "Ability_MeleeDamage", classes = 'Hunter'},
 	["Wyvern Sting"] = {duration = 2*60, desc = "A stinging shot that puts the target to sleep for 12 sec. Any damage will cancel the effect. When the target wakes up, the Sting causes 600 Nature damage over 12 sec. Only usable out of combat. Only one Sting per Hunter can be active on the target at a time.", icon = "INV_Spear_02", classes = 'Hunter'},
 	["Bestial Wrath"] = {duration = 2*60, desc = "Send your pet into a rage causing 50% additional damage for 18 sec. While enraged, the beast does not feel pity or remorse or fear and it cannot be stopped unless killed.", icon = "Ability_Druid_FerociousBite", classes = 'Hunter'},
-	["Intimidation"] = {duration = 60, desc = "Command your pet to intimidate the target on the next successful melee attack, causing a high amount of threat and stunning the target for 3 sec.", icon = "Ability_Devour"},
+	["Intimidation"] = {duration = 60, desc = "Command your pet to intimidate the target on the next successful melee attack, causing a high amount of threat and stunning the target for 3 sec.", icon = "Ability_Devour", classes = 'Hunter'},
 	["Deterrence"] = {duration = 5*60, desc = "When activated, increases your Dodge and Parry chance by 25% for 10 sec.", icon = "Ability_Whirlwind", classes = 'Hunter'},
 	["Scatter Shot"] = {duration = 30, desc = "A short-range shot that deals 50% weapon damage and disorients the target for 4 sec. Any damage caused will remove the effect. Turns off your attack when used.", icon = "Ability_GolemStormBolt", classes = 'Hunter'},
 
