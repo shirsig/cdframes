@@ -174,7 +174,7 @@ local COOLDOWNS = {
 	["Lash of Pain"] = {duration = 12, desc = "An instant attack that lashes the target, causing 99 Shadow damage.", icon = "Spell_Shadow_Curse", classes = 'Warlock'},
 	["Soothing Kiss"] = {duration = 4, desc = "Soothes the target, increasing the chance that it will attack something else. More effective than Soothing Kiss (Rank 3).", icon = "Spell_Shadow_SoothingKiss", classes = 'Warlock'},
 	["Fel Domination"] = {duration = 15*60, desc = "Your next Imp, Voidwalker, Succubus, or Felhunter Summon spell has its casting time reduced by 5.5 sec and its Mana cost reduced by 50%.", icon = "Spell_Nature_RemoveCurse", classes = 'Warlock'},
-	["Spell Lock"] = {duration = 15*60, desc = "Silences the enemy for 3 sec. If used on a casting target, it will counter the enemy's spellcast, preventing any spell from that school of magic from being cast for 8 sec.", icon = "Spell_Nature_RemoveCurse", classes = 'Warlock'},
+	["Spell Lock"] = {duration = 30, desc = "Silences the enemy for 3 sec. If used on a casting target, it will counter the enemy's spellcast, preventing any spell from that school of magic from being cast for 8 sec.", icon = "Spell_Nature_RemoveCurse", classes = 'Warlock'},
 
 	-- Priest
 	["Elune's Grace"] = {duration = 5*60, desc = "Reduces ranged damage taken by 95 and increases chance to dodge by 10% for 15 sec.", icon = "Spell_Holy_ElunesGrace", classes = 'Priest'},
