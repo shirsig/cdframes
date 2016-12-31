@@ -1,4 +1,4 @@
-module 'cooldowns.enemy'
+module 'cooldowns.target'
 
 include 'T'
 include 'cooldowns'
@@ -56,7 +56,6 @@ local COOLDOWNS = {
 	["Shield Block"] = {duration = 5, desc = "Increases chance to block by 75% for 5 sec, but will only block 1 attack.", icon = "Ability_Defend", classes = 'Warrior'},
 	["Shield Slam"] = {duration = 6, desc = "Slam the target with your shield, causing 342 to 358 damage, modified by your shield block value, and has a 50% chance of dispelling 1 magic effect on the target. Also causes a high amount of threat.", icon = "INV_Shield_05", classes = 'Warrior'},
 	["Shield Wall"] = {duration = 30*60, desc = "Reduces the damage taken from melee attacks, ranged attacks and spells by 75% for 10 sec.", icon = "Ability_Warrior_ShieldWall", classes = 'Warrior'},
-
 	["Sweeping Strikes"] = {duration = 30, desc = "Your next 5 melee attacks strike an additional nearby opponent.", icon = "Ability_Rogue_SliceDice", classes = 'Warrior'},
 	["Last Stand"] = {duration = 10*60, desc = "When activated, this ability temporarily grants you 30% of your maximum hit points for 20 seconds. After the effect expires, the hit points are lost.", icon = "Spell_Holy_AshesToAshes", classes = 'Warrior'},
 	["Death Wish"] = {duration = 3*60, desc = "When activated, increases your physical damage by 20% and makes you immune to Fear effects, but lowers your armor and all resistances by -20%. Lasts 30 sec.", icon = "Spell_Shadow_DeathPact", classes = 'Warrior'},
@@ -75,7 +74,6 @@ local COOLDOWNS = {
 	["Divine Shield"] = {duration = 5*60, desc = "Protects the paladin from all damage and spells for 12 sec, but reduces attack speed by 50%. Once protected, the target cannot be made invulnerable by Divine Shield, Divine Protection or Blessing of Protection again for 1 min.", icon = "Spell_Holy_DivineIntervention", classes = 'Paladin'},
 	["Hammer of Justice"] = {duration = 60, desc = "Stuns the target for 6 sec.", icon = "Spell_Holy_SealOfMight", classes = 'Paladin'},
 	["Judgement"] = {duration = 10, desc = "Unleashes the energy of a Seal spell upon an enemy. Refer to individual Seals for Judgement effect.", icon = "Spell_Holy_RighteousFury", classes = 'Paladin'},
-
 	["Divine Favor"] = {duration = 2*60, desc = "When activated, gives your next Flash of Light, Holy Light, or Holy Shock spell a 100% critical effect chance.", icon = "Spell_Holy_Heal", classes = 'Paladin'},
 	["Holy Shock"] = {duration = 30, desc = "Blasts the target with Holy energy, causing 365 to 396 Holy damage to an enemy, or 365 to 396 healing to an ally.", icon = "Spell_Holy_SearingLight", classes = 'Paladin'},
 	["Holy Shield"] = {duration = 10, desc = "Increases chance to block by 30% for 10 sec, and deals 130 Holy damage for each attack blocked while active. Damage caused by Holy Shield causes 20% additional threat. Each block expends a charge. 4 charges.", icon = "Spell_Holy_BlessingOfProtection", classes = 'Paladin'},
@@ -97,7 +95,6 @@ local COOLDOWNS = {
 	["Frost Ward"] = {duration = 30, desc = "Absorbs 920 Frost damage. Lasts 30 sec.", icon = "Spell_Frost_FrostWard", classes = 'Mage'},
 	["Ice Barrier"] = {duration = 30, desc = "Instantly shields you, absorbing 818 damage. Lasts 1 min. While the shield holds, spells will not be interrupted.", icon = "Spell_Ice_Lament", classes = 'Mage'},
 	["Counterspell"] = {duration = 30, desc = "Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 10 sec. Generates a high amount of threat.", icon = "Spell_Frost_IceShock", classes = 'Mage'},
-
 	["Presence of Mind"] = {duration = 3*60, desc = "When activated, your next Mage spell with a casting time less than 10 sec becomes an instant cast spell.", icon = "Spell_Nature_EnchantArmor", classes = 'Mage'},
 	["Arcane Power"] = {duration = 3*60, desc = "When activated, your spells deal 30% more damage while costing 30% more mana to cast. This effect lasts 15 sec.", icon = "Spell_Nature_Lightning", classes = 'Mage'},
 	["Combustion"] = {duration = 3*60, desc = "When activated, this spell causes each of your Fire damage spell hits to increase your critical strike chance with Fire damage spells by 10%. This effect lasts until you have caused 3 critical strikes with Fire spells.", icon = "Spell_Fire_SealOfFire", classes = 'Mage'},
@@ -115,7 +112,6 @@ local COOLDOWNS = {
 	["Distract"] = {duration = 30, desc = "Throws a distraction, attracting the attention of all nearby monsters for 10 seconds. Does not break stealth.", icon = "Ability_Rogue_Distract", classes = 'Rogue'},
 	["Stealth"] = {duration = 10, desc = "Allows the rogue to sneak around, but reduces your speed by 30%. Lasts until cancelled.", icon = "Ability_Stealth", classes = 'Rogue'},
 	["Vanish"] = {duration = 5*60, desc = "Allows the rogue to vanish from sight, entering an improved stealth mode for 10 sec. Also breaks movement impairing effects. More effective than Vanish (Rank 1).", icon = "Ability_Vanish", classes = 'Rogue'},
-
 	["Blade Flurry"] = {duration = 2*60, desc = "Increases your attack speed by 20%. In addition, attacks strike an additional nearby opponent. Lasts 15 sec.", icon = "Ability_Warrior_PunishingBlow", classes = 'Rogue'},
 	["Adrenaline Rush"] = {duration = 6*60, desc = "Increases your Energy regeneration rate by 100% for 15 sec.", icon = "Spell_Shadow_ShadowWordDominate", classes = 'Rogue'},
 	["Preparation"] = {duration = 10*60, desc = "When activated, this ability immediately finishes the cooldown of your other Rogue abilities.", icon = "Spell_Shadow_AntiShadow", classes = 'Rogue'},
@@ -134,7 +130,6 @@ local COOLDOWNS = {
 	["Astral Recall"] = {duration = 15*60, desc = "Yanks the caster through the twisting nether back to [home]. Speak to an Innkeeper in a different place to change your home location.", icon = "Spell_Nature_AstralRecal", classes = 'Shaman'},
 	["Grounding Totem"] = {duration = 15, desc = "Summons a Grounding Totem with 5 health at the feet of the caster that will redirect one harmful spell cast on a nearby party member to itself every 10 seconds. Will not redirect area of effect spells. Lasts 45 sec.", icon = "Spell_Nature_GroundingTotem", classes = 'Shaman'},
 	["Mana Tide Totem"] = {duration = 5*60, desc = "Summons a Mana Tide Totem with 5 health at the feet of the caster for 12 sec that restores 290 mana every 3 seconds to group members within 20 yards.", icon = "Spell_Frost_SummonWaterElemental", classes = 'Shaman'},
-
 	["Elemental Mastery"] = {duration = 3*60, desc = "When activated, this spell gives your next Fire, Frost, or Nature damage spell a 100% critical strike chance and reduces the mana cost by 100%.", icon = "Spell_Nature_WispHeal", classes = 'Shaman'},
 	["Stormstrike"] = {duration = 20, desc = "Gives you an extra attack. In addition, the next 2 sources of Nature damage dealt to the target are increased by 20%. Lasts 12 sec.", icon = "Spell_Holy_SealOfMight", classes = 'Shaman'},
 	["Nature's Swiftness"] = {duration = 3*60, desc = "When activated, your next Nature spell with a casting time less than 10 sec. becomes an instant cast spell.", icon = "Spell_Nature_RavenForm", classes = 'Shaman,Druid'},
@@ -159,9 +154,8 @@ local COOLDOWNS = {
 	["Mongoose Bite"] = {duration = 5, desc = "Counterattack the enemy for 115 damage. Can only be performed after you dodge.", icon = "Ability_Hunter_SwiftStrike", classes = 'Hunter'},
 	["Raptor Strike"] = {duration = 6, desc = "A strong attack that increases melee damage by 140.", icon = "Ability_MeleeDamage", classes = 'Hunter'},
 	["Wyvern Sting"] = {duration = 2*60, desc = "A stinging shot that puts the target to sleep for 12 sec. Any damage will cancel the effect. When the target wakes up, the Sting causes 600 Nature damage over 12 sec. Only usable out of combat. Only one Sting per Hunter can be active on the target at a time.", icon = "INV_Spear_02", classes = 'Hunter'},
-
 	["Bestial Wrath"] = {duration = 2*60, desc = "Send your pet into a rage causing 50% additional damage for 18 sec. While enraged, the beast does not feel pity or remorse or fear and it cannot be stopped unless killed.", icon = "Ability_Druid_FerociousBite", classes = 'Hunter'},
-	["Intimidation"] = {duration = 60, desc = "Command your pet to intimidate the target on the next successful melee attack, causing a high amount of threat and stunning the target for 3 sec.", icon = "Ability_Devour", classes = 'Hunter'},
+	["Intimidation"] = {duration = 60, desc = "Command your pet to intimidate the target on the next successful melee attack, causing a high amount of threat and stunning the target for 3 sec.", icon = "Ability_Devour"},
 	["Deterrence"] = {duration = 5*60, desc = "When activated, increases your Dodge and Parry chance by 25% for 10 sec.", icon = "Ability_Whirlwind", classes = 'Hunter'},
 	["Scatter Shot"] = {duration = 30, desc = "A short-range shot that deals 50% weapon damage and disorients the target for 4 sec. Any damage caused will remove the effect. Turns off your attack when used.", icon = "Ability_GolemStormBolt", classes = 'Hunter'},
 
@@ -179,8 +173,8 @@ local COOLDOWNS = {
 	["Spell Loc"] = {duration = 30, desc = "Silences the enemy for 3 sec. If used on a casting target, it will counter the enemy's spellcast, preventing any spell from that school of magic from being cast for 8 sec.", icon = "Spell_Shadow_MindRot", classes = 'Warlock'},
 	["Lash of Pain"] = {duration = 12, desc = "An instant attack that lashes the target, causing 99 Shadow damage.", icon = "Spell_Shadow_Curse", classes = 'Warlock'},
 	["Soothing Kiss"] = {duration = 4, desc = "Soothes the target, increasing the chance that it will attack something else. More effective than Soothing Kiss (Rank 3).", icon = "Spell_Shadow_SoothingKiss", classes = 'Warlock'},
-
-	["Fel Domination"] = {duration = 15*60, desc = "Your next Imp, Voidwalker, Succubus, or Felhunter Summon spell has its casting time reduced by 5.5 sec and its Mana cost reduced by 50%.", icon = "Spell_Nature_RemoveCurse"},
+	["Fel Domination"] = {duration = 15*60, desc = "Your next Imp, Voidwalker, Succubus, or Felhunter Summon spell has its casting time reduced by 5.5 sec and its Mana cost reduced by 50%.", icon = "Spell_Nature_RemoveCurse", classes = 'Warlock'},
+	["Spell Lock"] = {duration = 15*60, desc = "Silences the enemy for 3 sec. If used on a casting target, it will counter the enemy's spellcast, preventing any spell from that school of magic from being cast for 8 sec.", icon = "Spell_Nature_RemoveCurse", classes = 'Warlock'},
 
 	-- Priest
 	["Elune's Grace"] = {duration = 5*60, desc = "Reduces ranged damage taken by 95 and increases chance to dodge by 10% for 15 sec.", icon = "Spell_Holy_ElunesGrace", classes = 'Priest'},
@@ -192,7 +186,6 @@ local COOLDOWNS = {
 	["Fade"] = {duration = 30, desc = "Fade out, discouraging enemies from attacking you for 10 sec. More effective than Fade (rank 5).", icon = "Spell_Magic_LesserInvisibilty", classes = 'Priest'},
 	["Mind Blast"] = {duration = 8, desc = "Blasts the target for 503 to 531 Shadow damage, but causes a high amount of threat.", icon = "Spell_Shadow_UnholyFrenzy", classes = 'Priest'},
 	["Psychic Scream"] = {duration = 30, desc = "The caster lets out a psychic scream, causing 5 enemies within 8 yards to flee for 8 sec. Damage caused may interrupt the effect.", icon = "Spell_Shadow_PsychicScream", classes = 'Priest'},
-
 	["Inner Focus"] = {duration = 3*60, desc = "When activated, reduces the Mana cost of your next spell by 100% and increases its critical effect chance by 25% if it is capable of a critical effect.", icon = "Spell_Frost_WindWalkOn", classes = 'Priest'},
 	["Power Infusion"] = {duration = 3*60, desc = "Infuses the target with power, increasing their spell damage and healing by 20%. Lasts 15 sec.", icon = "Spell_Holy_PowerInfusion", classes = 'Priest'},
 	["Silence"] = {duration = 45, desc = "Silences the target, preventing them from casting spells for 5 sec.", icon = "Spell_Shadow_ImpPhaseShift", classes = 'Priest'},
@@ -213,7 +206,6 @@ local COOLDOWNS = {
 	["Rebirth"] = {duration = 30*60, desc = "Returns the spirit to the body, restoring a dead target to life with 2200 health and 2800 mana.", icon = "Spell_Nature_Reincarnation", classes = 'Druid'},
 	["Tranquility"] = {duration = 5*60, desc = "Regenerates all nearby group members for 294 every 2 seconds for 10 sec. Druid must channel to maintain the spell.", icon = "Spell_Nature_Tranquility", classes = 'Druid'},
 	["Innervate"] = {duration = 6*60, desc = "Increases the target's Mana regeneration by 400% and allows 100% of the target's Mana regeneration to continue while casting. Lasts 20 sec.", icon = "Spell_Nature_Lightning", classes = 'Druid'},
-
 	["Faerie Fire (Feral)"] = {duration = 6, desc = "Decrease the armor of the target by 505 for 40 sec. While affected, the target cannot stealth or turn invisible.", icon = "Spell_Nature_FaerieFire", classes = 'Druid'},
 	["Feral Charge"] = {duration = 15, desc = "Causes you to charge an enemy, immobilizing and interrupting any spell being cast for 4 sec.", icon = "Ability_Hunter_Pet_Bear", classes = 'Druid'},
 	-- ["Nature's Swiftness"] = {duration = 3*60, desc = "When activated, your next Nature spell becomes an instant cast spell.", icon = "Spell_Nature_RavenForm"},
@@ -265,8 +257,8 @@ local COMBAT_LOG_PATTERNS_PARTIAL = {
 function M.setup()
 	cooldowns_settings.TARGET = cooldowns_settings.TARGET or T
 	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or {active=false}
-	M.targetFrame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
-	M.targetTargetFrame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
+	M.target_frame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
+	M.targettarget_frame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
 
 	events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
@@ -277,13 +269,13 @@ function M.setup()
 	end
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	targeted_enemies = T
+	recent_targets = T
 end
 
 function combat_log_event_handler()
 	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
 		for cooldown_name in string.gfind(arg1, pattern) do
-			for _, enemy in targeted_enemies do
+			for _, enemy in recent_targets do
 				if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
 					start_cooldown(enemy.name, cooldown_name)
 					break
@@ -344,8 +336,8 @@ function start_cooldown(player, cooldown_name)
 	triggers(player, cooldown_name)
 	local key = player .. '|' .. cooldown_name
 	if active_cooldowns[key] then
-		hide_cooldown(targetFrame, key)
-		hide_cooldown(targetTargetFrame, key)
+		hide_cooldown(target_frame, key)
+		hide_cooldown(targettarget_frame, key)
 	end
 	active_cooldowns[key] = O(
 		'name', cooldown_name,
@@ -353,10 +345,10 @@ function start_cooldown(player, cooldown_name)
 		'started', GetTime()
 	)
 	if player == UnitName('target') then
-		show_cooldown(targetFrame, key)
+		show_cooldown(target_frame, key)
 	end
 	if player == UnitName('targettarget') then
-		show_cooldown(targetTargetFrame, key)
+		show_cooldown(targettarget_frame, key)
 	end
 end
 
@@ -364,8 +356,8 @@ function stop_cooldowns(player, ...)
 	for i = 1, arg.n do
 		local key = player .. '|' .. arg[i]
 		if active_cooldowns[key] then
-			hide_cooldown(targetFrame, key)
-			hide_cooldown(targetTargetFrame, key)
+			hide_cooldown(target_frame, key)
+			hide_cooldown(targettarget_frame, key)
 			active_cooldowns[key] = nil
 		end
 	end
@@ -387,10 +379,10 @@ end
 
 function PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
-		tinsert(targeted_enemies, 1, O('name', UnitName('target'), 'class', UnitClass('target')))
-		if getn(targeted_enemies) > 100 then release(tremove(targeted_enemies)) end
+		tinsert(recent_targets, 1, O('name', UnitName('target'), 'class', UnitClass('target')))
+		if getn(recent_targets) > 100 then release(tremove(recent_targets)) end
 	end
-	update_frame(targetFrame, UnitName('target'), UnitClass('target'))
+	update_frame(target_frame, UnitName('target'), UnitClass('target'))
 end
 
 do
@@ -399,7 +391,7 @@ do
 		if skip ~= 0 then return end
 		skip = mod(skip - 1, 6)
 		if cooldowns_settings.TARGETTARGET.active then
-			update_frame(targetTargetFrame, UnitName('targettarget'), UnitClass('targettarget'))
+			update_frame(targettarget_frame, UnitName('targettarget'), UnitClass('targettarget'))
 		end
 	end
 end

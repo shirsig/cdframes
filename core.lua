@@ -3,7 +3,7 @@ module 'cooldowns'
 include 'T'
 
 local cooldowns_player = require 'cooldowns.player'
-local cooldowns_enemy = require 'cooldowns.enemy'
+local cooldowns_target = require 'cooldowns.target'
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 
@@ -47,7 +47,7 @@ function ADDON_LOADED()
 	_G.SlashCmdList.COOLDOWNS = SLASH
 
 	cooldowns_player.setup()
-	cooldowns_enemy.setup()
+	cooldowns_target.setup()
 end
 
 function parse_number(params)
@@ -68,13 +68,13 @@ function SLASH(str)
 		frames[cooldowns_player.frame] = true
 	end
 	if contains(parameters[1] or '', 'TARGET') then
-		frames[cooldowns_enemy.targetFrame] = true
+		frames[cooldowns_target.target_frame] = true
 	end
 	if contains(parameters[1] or '', 'TARGETTARGET') then
-		frames[cooldowns_enemy.targetTargetFrame] = true
+		frames[cooldowns_target.targettarget_frame] = true
 	end
 	if not next(frames) then
-		frames = temp-S(cooldowns_player.frame, cooldowns_enemy.targetFrame, cooldowns_enemy.targetTargetFrame)
+		frames = temp-S(cooldowns_player.frame, cooldowns_target.target_frame, cooldowns_target.targettarget_frame)
 	else
 		tremove(parameters, 1)
 	end
