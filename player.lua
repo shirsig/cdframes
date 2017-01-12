@@ -17,6 +17,7 @@ function M.setup()
 		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
 		frame:RegisterEvent('SPELLCAST_START')
 		frame:RegisterEvent('SPELLCAST_STOP')
+		frame:RegisterEvent('CHAT_MSG_SPELL_FAILED_LOCALPLAYER')
 	end
 	BAG_UPDATE_COOLDOWN()
 	SPELL_UPDATE_COOLDOWN()
@@ -112,19 +113,27 @@ function link_name(link)
 end
 
 do
-	local casting
+	local cast
 
 	function SPELLCAST_START()
-		casting = true
+		cast = arg1
 	end
 	function SPELLCAST_STOP()
-		casting = false
+		cast = nil
+	end
+
+	function CHAT_MSG_SPELL_FAILED_LOCALPLAYER()
+		for name in string.gfind(arg1, 'You fail to %a+ (.*):.*') do
+			if name == cast then
+				cast = nil
+			end
+		end
 	end
 
 	do
 		local orig = UseContainerItem
 		function _G.UseContainerItem(...)
-			if not casting then
+			if not cast then
 				last_used = link_name(GetContainerItemLink(unpack(arg)) or '')
 			end
 			return orig(unpack(arg))
@@ -134,7 +143,7 @@ do
 	do
 		local orig = UseInventoryItem
 		function _G.UseInventoryItem(...)
-			if not casting then
+			if not cast then
 				last_used = link_name(GetInventoryItemLink('player', arg[1]) or '')
 			end
 			return orig(unpack(arg))
@@ -144,7 +153,7 @@ do
 	do
 		local orig = CastSpellByName
 		function _G.CastSpellByName(...)
-			if not casting then
+			if not cast then
 				last_used = arg[1]
 			end
 			return orig(unpack(arg))
@@ -154,7 +163,7 @@ do
 	do
 		local orig = CastSpell
 		function _G.CastSpell(...)
-			if not casting then
+			if not cast then
 				last_used = GetSpellName(unpack(arg))
 			end
 			return orig(unpack(arg))
@@ -164,7 +173,7 @@ do
 	do
 		local orig = UseAction
 		function _G.UseAction(...)
-			if not casting and HasAction(arg[1]) and not GetActionText(arg[1]) then
+			if not cast and HasAction(arg[1]) and not GetActionText(arg[1]) then
 				cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
 				cooldowns_Tooltip:SetAction(arg[1])
 				last_used = cooldowns_TooltipTextLeft1:GetText()
