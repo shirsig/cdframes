@@ -123,8 +123,8 @@ do
 	end
 
 	function CHAT_MSG_SPELL_FAILED_LOCALPLAYER()
-		for name in string.gfind(arg1, 'You fail to %a+ (.*):.*') do
-			if name == cast then
+		for name, reason in string.gfind(arg1, 'You fail to %a+ (.*): (.*)') do
+			if name == cast and reason ~= 'Another action is in progress.' then
 				cast = nil
 			end
 		end
