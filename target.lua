@@ -94,7 +94,7 @@ local COOLDOWNS = {
 	["Frost Nova"] = {duration = 25, desc = "Blasts enemies near the caster for 71 to 79 Frost damage and freezes them in place for up to 8 sec. Damage caused may interrupt the effect.", icon = "Spell_Frost_FrostNova", classes = 'Mage'},
 	["Frost Ward"] = {duration = 30, desc = "Absorbs 920 Frost damage. Lasts 30 sec.", icon = "Spell_Frost_FrostWard", classes = 'Mage'},
 	["Ice Barrier"] = {duration = 30, desc = "Instantly shields you, absorbing 818 damage. Lasts 1 min. While the shield holds, spells will not be interrupted.", icon = "Spell_Ice_Lament", classes = 'Mage'},
-	["Counterspell"] = {duration = 30, desc = "Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 10 sec. Generates a high amount of threat.", icon = "Spell_Frost_IceShock", classes = 'Mage'},
+	["Counterspell - Silenced"] = {duration = 30, desc = "Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 10 sec. Generates a high amount of threat.", icon = "Spell_Frost_IceShock", classes = 'Mage'},
 	["Presence of Mind"] = {duration = 3*60, desc = "When activated, your next Mage spell with a casting time less than 10 sec becomes an instant cast spell.", icon = "Spell_Nature_EnchantArmor", classes = 'Mage'},
 	["Arcane Power"] = {duration = 3*60, desc = "When activated, your spells deal 30% more damage while costing 30% more mana to cast. This effect lasts 15 sec.", icon = "Spell_Nature_Lightning", classes = 'Mage'},
 	["Combustion"] = {duration = 3*60, desc = "When activated, this spell causes each of your Fire damage spell hits to increase your critical strike chance with Fire damage spells by 10%. This effect lasts until you have caused 3 critical strikes with Fire spells.", icon = "Spell_Fire_SealOfFire", classes = 'Mage'},
@@ -249,10 +249,7 @@ local COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
-local COMBAT_LOG_PATTERNS_PARTIAL = {
-	"You are afflicted by (.+)%.",
-	"You are afflicted by (.+) %-",
-}
+local COMBAT_LOG_PATTERN_PARTIAL = "You are afflicted by (.+)%."
 
 function M.setup()
 	cooldowns_settings.TARGET = cooldowns_settings.TARGET or T
@@ -273,13 +270,11 @@ function M.setup()
 end
 
 function combat_log_event_handler()
-	for _, pattern in COMBAT_LOG_PATTERNS_PARTIAL do
-		for cooldown_name in string.gfind(arg1, pattern) do
-			for _, enemy in recent_targets do
-				if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
-					start_cooldown(enemy.name, cooldown_name)
-					break
-				end
+	for cooldown_name in string.gfind(arg1, COMBAT_LOG_PATTERN_PARTIAL) do
+		for _, enemy in recent_targets do
+			if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
+				start_cooldown(enemy.name, cooldown_name)
+				break
 			end
 		end
 	end
