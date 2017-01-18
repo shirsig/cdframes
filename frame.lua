@@ -173,6 +173,28 @@ do
 			frame.cooldown:SetScale(34/36)
 
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
+			end,
+		modui = function(frame)
+			frame:SetWidth(33)
+			frame:SetHeight(33)
+
+			frame.icon:SetWidth(30)
+			frame.icon:SetHeight(30)
+			frame.icon:SetTexCoord(0, 1, 0, 1)
+
+			frame.border:Show()
+			frame.border:SetPoint('CENTER', 0, 0)
+			frame.border:SetWidth(38.5)
+			frame.border:SetHeight(38.5)
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\modui\Border]])
+			frame.border:SetTexCoord(0, 1, 0, 1)
+			frame.border:SetVertexColor(.22, .22, .22)
+
+			frame.gloss:Hide()
+
+			frame.cooldown:SetScale(32.5/36)
+
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 	}
 	function skin(frame, skin)
