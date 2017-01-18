@@ -99,7 +99,7 @@ function SLASH(str)
 			frame.settings.y = frame.settings.y * frame.settings.scale / scale
 			frame.settings.scale = scale
 		elseif parameters[1] == 'SKIN' then
-			frame.settings.skin = (temp-S('darion', 'blizzard', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'darion'
+			frame.settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'darion'
 		elseif parameters[1] == 'COUNT' then
 			frame.settings.count = not frame.settings.count
 		elseif parameters[1] == 'BLINK' then
