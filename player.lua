@@ -7,9 +7,9 @@ local cooldowns_frame = require 'cooldowns.frame'
 
 local last_used
 
-function M.setup()
-	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or T
-	M.frame = cooldowns_frame.new('Player Cooldowns', A(.2, .8, .2), cooldowns_settings.PLAYER)
+function SETUP()
+	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or {}
+	M.frame = cooldowns_frame.new('Player Cooldowns', {.2, .8, .2}, cooldowns_settings.PLAYER)
 	do
 		local frame = CreateFrame('Frame')
 		frame:SetScript('OnEvent', function() _M[event]() end)
@@ -97,7 +97,7 @@ function SPELL_UPDATE_COOLDOWN()
 end
 
 do
-	local cooldowns = T
+	local cooldowns = {}
 	function start_cd(name, texture, started, duration, pet)
 		if cooldowns_settings.used and not pet and name ~= last_used then return end
 		if cooldowns[name] then frame:CancelCD(cooldowns[name]) end

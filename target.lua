@@ -251,11 +251,11 @@ local COMBAT_LOG_PATTERNS = {
 
 local COMBAT_LOG_PATTERN_PARTIAL = "You are afflicted by (.+)%."
 
-function M.setup()
-	cooldowns_settings.TARGET = cooldowns_settings.TARGET or T
+function SETUP()
+	cooldowns_settings.TARGET = cooldowns_settings.TARGET or {}
 	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or {active=false}
-	M.target_frame = cooldowns_frame.new('Target Cooldowns', A(.8, .2, .2), cooldowns_settings.TARGET)
-	M.targettarget_frame = cooldowns_frame.new('Target Target Cooldowns', A(.2, .2, .8), cooldowns_settings.TARGETTARGET)
+	M.target_frame = cooldowns_frame.new('Target Cooldowns', {.8, .2, .2}, cooldowns_settings.TARGET)
+	M.targettarget_frame = cooldowns_frame.new('Target Target Cooldowns', {.2, .2, .8}, cooldowns_settings.TARGETTARGET)
 
 	events = CreateFrame('Frame')
 	events:SetScript('OnUpdate', UPDATE)
@@ -266,7 +266,7 @@ function M.setup()
 	end
 	events:RegisterEvent('PLAYER_TARGET_CHANGED')
 
-	recent_targets = T
+	recent_targets = {}
 end
 
 function combat_log_event_handler()
@@ -293,7 +293,7 @@ function expired(cooldown)
 end
 
 do
-	local active_cooldowns = T
+	local active_cooldowns = {}
 	function get_active_cooldowns()
 		for k, v in active_cooldowns do
 			if expired(v) then
@@ -375,7 +375,9 @@ end
 function PLAYER_TARGET_CHANGED()
 	if UnitIsEnemy('target', 'player') then
 		tinsert(recent_targets, 1, O('name', UnitName('target'), 'class', UnitClass('target')))
-		if getn(recent_targets) > 100 then release(tremove(recent_targets)) end
+		if getn(recent_targets) > 100 then
+			release(tremove(recent_targets))
+		end
 	end
 	update_frame(target_frame, UnitName('target'), UnitClass('target'))
 end
@@ -383,8 +385,11 @@ end
 do
 	local skip = 0
 	function UPDATE()
-		if skip ~= 0 then return end
-		skip = mod(skip - 1, 6)
+		if skip > 0 then
+			skip = skip - 1
+			return
+		end
+		skip = 5
 		if cooldowns_settings.TARGETTARGET.active then
 			update_frame(targettarget_frame, UnitName('targettarget'), UnitClass('targettarget'))
 		end

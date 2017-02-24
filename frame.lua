@@ -3,25 +3,25 @@ module 'cooldowns.frame'
 include 'T'
 include 'cooldowns'
 
-ORIENTATIONS = A('RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR')
+local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
-DEFAULT_SETTINGS = O(
-	'active', true,
-	'locked', false,
-	'x', UIParent:GetCenter(),
-	'y', (temp-A(UIParent:GetCenter()))[2],
-	'scale', 1,
-	'size', 15,
-	'line', 8,
-	'spacing', .1,
-	'orientation', 'RU',
-	'skin', 'darion',
-	'count', true,
-	'blink', 0,
-	'animation', false,
-	'clickthrough', false,
-	'ignore_list', ''
-)
+local DEFAULT_SETTINGS = {
+	active = true,
+	locked = false,
+	x = UIParent:GetCenter(),
+	y = (temp-A(UIParent:GetCenter()))[2],
+	scale = 1,
+	size = 15,
+	line = 8,
+	spacing = .1,
+	orientation = 'RU',
+	skin = 'darion',
+	count = true,
+	blink = 0,
+	animation = false,
+	clickthrough = false,
+	ignore_list = '',
+}
 
 function M.new(title, color, settings)
 	local self = T
@@ -34,7 +34,7 @@ function M.new(title, color, settings)
 	return self
 end
 
-method = T
+method = {}
 
 function method:LoadSettings(settings)
 	for k, v in DEFAULT_SETTINGS do

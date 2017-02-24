@@ -39,15 +39,24 @@ function M.contains(list, str)
 	end
 end
 
-function ADDON_LOADED()
-	if arg1 ~= 'cooldowns' then return end
+do
+	local setup = {}
 
-	_G.SLASH_COOLDOWNS1 = '/cooldowns'
-	_G.SLASH_COOLDOWNS2 = '/cds'
-	_G.SlashCmdList.COOLDOWNS = SLASH
+	function M.set_SETUP(f)
+		tinsert(setup, f)
+	end
 
-	cooldowns_player.setup()
-	cooldowns_target.setup()
+	function ADDON_LOADED()
+		if arg1 ~= 'cooldowns' then return end
+
+		_G.SLASH_COOLDOWNS1 = '/cooldowns'
+		_G.SLASH_COOLDOWNS2 = '/cds'
+		SlashCmdList.COOLDOWNS = SLASH
+
+		for _, f in setup do
+			f()
+		end
+	end
 end
 
 function parse_number(params)
