@@ -1,8 +1,8 @@
 ## Interface: 11200
-## Title: cooldowns
-## Notes: Cooldown timers
+## Title: cdframes
+## Notes: Cooldown timer frames
 ## Author: shirsig
-## SavedVariables: cooldowns_settings
+## SavedVariables: cdframes
 libs\module.lua
 libs\T.lua
 core.lua

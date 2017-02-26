@@ -1,10 +1,10 @@
-module 'cooldowns'
+module 'cdframes'
 
 include 'T'
 
-local cooldowns_frame = require 'cooldowns.frame'
-local cooldowns_player = require 'cooldowns.player'
-local cooldowns_other = require 'cooldowns.other'
+local cdframes_frame = require 'cdframes.frame'
+local cdframes_player = require 'cdframes.player'
+local cdframes_other = require 'cdframes.other'
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 
@@ -14,30 +14,37 @@ do
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-local strings = {
-	PLAYER = [[UnitName'player']],
-	TARGET = [[UnitName'target']],
+_G.cdframes = {
+	used = true,
+	frames = {
+		PLAYER = {code=[[UnitName'player']], settings={}},
+		TARGET = {code=[[UnitName'target']], settings={}},
+	},
 }
+
 local chunks, frames = {}, {}
 
 function update_chunks()
-	chunks = {}
-	for k, v in strings do
-		chunks[k] = loadstring('return ' .. v)
-		cooldowns_settings.frames[k] = cooldowns_settings.frames[k] or {}
-		frames[k] = frames[k] or cooldowns_frame.new(k, cooldowns_settings.frames[k])
+	for k, v in cdframes.frames do
+		chunks[k] = loadstring('return ' .. v.code)
+		frames[k] = frames[k] or cdframes_frame.new(k)
+		frames[k]:LoadSettings(v.settings)
 	end
 end
 
 CreateFrame'Frame':SetScript('OnUpdate', function()
-	for k, chunk in chunks do
-		local unit = chunk()
-		if unit == UnitName'player' then
-			frames[k]:Update(cooldowns_player.cooldowns)
-		else
-			frames[k]:Update(cooldowns_other.cooldowns(unit))
+	update_chunks()
+
+	this:SetScript('OnUpdate', function()
+		for k in cdframes.frames do
+			local unit = chunks[k]()
+			if unit == UnitName'player' then
+				frames[k]:Update(cdframes_player.cooldowns)
+			else
+				frames[k]:Update(cdframes_other.cooldowns(unit))
+			end
 		end
-	end
+	end)
 end)
 
 function M.print(msg)
@@ -61,32 +68,10 @@ function M.contains(list, str)
 	end
 end
 
-do
-	local setup = {}
-
-	function M.set_SETUP(f)
-		tinsert(setup, f)
-	end
-
-	function ADDON_LOADED()
-		if arg1 ~= 'cooldowns' then return end
-
-		_G.cooldowns_settings = cooldowns_settings or {}
-		if cooldowns_settings.used == nil then
-			cooldowns_settings.used = true
-		end
-		cooldowns_settings.frames = cooldowns_settings.frames or {}
-
-		_G.SLASH_COOLDOWNS1 = '/cooldowns'
-		_G.SLASH_COOLDOWNS2 = '/cds'
-		SlashCmdList.COOLDOWNS = SLASH
-
-		for _, f in setup do
-			f()
-		end
-
-		update_chunks()
-	end
+function tokenize(str)
+	local tokens = T
+	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
+	return tokens
 end
 
 function parse_number(params)
@@ -96,83 +81,86 @@ function parse_number(params)
 	return params.integer and floor(number + .5) or number
 end
 
-function SLASH(str)
+_G.SLASH_COOLDOWNS1 = '/cdframes'
+function SlashCmdList.COOLDOWNS(str)
 	str = strupper(str)
 	local parameters = tokenize(str)
 	if parameters[1] == 'USED' then
-		cooldowns_settings.used = not cooldowns_settings.used
-		return
+		cdframes.used = not cdframes.used
 	elseif parameters[1] == 'FRAME' then
 		if parameters[2] then
-			strings[parameters[2]] = parameters[3] or [['']]
+			if parameters[3] then
+				cdframes.frames[parameters[2]] = {code=parameters[3], settings={}}
+			elseif cdframes.frames[parameters[2]] then
+				frames[parameters[2]]:Hide()
+				cdframes.frames[parameters[2]] = nil
+			end
+			update_chunks()
 		else
 			for k, v in strings do
 				print(k .. ': ' .. v)
 			end
 		end
-	end
---
---	for _, key in elems(parameters[1]) do
---		if strings[key]
---	end
---
---		tremove(parameters, 1)
---	end
-	for key in strings do
-		local settings = cooldowns_settings.frames[key]
-		if parameters[1] == 'LOCK' then
-			settings.locked = true
-		elseif parameters[1] == 'UNLOCK' then
-			settings.locked = false
-		elseif parameters[1] == 'SIZE' then
-			settings.size = parse_number{input=parameters[2], min=1, max=100, default=16, integer=true}
-		elseif parameters[1] == 'LINE' then
-			settings.line = parse_number{input=parameters[2], min=1, max=100, default=8, integer=true}
-		elseif parameters[1] == 'SPACING' then
-			settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
-		elseif parameters[1] == 'SCALE' then
-			local scale = parse_number{input=parameters[2], min=.5, max=2, default=1}
-			settings.x = settings.x * settings.scale / scale
-			settings.y = settings.y * settings.scale / scale
-			settings.scale = scale
-		elseif parameters[1] == 'SKIN' then
-			settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'darion'
-		elseif parameters[1] == 'COUNT' then
-			settings.count = not settings.count
-		elseif parameters[1] == 'BLINK' then
-			settings.blink = parse_number{input=parameters[2], min=0, default=7}
-		elseif parameters[1] == 'ANIMATION' then
-			settings.animation = not settings.animation
-		elseif parameters[1] == 'CLICKTHROUGH' then
-			settings.clickthrough = not settings.clickthrough
-		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
-			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
-			local names = temp-T
-			for _, name in temp-elems(match) do
-				if not contains(settings.ignore_list, name) then tinsert(names, name) end
+	elseif parameters[1] then
+		local selected_frames
+		if parameters[1] == '*' then
+			selected_frames = {}
+			for k in cdframes.frames do
+				tinsert(selected_frames, k)
 			end
-			settings.ignore_list = settings.ignore_list == '' and list(unpack(names)) or settings.ignore_list .. ',' .. list(unpack(names))
-		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
-			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
-			local names = temp-T
-			for _, name in temp-elems(settings.ignore_list) do
-				if not contains(match, name) then tinsert(names, name) end
-			end
-			settings.ignore_list = list(unpack(names))
-		elseif parameters[1] == 'IGNORE' then
-			print(key .. ':')
-			for _, name in temp-elems(settings.ignore_list) do print(name) end
-		elseif parameters[1] == 'RESET' then
-			wipe(settings)
 		else
-			return
+			selected_frames = elems(parameters[1])
 		end
-		frames[key]:LoadSettings(settings)
+		for _, k in selected_frames do
+			local settings = cdframes.frames[k].settings
+			if parameters[2] == 'LOCK' then
+				settings.locked = true
+			elseif parameters[2] == 'UNLOCK' then
+				settings.locked = false
+			elseif parameters[2] == 'SIZE' then
+				settings.size = parse_number{input=parameters[3], min=1, max=100, default=16, integer=true}
+			elseif parameters[2] == 'LINE' then
+				settings.line = parse_number{input=parameters[3], min=1, max=100, default=8, integer=true}
+			elseif parameters[2] == 'SPACING' then
+				settings.spacing = parse_number{input=parameters[3], min=0, max=1, default=0}
+			elseif parameters[2] == 'SCALE' then
+				local scale = parse_number{input=parameters[3], min=.5, max=2, default=1}
+				settings.x = settings.x * settings.scale / scale
+				settings.y = settings.y * settings.scale / scale
+				settings.scale = scale
+			elseif parameters[2] == 'SKIN' then
+				settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[3] or '')] and strlower(parameters[3]) or 'darion'
+			elseif parameters[2] == 'COUNT' then
+				settings.count = not settings.count
+			elseif parameters[2] == 'BLINK' then
+				settings.blink = parse_number{input=parameters[3], min=0, default=7}
+			elseif parameters[2] == 'ANIMATION' then
+				settings.animation = not settings.animation
+			elseif parameters[2] == 'CLICKTHROUGH' then
+				settings.clickthrough = not settings.clickthrough
+			elseif parameters[2] == 'IGNORE' and parameters[3] == 'ADD' then
+				local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
+				local names = temp-T
+				for _, name in temp-elems(match) do
+					if not contains(settings.ignore_list, name) then tinsert(names, name) end
+				end
+				settings.ignore_list = settings.ignore_list == '' and list(unpack(names)) or settings.ignore_list .. ',' .. list(unpack(names))
+			elseif parameters[2] == 'IGNORE' and parameters[3] == 'REMOVE' then
+				local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
+				local names = temp-T
+				for _, name in temp-elems(settings.ignore_list) do
+					if not contains(match, name) then tinsert(names, name) end
+				end
+				settings.ignore_list = list(unpack(names))
+			elseif parameters[2] == 'IGNORE' then
+				print(k .. ':')
+				for _, name in temp-elems(settings.ignore_list) do print(name) end
+			elseif parameters[2] == 'RESET' then
+				wipe(settings)
+			else
+				return
+			end
+			frames[k]:LoadSettings(settings)
+		end
 	end
-end
-
-function tokenize(str)
-	local tokens = T
-	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
-	return tokens
 end

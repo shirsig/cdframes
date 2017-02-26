@@ -1,7 +1,7 @@
-module 'cooldowns.frame'
+module 'cdframes.frame'
 
 include 'T'
-include 'cooldowns'
+include 'cdframes'
 
 local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
@@ -23,7 +23,7 @@ local DEFAULT_SETTINGS = {
 }
 
 do
-	local apply = {
+	local t = {
 		blizzard = function(frame)
 			frame:SetWidth(33.5)
 			frame:SetHeight(33.5)
@@ -123,17 +123,14 @@ do
 			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
 		end,
 	}
-	function skin(frame, skin)
-		apply[skin](frame)
+	function apply_skin(frame, skin)
+		t[skin](frame)
 	end
 end
 
-function M.new(code, settings)
-	local self = T
+function M.new(key)
+	local self = O('title', key)
 	for k, v in method do self[k] = v end
-	self.title = code
-	self.iconFramePool = T
-	self:LoadSettings(settings)
 	return self
 end
 
@@ -174,7 +171,7 @@ function method:CreateFrames()
 	end
 	for i = 1, self.settings.size do
 		local cd_frame = self.frame.cd_frames[i]
-		skin(cd_frame, self.settings.skin)
+		apply_skin(cd_frame, self.settings.skin)
 		cd_frame:EnableMouse(not self.settings.clickthrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
 	end

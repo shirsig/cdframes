@@ -1,7 +1,7 @@
-module 'cooldowns.other'
+module 'cdframes.other'
 
 include 'T'
-include 'cooldowns'
+include 'cdframes'
 
 local DATA = {
 	-- Trinkets & Racials

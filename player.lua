@@ -1,7 +1,7 @@
-module 'cooldowns.player'
+module 'cdframes.player'
 
 include 'T'
-include 'cooldowns'
+include 'cdframes'
 
 local last_used
 
@@ -18,7 +18,7 @@ do
 		return t
 	end
 	function start_cooldown(name, icon, started, duration, pet)
-		if cooldowns_settings.used and not pet and name ~= last_used then
+		if cdframes.used and not pet and name ~= last_used then
 			return
 		end
 		t[name] = O(
@@ -37,19 +37,19 @@ do
 	end
 end
 
-function SETUP()
-	do
-		local frame = CreateFrame'Frame'
-		frame:SetScript('OnEvent', function() _M[event]() end)
-		frame:RegisterEvent('BAG_UPDATE_COOLDOWN')
-		frame:RegisterEvent('SPELL_UPDATE_COOLDOWN')
-		frame:RegisterEvent('SPELLCAST_START')
-		frame:RegisterEvent('SPELLCAST_STOP')
-		frame:RegisterEvent('CHAT_MSG_SPELL_FAILED_LOCALPLAYER')
-	end
+CreateFrame'Frame':SetScript('OnUpdate', function()
+	local f = CreateFrame'Frame'
+	f:SetScript('OnEvent', function() _M[event]() end)
+	f:RegisterEvent('BAG_UPDATE_COOLDOWN')
+	f:RegisterEvent('SPELL_UPDATE_COOLDOWN')
+	f:RegisterEvent('SPELLCAST_START')
+	f:RegisterEvent('SPELLCAST_STOP')
+	f:RegisterEvent('CHAT_MSG_SPELL_FAILED_LOCALPLAYER')
 	BAG_UPDATE_COOLDOWN()
 	SPELL_UPDATE_COOLDOWN()
-end
+
+	this:SetScript('OnUpdate', nil)
+end)
 
 function BAG_UPDATE_COOLDOWN()
 	for bag = 0, 4 do
