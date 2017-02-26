@@ -233,7 +233,7 @@ local PATTERNS = {
 
 local PARTIAL_PATTERN = "You are afflicted by (.+)%."
 
-local recent_targets = {}
+local recent, class = {}, {}
 
 do
 	local t = {}
@@ -241,7 +241,7 @@ do
 		local time = GetTime()
 		if t[unit] then
 			for k, v in t[unit] do
-				if v.started + v.duration <= time then -- TODO or DATA[k].classes and not contains(DATA[k].classes, class[unit]) then
+				if v.started + v.duration <= time or class[unit] and DATA[k].classes and not contains(DATA[k].classes, class[unit]) then
 					release(t[unit][k])
 					t[unit][k] = nil
 				end
@@ -303,7 +303,7 @@ do
 	} do f:RegisterEvent(event) end
 	f:SetScript('OnEvent', function()
 		for action in string.gfind(arg1, PARTIAL_PATTERN) do
-			for _, enemy in recent_targets do
+			for _, enemy in recent do
 				if DATA[action] and not active_cooldowns[enemy.name .. '|' .. action] and (not DATA[action].classes or contains(DATA[action].classes, enemy.class)) then
 					start_cooldown(enemy.name, action)
 					break
@@ -326,13 +326,25 @@ do
 	f:RegisterEvent'PLAYER_TARGET_CHANGED'
 	f:SetScript('OnEvent', function()
 		if UnitIsEnemy('player', 'target') and UnitIsPlayer'target' then
-			for i, unit in recent_targets do
+			for i, unit in recent do
 				if i == 100 or unit.name == UnitName'target' then
-					release(tremove(recent_targets, i))
+					release(tremove(recent, i))
 					break
 				end
 			end
-			tinsert(recent_targets, 1, O('name', UnitName'target', 'class', UnitClass'target'))
+			tinsert(recent, 1, O('name', UnitName'target', 'class', UnitClass'target'))
+		end
+	end)
+end
+
+do
+	local f = CreateFrame'Frame'
+	f:RegisterEvent'PLAYER_TARGET_CHANGED'
+	f:RegisterEvent'UPDATE_MOUSEOVER_UNIT'
+	f:SetScript('OnEvent', function()
+		local unit = event == 'PLAYER_TARGET_CHANGED' and 'target' or 'mouseover'
+		if UnitIsPlayer(unit) then
+			class[UnitName(unit)] = UnitClass(unit)
 		end
 	end)
 end
