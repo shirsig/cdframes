@@ -4,7 +4,7 @@ include 'T'
 
 local cooldowns_frame = require 'cooldowns.frame'
 local cooldowns_player = require 'cooldowns.player'
-local cooldowns_target = require 'cooldowns.target'
+local cooldowns_other = require 'cooldowns.other'
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 
@@ -15,18 +15,17 @@ do
 end
 
 local strings = {
-	player = [[UnitName'player']],
-	target = [[UnitName'target']],
-	mouseover = [[UnitName'mouseover']],
+	PLAYER = [[UnitName'player']],
+	TARGET = [[UnitName'target']],
 }
-local chunks, frames
+local chunks, frames = {}, {}
 
 function update_chunks()
 	chunks = {}
 	for k, v in strings do
 		chunks[k] = loadstring('return ' .. v)
 		cooldowns_settings.frames[k] = cooldowns_settings.frames[k] or {}
-		frames[k] = frames[k] or cooldowns_frame.new(v, cooldowns_settings.frames[k])
+		frames[k] = frames[k] or cooldowns_frame.new(k, cooldowns_settings.frames[k])
 	end
 end
 
@@ -36,7 +35,7 @@ CreateFrame'Frame':SetScript('OnUpdate', function()
 		if unit == UnitName'player' then
 			frames[k]:Update(cooldowns_player.cooldowns)
 		else
-			frames[k]:Update(cooldowns_target.cooldowns(unit))
+			frames[k]:Update(cooldowns_other.cooldowns(unit))
 		end
 	end
 end)
@@ -85,6 +84,8 @@ do
 		for _, f in setup do
 			f()
 		end
+
+		update_chunks()
 	end
 end
 
@@ -97,78 +98,80 @@ end
 
 function SLASH(str)
 	str = strupper(str)
-	local parameters, frames = tokenize(str), temp-T
+	local parameters = tokenize(str)
 	if parameters[1] == 'USED' then
 		cooldowns_settings.used = not cooldowns_settings.used
 		return
+	elseif parameters[1] == 'FRAME' then
+		if parameters[2] then
+			strings[parameters[2]] = parameters[3] or [['']]
+		else
+			for k, v in strings do
+				print(k .. ': ' .. v)
+			end
+		end
 	end
-	if contains(parameters[1] or '', 'PLAYER') then
-		frames[cooldowns_player.frame] = true
-	end
-	if contains(parameters[1] or '', 'TARGET') then
-		frames[cooldowns_target.target_frame] = true
-	end
-	if contains(parameters[1] or '', 'TARGETTARGET') then
-		frames[cooldowns_target.targettarget_frame] = true
-	end
-	if not next(frames) then
-		frames = temp-S(cooldowns_player.frame, cooldowns_target.target_frame, cooldowns_target.targettarget_frame)
-	else
-		tremove(parameters, 1)
-	end
-	for frame in frames do
+--
+--	for _, key in elems(parameters[1]) do
+--		if strings[key]
+--	end
+--
+--		tremove(parameters, 1)
+--	end
+	for key in strings do
+		local settings = cooldowns_settings.frames[key]
 		if parameters[1] == 'ON' then
-			frame.settings.active = true
+			settings.active = true
 		elseif parameters[1] == 'OFF' then
-			frame.settings.active = false
+			settings.active = false
 		elseif parameters[1] == 'LOCK' then
-			frame.settings.locked = true
+			settings.locked = true
 		elseif parameters[1] == 'UNLOCK' then
-			frame.settings.locked = false
+			settings.locked = false
 		elseif parameters[1] == 'SIZE' then
-			frame.settings.size = parse_number{input=parameters[2], min=1, max=100, default=16, integer=true}
+			settings.size = parse_number{input=parameters[2], min=1, max=100, default=16, integer=true}
 		elseif parameters[1] == 'LINE' then
-			frame.settings.line = parse_number{input=parameters[2], min=1, max=100, default=8, integer=true}
+			settings.line = parse_number{input=parameters[2], min=1, max=100, default=8, integer=true}
 		elseif parameters[1] == 'SPACING' then
-			frame.settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
+			settings.spacing = parse_number{input=parameters[2], min=0, max=1, default=0}
 		elseif parameters[1] == 'SCALE' then
 			local scale = parse_number{input=parameters[2], min=.5, max=2, default=1}
-			frame.settings.x = frame.settings.x * frame.settings.scale / scale
-			frame.settings.y = frame.settings.y * frame.settings.scale / scale
-			frame.settings.scale = scale
+			settings.x = settings.x * settings.scale / scale
+			settings.y = settings.y * settings.scale / scale
+			settings.scale = scale
 		elseif parameters[1] == 'SKIN' then
-			frame.settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'darion'
+			settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2]) or 'darion'
 		elseif parameters[1] == 'COUNT' then
-			frame.settings.count = not frame.settings.count
+			settings.count = not settings.count
 		elseif parameters[1] == 'BLINK' then
-			frame.settings.blink = parse_number{input=parameters[2], min=0, default=7}
+			settings.blink = parse_number{input=parameters[2], min=0, default=7}
 		elseif parameters[1] == 'ANIMATION' then
-			frame.settings.animation = not frame.settings.animation
+			settings.animation = not settings.animation
 		elseif parameters[1] == 'CLICKTHROUGH' then
-			frame.settings.clickthrough = not frame.settings.clickthrough
+			settings.clickthrough = not settings.clickthrough
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 			local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
 			local names = temp-T
 			for _, name in temp-elems(match) do
-				if not contains(frame.settings.ignore_list, name) then tinsert(names, name) end
+				if not contains(settings.ignore_list, name) then tinsert(names, name) end
 			end
-			frame.settings.ignore_list = frame.settings.ignore_list == '' and list(unpack(names)) or frame.settings.ignore_list .. ',' .. list(unpack(names))
+			settings.ignore_list = settings.ignore_list == '' and list(unpack(names)) or settings.ignore_list .. ',' .. list(unpack(names))
 		elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 			local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
 			local names = temp-T
-			for _, name in temp-elems(frame.settings.ignore_list) do
+			for _, name in temp-elems(settings.ignore_list) do
 				if not contains(match, name) then tinsert(names, name) end
 			end
-			frame.settings.ignore_list = list(unpack(names))
+			settings.ignore_list = list(unpack(names))
 		elseif parameters[1] == 'IGNORE' then
-			print(frame.title .. ':')
-			for _, name in temp-elems(frame.settings.ignore_list) do print(name) end
+			print(key .. ':')
+			for _, name in temp-elems(settings.ignore_list) do print(name) end
 		elseif parameters[1] == 'RESET' then
-			wipe(frame.settings)
+			wipe(settings)
 		else
 			return
 		end
-		frame:LoadSettings(frame.settings)
+		frames[key]:LoadSettings(settings)
 	end
 end
 

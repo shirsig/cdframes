@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Title: cooldowns
-## Notes: Cooldown timers for player, target and targettarget
+## Notes: Cooldown timers
 ## Author: shirsig
 ## SavedVariables: cooldowns_settings
 libs\module.lua

@@ -1,4 +1,4 @@
-module 'cooldowns.target'
+module 'cooldowns.other'
 
 include 'T'
 include 'cooldowns'
@@ -241,13 +241,17 @@ do
 		local time = GetTime()
 		if t[unit] then
 			for k, v in t[unit] do
-				if v.started + v.duration <= time or DATA[k].classes then -- TODO and not contains(DATA[k].classes, class[unit]) then
+				if v.started + v.duration <= time then -- TODO or DATA[k].classes and not contains(DATA[k].classes, class[unit]) then
 					release(t[unit][k])
 					t[unit][k] = nil
 				end
 			end
+			if not next(t[unit]) then
+				release(t[unit])
+				t[unit] = nil
+			end
 		end
-		return t[unit] -- TODO immutable
+		return t[unit] or empty
 	end
 	function start_cooldown(unit, action)
 		triggers(unit, action)
@@ -263,8 +267,10 @@ do
 	function stop_cooldowns(unit, ...)
 		if t[unit] then
 			for i = 1, arg.n do
-				release(t[unit][arg[i]])
-				t[unit][arg[i]] = nil
+				if t[unit][arg[i]] then
+					release(t[unit][arg[i]])
+					t[unit][arg[i]] = nil
+				end
 			end
 		end
 	end

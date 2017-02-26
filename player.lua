@@ -5,8 +5,39 @@ include 'cooldowns'
 
 local last_used
 
+do
+	local t = {}
+	function M.get_cooldowns()
+		local time = GetTime()
+		for k, v in t do
+			if v.started + v.duration <= time then
+				release(t[k])
+				t[k] = nil
+			end
+		end
+		return t
+	end
+	function start_cooldown(name, icon, started, duration, pet)
+		if cooldowns_settings.used and not pet and name ~= last_used then
+			return
+		end
+		t[name] = O(
+			'name', name,
+			'info', '',
+			'icon', icon,
+			'started', started,
+			'duration', duration
+		)
+	end
+	function stop_cooldown(name)
+		if t[name] then
+			release(t[name])
+			t[name] = nil
+		end
+	end
+end
+
 function SETUP()
-	cooldowns_settings.PLAYER = cooldowns_settings.PLAYER or {}
 	do
 		local frame = CreateFrame'Frame'
 		frame:SetScript('OnEvent', function() _M[event]() end)
@@ -90,30 +121,6 @@ function SPELL_UPDATE_COOLDOWN()
 		elseif duration == 0 then
 			stop_cooldown(name)
 		end
-	end
-end
-
-do
-	local t = {}
-	do
-		local t = setmetatable({}, {__metatable=false, __newindex=nop, __index=t})
-		function get_cooldowns()
-			return t
-		end
-	end
-	function start_cooldown(name, icon, started, duration, pet)
-		if cooldowns_settings.used and not pet and name ~= last_used then return end
-		t[name] = O(
-			'name', name,
-			'info', '',
-			'icon', icon,
-			'started', started,
-			'duration', duration
-		)
-	end
-	function stop_cooldown(name)
-		release(t[name])
-		t[name] = nil
 	end
 end
 

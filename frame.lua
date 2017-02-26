@@ -98,7 +98,6 @@ do
 			frame.gloss:SetWidth(40)
 			frame.gloss:SetHeight(40)
 			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Gloss]])
-			frame.gloss:SetTexCoord(0, 1, 0, 1)
 
 			frame.cooldown:SetScale(34/36)
 
@@ -166,7 +165,6 @@ function method:CreateFrames()
 		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
 		frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
-		frame:SetScript('OnUpdate', function() return self.settings.locked and self:Update() end)
 		frame.cd_frames = T
 	end
 	for i = getn(self.frame.cd_frames) + 1, self.settings.size do
@@ -365,6 +363,10 @@ function method:Ignored(name)
 end
 
 function method:Update(cooldowns)
+	if not self.settings.locked then
+		return
+	end
+
 	local tm = GetTime()
 
 	local cooldown_list = temp-T
