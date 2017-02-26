@@ -303,11 +303,13 @@ do
 	} do f:RegisterEvent(event) end
 	f:SetScript('OnEvent', function()
 		for action in string.gfind(arg1, PARTIAL_PATTERN) do
-			for _, enemy in recent do
-				local cooldowns = cooldowns(enemy.name)
-				if DATA[action] and not (cooldowns and cooldowns[action]) and (not DATA[action].classes or contains(DATA[action].classes, enemy.class)) then
-					start_cooldown(enemy.name, action)
-					break
+			if DATA[action] then
+				for _, enemy in recent do
+					local cooldowns = cooldowns(enemy.name)
+					if not (cooldowns and cooldowns[action]) and (not DATA[action].classes or contains(DATA[action].classes, enemy.class)) then
+						start_cooldown(enemy.name, action)
+						break
+					end
 				end
 			end
 		end
