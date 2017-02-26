@@ -3,6 +3,9 @@ module 'cdframes.frame'
 include 'T'
 include 'cdframes'
 
+local cdframes_player = require 'cdframes.player'
+local cdframes_other = require 'cdframes.other'
+
 local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 local DEFAULT_SETTINGS = {
@@ -71,7 +74,7 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(38)
 			frame.border:SetHeight(38)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\elvui\Border]])
+			frame.border:SetTexture([[Interface\Addons\cdframes\Textures\elvui\Border]])
 			frame.border:SetVertexColor(0, 0, 0)
 
 			frame.gloss:SetTexture()
@@ -91,12 +94,12 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(40)
 			frame.border:SetHeight(40)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Border]])
+			frame.border:SetTexture([[Interface\Addons\cdframes\Textures\darion\Border]])
 			frame.border:SetVertexColor(.2, .2, .2)
 
 			frame.gloss:SetWidth(40)
 			frame.gloss:SetHeight(40)
-			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Gloss]])
+			frame.gloss:SetTexture([[Interface\Addons\cdframes\Textures\darion\Gloss]])
 
 			frame.cooldown:SetScale(34/36)
 
@@ -113,7 +116,7 @@ do
 			frame.border:SetPoint('CENTER', 0, 0)
 			frame.border:SetWidth(38.5)
 			frame.border:SetHeight(38.5)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\modui\Border]])
+			frame.border:SetTexture([[Interface\Addons\cdframes\Textures\modui\Border]])
 			frame.border:SetVertexColor(.22, .22, .22)
 
 			frame.gloss:SetTexture()
@@ -137,6 +140,7 @@ end
 method = {}
 
 function method:LoadSettings(settings)
+	self.unit = loadstring('return ' .. settings.code)
 	for k, v in DEFAULT_SETTINGS do
 		if settings[k] == nil then settings[k] = v end
 	end
@@ -158,9 +162,10 @@ function method:CreateFrames()
 			this:StopMovingOrSizing()
 			self.settings.x, self.settings.y = this:GetCenter()
 		end)
-		frame:SetScript('OnClick', function() self:OnClick() end) -- TODO string lambdas?
+		frame:SetScript('OnClick', function() self:OnClick() end)
 		frame:SetScript('OnEnter', function() self:Tooltip() end)
 		frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
+		frame:SetScript('OnUpdate', function() self:Update() end)
 		frame.cd_frames = T
 	end
 	for i = getn(self.frame.cd_frames) + 1, self.settings.size do
@@ -199,7 +204,7 @@ function method:CDFrame()
 
 	frame.background = frame:CreateTexture(nil, 'BACKGROUND')
 	frame.background:SetAllPoints(frame.icon)
-	frame.background:SetTexture(.5, .5, .5)
+	frame.background:SetTexture(0, 0, 0)
 	frame.background:SetAlpha(.6)
 
 	frame.border = frame:CreateTexture(nil, 'ARTWORK')
@@ -361,6 +366,13 @@ end
 function method:Update(cooldowns)
 	if not self.settings.locked then
 		return
+	end
+
+	local cooldowns
+	if self.unit() == UnitName'player' then
+		cooldowns = cdframes_player.cooldowns
+	else
+		cooldowns = cdframes_other.cooldowns(self.unit())
 	end
 
 	local tm = GetTime()

@@ -3,48 +3,30 @@ module 'cdframes'
 include 'T'
 
 local cdframes_frame = require 'cdframes.frame'
-local cdframes_player = require 'cdframes.player'
-local cdframes_other = require 'cdframes.other'
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
-
-do
-	local frame = CreateFrame'Frame'
-	frame:SetScript('OnEvent', function() _M[event]() end)
-	frame:RegisterEvent('ADDON_LOADED')
-end
 
 _G.cdframes = {
 	used = true,
 	frames = {
-		PLAYER = {code=[[UnitName'player']], settings={}},
-		TARGET = {code=[[UnitName'target']], settings={}},
+		PLAYER = {code=[[UnitName'player']]},
+		TARGET = {code=[[UnitName'target']]},
 	},
 }
 
-local chunks, frames = {}, {}
+local frames = {}
 
-function update_chunks()
+function update_frames()
 	for k, v in cdframes.frames do
-		chunks[k] = loadstring('return ' .. v.code)
 		frames[k] = frames[k] or cdframes_frame.new(k)
-		frames[k]:LoadSettings(v.settings)
+		frames[k]:LoadSettings(v)
+--		frames[k]:Show()
 	end
 end
 
 CreateFrame'Frame':SetScript('OnUpdate', function()
-	update_chunks()
-
-	this:SetScript('OnUpdate', function()
-		for k in cdframes.frames do
-			local unit = chunks[k]()
-			if unit == UnitName'player' then
-				frames[k]:Update(cdframes_player.cooldowns)
-			else
-				frames[k]:Update(cdframes_other.cooldowns(unit))
-			end
-		end
-	end)
+	update_frames()
+	this:SetScript('OnUpdate', nil)
 end)
 
 function M.print(msg)
@@ -90,12 +72,12 @@ function SlashCmdList.COOLDOWNS(str)
 	elseif parameters[1] == 'FRAME' then
 		if parameters[2] then
 			if parameters[3] then
-				cdframes.frames[parameters[2]] = {code=parameters[3], settings={}}
+				cdframes.frames[parameters[2]] = {code=parameters[3]}
 			elseif cdframes.frames[parameters[2]] then
 				frames[parameters[2]]:Hide()
 				cdframes.frames[parameters[2]] = nil
 			end
-			update_chunks()
+			update_frames()
 		else
 			for k, v in strings do
 				print(k .. ': ' .. v)
@@ -112,7 +94,7 @@ function SlashCmdList.COOLDOWNS(str)
 			selected_frames = elems(parameters[1])
 		end
 		for _, k in selected_frames do
-			local settings = cdframes.frames[k].settings
+			local settings = cdframes.frames[k]
 			if parameters[2] == 'LOCK' then
 				settings.locked = true
 			elseif parameters[2] == 'UNLOCK' then
