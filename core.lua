@@ -20,7 +20,6 @@ function update_frames()
 	for k, v in cdframes.frames do
 		frames[k] = frames[k] or cdframes_frame.new(k)
 		frames[k]:LoadSettings(v)
---		frames[k]:Show()
 	end
 end
 
@@ -65,22 +64,22 @@ end
 
 _G.SLASH_COOLDOWNS1 = '/cdframes'
 function SlashCmdList.COOLDOWNS(str)
-	str = strupper(str)
-	local parameters = tokenize(str)
+	local parameters = tokenize(strupper(str))
 	if parameters[1] == 'USED' then
 		cdframes.used = not cdframes.used
 	elseif parameters[1] == 'FRAME' then
 		if parameters[2] then
-			if parameters[3] then
-				cdframes.frames[parameters[2]] = {code=parameters[3]}
+			local _, _, code = strfind(str, '%s*%S+%s+%S+%s+(.*)')
+			if code then
+				cdframes.frames[parameters[2]] = {code=code}
 			elseif cdframes.frames[parameters[2]] then
-				frames[parameters[2]]:Hide()
+				frames[parameters[2]]:LoadSettings{code=[[nil]], locked=true}
 				cdframes.frames[parameters[2]] = nil
 			end
 			update_frames()
 		else
-			for k, v in strings do
-				print(k .. ': ' .. v)
+			for k, v in cdframes.frames do
+				print(k .. ': ' .. v.code)
 			end
 		end
 	elseif parameters[1] then
@@ -121,14 +120,14 @@ function SlashCmdList.COOLDOWNS(str)
 			elseif parameters[2] == 'CLICKTHROUGH' then
 				settings.clickthrough = not settings.clickthrough
 			elseif parameters[2] == 'IGNORE' and parameters[3] == 'ADD' then
-				local _, _, match = strfind(str, '[^,]*ADD%s+(.-)%s*$')
+				local _, _, match = strfind(strupper(str), '[^,]*ADD%s+(.-)%s*$')
 				local names = temp-T
 				for _, name in temp-elems(match) do
 					if not contains(settings.ignore_list, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = settings.ignore_list == '' and list(unpack(names)) or settings.ignore_list .. ',' .. list(unpack(names))
 			elseif parameters[2] == 'IGNORE' and parameters[3] == 'REMOVE' then
-				local _, _, match = strfind(str, '[^,]*REMOVE%s+(.-)%s*$')
+				local _, _, match = strfind(strupper(str), '[^,]*REMOVE%s+(.-)%s*$')
 				local names = temp-T
 				for _, name in temp-elems(settings.ignore_list) do
 					if not contains(match, name) then tinsert(names, name) end
