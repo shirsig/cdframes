@@ -120,11 +120,7 @@ function SLASH(str)
 --	end
 	for key in strings do
 		local settings = cooldowns_settings.frames[key]
-		if parameters[1] == 'ON' then
-			settings.active = true
-		elseif parameters[1] == 'OFF' then
-			settings.active = false
-		elseif parameters[1] == 'LOCK' then
+		if parameters[1] == 'LOCK' then
 			settings.locked = true
 		elseif parameters[1] == 'UNLOCK' then
 			settings.locked = false

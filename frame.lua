@@ -6,7 +6,6 @@ include 'cooldowns'
 local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 
 local DEFAULT_SETTINGS = {
-	active = true,
 	locked = false,
 	x = UIParent:GetCenter(),
 	y = (temp-A(UIParent:GetCenter()))[2],
@@ -242,7 +241,7 @@ end
 
 function method:Configure()
 	self:CreateFrames()
-	if self.settings.active then self.frame:Show() else self.frame:Hide() end
+	self.frame:Show()
 	if self.settings.locked then self:Lock() else self:Unlock() end
 	self:PlaceFrames()
 end
