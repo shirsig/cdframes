@@ -3,9 +3,7 @@ module 'cooldowns.target'
 include 'T'
 include 'cooldowns'
 
-local cooldowns_frame = require 'cooldowns.frame'
-
-local COOLDOWNS = {
+local DATA = {
 	-- Trinkets & Racials
 	["Will of the Forsaken"] = {duration = 2*60, desc = "Provides immunity to Charm, Fear and Sleep while active. May also be used while already afflicted by Charm, Fear or Sleep. Lasts 5 sec.", icon = "Spell_Shadow_RaiseDead"},
 	["Perception"] = {duration = 3*60, desc = "Dramatically increases stealth detection for 20 sec.", icon = "Spell_Nature_Sleep"},
@@ -212,23 +210,7 @@ local COOLDOWNS = {
 	["Swiftmend"] = {duration = 15, desc = "Consumes a Rejuvenation or Regrowth effect on a friendly target to instantly heal them an amount equal to 12 sec. of Rejuvenation or 18 sec. of Regrowth.", icon = "Inv_Relics_IdolOfRejuvenation", classes = 'Druid'},
 }
 
-local COMBAT_LOG_EVENTS = {
-	'CHAT_MSG_SPELL_PARTY_DAMAGE',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
-	'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
-	'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
-	'CHAT_MSG_SPELL_PARTY_BUFF',
-	'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
-	'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
-}
-
-local COMBAT_LOG_PATTERNS = {
+local PATTERNS = {
 	"(.+) performs (.+)%.",
 	"(.+) performs (.+) on ",
 	"(.+) casts (.+)%.",
@@ -249,149 +231,102 @@ local COMBAT_LOG_PATTERNS = {
 	" immune to (.+)'s (.+)%.",
 }
 
-local COMBAT_LOG_PATTERN_PARTIAL = "You are afflicted by (.+)%."
+local PARTIAL_PATTERN = "You are afflicted by (.+)%."
 
-function SETUP()
-	cooldowns_settings.TARGET = cooldowns_settings.TARGET or {}
-	cooldowns_settings.TARGETTARGET = cooldowns_settings.TARGETTARGET or {active=false}
-	M.target_frame = cooldowns_frame.new('Target Cooldowns', {.8, .2, .2}, cooldowns_settings.TARGET)
-	M.targettarget_frame = cooldowns_frame.new('Target Target Cooldowns', {.2, .2, .8}, cooldowns_settings.TARGETTARGET)
+local recent_targets = {}
 
-	events = CreateFrame('Frame')
-	events:SetScript('OnUpdate', UPDATE)
-	events:SetScript('OnEvent', function() _M[event]() end)
-	for _, event in COMBAT_LOG_EVENTS do
-		_M[event] = combat_log_event_handler
-		events:RegisterEvent(event)
+do
+	local t = {}
+	function M.cooldowns(unit)
+		local time = GetTime()
+		if t[unit] then
+			for k, v in t[unit] do
+				if v.started + v.duration <= time or DATA[k].classes then -- TODO and not contains(DATA[k].classes, class[unit]) then
+					release(t[unit][k])
+					t[unit][k] = nil
+				end
+			end
+		end
+		return t[unit] -- TODO immutable
 	end
-	events:RegisterEvent('PLAYER_TARGET_CHANGED')
-
-	recent_targets = {}
-end
-
-function combat_log_event_handler()
-	for cooldown_name in string.gfind(arg1, COMBAT_LOG_PATTERN_PARTIAL) do
-		for _, enemy in recent_targets do
-			if COOLDOWNS[cooldown_name] and not active_cooldowns[enemy.name .. '|' .. cooldown_name] and (not COOLDOWNS[cooldown_name].classes or contains(COOLDOWNS[cooldown_name].classes, enemy.class)) then
-				start_cooldown(enemy.name, cooldown_name)
-				break
+	function start_cooldown(unit, action)
+		triggers(unit, action)
+		t[unit] = t[unit] or T
+		t[unit][action] = O(
+			'name', action,
+			'info', DATA[action].desc,
+			'icon', [[Interface\Icons\]] .. DATA[action].icon,
+			'started', GetTime(),
+			'duration', DATA[action].duration
+		)
+	end
+	function stop_cooldowns(unit, ...)
+		if t[unit] then
+			for i = 1, arg.n do
+				release(t[unit][arg[i]])
+				t[unit][arg[i]] = nil
 			end
 		end
 	end
-
-	for _, pattern in COMBAT_LOG_PATTERNS do
-		for player, cooldown_name in string.gfind(arg1, pattern) do
-			if COOLDOWNS[cooldown_name] then
-				start_cooldown(player, cooldown_name)
-			end
-		end
-	end
 end
 
-function expired(cooldown)
-	return cooldown.started + COOLDOWNS[cooldown.name].duration <= GetTime()
+function triggers(unit, action)
+	if action == 'Preparation' then
+		stop_cooldowns(unit, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
+	elseif action == 'Cold Snap' then
+		stop_cooldowns(unit, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova')
+	end
 end
 
 do
-	local active_cooldowns = {}
-	function get_active_cooldowns()
-		for k, v in active_cooldowns do
-			if expired(v) then
-				active_cooldowns[k] = nil
+	local f = CreateFrame'Frame'
+	for _, event in {
+		'CHAT_MSG_SPELL_PARTY_DAMAGE',
+		'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
+		'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
+		'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
+		'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
+		'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
+		'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
+		'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
+		'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
+		'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
+		'CHAT_MSG_SPELL_PARTY_BUFF',
+		'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
+		'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
+	} do f:RegisterEvent(event) end
+	f:SetScript('OnEvent', function()
+		for action in string.gfind(arg1, PARTIAL_PATTERN) do
+			for _, enemy in recent_targets do
+				if DATA[action] and not active_cooldowns[enemy.name .. '|' .. action] and (not DATA[action].classes or contains(DATA[action].classes, enemy.class)) then
+					start_cooldown(enemy.name, action)
+					break
+				end
 			end
 		end
-		return active_cooldowns
-	end
-end
-
-function show_cooldown(frame, key)
-	local cooldown = active_cooldowns[key]
-	if not cooldown[frame] then
-		cooldown[frame] = frame:StartCD(cooldown.name, COOLDOWNS[cooldown.name].desc, [[Interface\Icons\]] .. COOLDOWNS[cooldown.name].icon, cooldown.started, COOLDOWNS[cooldown.name].duration)
-	end
-end
-
-function hide_cooldown(frame, key)
-	local cooldown = active_cooldowns[key]
-	if cooldown[frame] then
-		frame:CancelCD(cooldown[frame])
-		cooldown[frame] = nil
-	end
-end
-
-function triggers(player, cooldown_name)
-	if cooldown_name == 'Preparation' then
-		stop_cooldowns(player, 'Kidney Shot', 'Evasion', 'Feint', 'Gouge', 'Kick', 'Sprint', 'Blind', 'Distract', 'Stealth', 'Blade Flurry', 'Adrenaline Rush', 'Ghostly Strike', 'Premeditation', 'Cold Blood')
-	elseif cooldown_name == 'Cold Snap' then
-		stop_cooldowns(player, 'Ice Block', 'Cone of Cold', 'Frost Ward', 'Ice Barrier', 'Frost Nova')
-	end
-end
-
-function start_cooldown(player, cooldown_name)
-	triggers(player, cooldown_name)
-	local key = player .. '|' .. cooldown_name
-	if active_cooldowns[key] then
-		hide_cooldown(target_frame, key)
-		hide_cooldown(targettarget_frame, key)
-	end
-	active_cooldowns[key] = O(
-		'name', cooldown_name,
-		'player', player,
-		'started', GetTime()
-	)
-	if player == UnitName('target') then
-		show_cooldown(target_frame, key)
-	end
-	if player == UnitName('targettarget') then
-		show_cooldown(targettarget_frame, key)
-	end
-end
-
-function stop_cooldowns(player, ...)
-	for i = 1, arg.n do
-		local key = player .. '|' .. arg[i]
-		if active_cooldowns[key] then
-			hide_cooldown(target_frame, key)
-			hide_cooldown(targettarget_frame, key)
-			active_cooldowns[key] = nil
-		end
-	end
-end
-
-function update_frame(frame, player_name, player_class)
-	for key, cooldown in active_cooldowns do
-		if player_name == cooldown.player then
-			if COOLDOWNS[cooldown.name].classes and not contains(COOLDOWNS[cooldown.name].classes, player_class) then
-				stop_cooldowns(cooldown.player, cooldown.name)
-			else
-				show_cooldown(frame, key)
+		for _, pattern in PATTERNS do
+			for unit, action in string.gfind(arg1, pattern) do
+				if DATA[action] then
+					start_cooldown(unit, action)
+					return
+				end
 			end
-		else
-			hide_cooldown(frame, key)
 		end
-	end
-end
-
-function PLAYER_TARGET_CHANGED()
-	if UnitIsEnemy('target', 'player') then
-		tinsert(recent_targets, 1, O('name', UnitName('target'), 'class', UnitClass('target')))
-		if getn(recent_targets) > 100 then
-			release(tremove(recent_targets))
-		end
-	end
-	update_frame(target_frame, UnitName('target'), UnitClass('target'))
+	end)
 end
 
 do
-	local skip = 0
-	function UPDATE()
-		if skip > 0 then
-			skip = skip - 1
-			return
+	local f = CreateFrame'Frame'
+	f:RegisterEvent'PLAYER_TARGET_CHANGED'
+	f:SetScript('OnEvent', function()
+		if UnitIsEnemy('player', 'target') and UnitIsPlayer'target' then
+			for i, unit in recent_targets do
+				if i == 100 or unit.name == UnitName'target' then
+					release(tremove(recent_targets, i))
+					break
+				end
+			end
+			tinsert(recent_targets, 1, O('name', UnitName'target', 'class', UnitClass'target'))
 		end
-		skip = 5
-		if cooldowns_settings.TARGETTARGET.active then
-			update_frame(targettarget_frame, UnitName('targettarget'), UnitClass('targettarget'))
-		end
-	end
+	end)
 end

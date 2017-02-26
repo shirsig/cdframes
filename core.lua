@@ -2,24 +2,47 @@ module 'cooldowns'
 
 include 'T'
 
+local cooldowns_frame = require 'cooldowns.frame'
 local cooldowns_player = require 'cooldowns.player'
 local cooldowns_target = require 'cooldowns.target'
 
 CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
 
-do local frame = CreateFrame('Frame')
+do
+	local frame = CreateFrame'Frame'
 	frame:SetScript('OnEvent', function() _M[event]() end)
 	frame:RegisterEvent('ADDON_LOADED')
 end
 
-_G.cooldowns_settings = {used=true}
+local strings = {
+	player = [[UnitName'player']],
+	target = [[UnitName'target']],
+	mouseover = [[UnitName'mouseover']],
+}
+local chunks, frames
+
+function update_chunks()
+	chunks = {}
+	for k, v in strings do
+		chunks[k] = loadstring('return ' .. v)
+		cooldowns_settings.frames[k] = cooldowns_settings.frames[k] or {}
+		frames[k] = frames[k] or cooldowns_frame.new(v, cooldowns_settings.frames[k])
+	end
+end
+
+CreateFrame'Frame':SetScript('OnUpdate', function()
+	for k, chunk in chunks do
+		local unit = chunk()
+		if unit == UnitName'player' then
+			frames[k]:Update(cooldowns_player.cooldowns)
+		else
+			frames[k]:Update(cooldowns_target.cooldowns(unit))
+		end
+	end
+end)
 
 function M.print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
-end
-
-function M.color_code(r, g, b)
-	return format('|cFF%02X%02X%02X', r*255, g*255, b*255)
 end
 
 function M.list(first, ...)
@@ -48,6 +71,12 @@ do
 
 	function ADDON_LOADED()
 		if arg1 ~= 'cooldowns' then return end
+
+		_G.cooldowns_settings = cooldowns_settings or {}
+		if cooldowns_settings.used == nil then
+			cooldowns_settings.used = true
+		end
+		cooldowns_settings.frames = cooldowns_settings.frames or {}
 
 		_G.SLASH_COOLDOWNS1 = '/cooldowns'
 		_G.SLASH_COOLDOWNS2 = '/cds'

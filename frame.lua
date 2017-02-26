@@ -23,12 +23,117 @@ local DEFAULT_SETTINGS = {
 	ignore_list = '',
 }
 
-function M.new(title, color, settings)
+do
+	local apply = {
+		blizzard = function(frame)
+			frame:SetWidth(33.5)
+			frame:SetHeight(33.5)
+
+			frame.icon:SetWidth(30)
+			frame.icon:SetHeight(30)
+			frame.icon:SetTexCoord(.07, .93, .07, .93)
+
+			frame.border:SetPoint('CENTER', .5, -.5)
+			frame.border:SetWidth(56)
+			frame.border:SetHeight(56)
+			frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
+			frame.border:SetVertexColor(1, 1, 1)
+
+			frame.gloss:SetTexture()
+
+			frame.cooldown:SetScale(32.5/36)
+
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
+		end,
+		zoomed = function(frame)
+			frame:SetWidth(36)
+			frame:SetHeight(36)
+
+			frame.icon:SetWidth(36)
+			frame.icon:SetHeight(36)
+			frame.icon:SetTexCoord(.08, .92, .08, .92)
+
+			frame.border:SetTexture()
+
+			frame.gloss:SetTexture()
+
+			frame.cooldown:SetScale(1.01)
+
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
+		end,
+		elvui = function(frame)
+			frame:SetWidth(36.5)
+			frame:SetHeight(36.5)
+
+			frame.icon:SetWidth(36)
+			frame.icon:SetHeight(36)
+			frame.icon:SetTexCoord(.07, .93, .07, .93)
+
+			frame.border:SetPoint('CENTER', 0, 0)
+			frame.border:SetWidth(38)
+			frame.border:SetHeight(38)
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\elvui\Border]])
+			frame.border:SetVertexColor(0, 0, 0)
+
+			frame.gloss:SetTexture()
+
+			frame.cooldown:SetScale(38/36)
+
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
+		end,
+		darion = function(frame)
+			frame:SetWidth(34.5)
+			frame:SetHeight(34.5)
+
+			frame.icon:SetWidth(33)
+			frame.icon:SetHeight(33)
+			frame.icon:SetTexCoord(0, 1, 0, 1)
+
+			frame.border:SetPoint('CENTER', 0, 0)
+			frame.border:SetWidth(40)
+			frame.border:SetHeight(40)
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Border]])
+			frame.border:SetVertexColor(.2, .2, .2)
+
+			frame.gloss:SetWidth(40)
+			frame.gloss:SetHeight(40)
+			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Gloss]])
+			frame.gloss:SetTexCoord(0, 1, 0, 1)
+
+			frame.cooldown:SetScale(34/36)
+
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
+		end,
+		modui = function(frame)
+			frame:SetWidth(33)
+			frame:SetHeight(33)
+
+			frame.icon:SetWidth(30)
+			frame.icon:SetHeight(30)
+			frame.icon:SetTexCoord(0, 1, 0, 1)
+
+			frame.border:SetPoint('CENTER', 0, 0)
+			frame.border:SetWidth(38.5)
+			frame.border:SetHeight(38.5)
+			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\modui\Border]])
+			frame.border:SetVertexColor(.22, .22, .22)
+
+			frame.gloss:SetTexture()
+
+			frame.cooldown:SetScale(32.5/36)
+
+			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
+		end,
+	}
+	function skin(frame, skin)
+		apply[skin](frame)
+	end
+end
+
+function M.new(code, settings)
 	local self = T
 	for k, v in method do self[k] = v end
-	self.title = title
-	self.color = color
-	self.cooldowns = T
+	self.title = code
 	self.iconFramePool = T
 	self:LoadSettings(settings)
 	return self
@@ -86,122 +191,6 @@ function method:CreateFrames()
 	end
 end
 
-do
-	local apply = {
-		blizzard = function(frame)
-			frame:SetWidth(33.5)
-			frame:SetHeight(33.5)
-
-			frame.icon:SetWidth(30)
-			frame.icon:SetHeight(30)
-			frame.icon:SetTexCoord(.07, .93, .07, .93)
-
-			frame.border:Show()
-			frame.border:SetPoint('CENTER', .5, -.5)
-			frame.border:SetWidth(56)
-			frame.border:SetHeight(56)
-			frame.border:SetTexture([[Interface\Buttons\UI-Quickslot2]])
-			frame.border:SetTexCoord(0, 1, 0, 1)
-			frame.border:SetVertexColor(1, 1, 1)
-
-			frame.gloss:Hide()
-
-			frame.cooldown:SetScale(32.5/36)
-
-			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
-		end,
-		zoomed = function(frame)
-			frame:SetWidth(36)
-			frame:SetHeight(36)
-
-			frame.icon:SetWidth(36)
-			frame.icon:SetHeight(36)
-			frame.icon:SetTexCoord(.08, .92, .08, .92)
-
-			frame.border:Hide()
-
-			frame.gloss:Hide()
-
-			frame.cooldown:SetScale(1.01)
-
-			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
-		end,
-		elvui = function(frame)
-			frame:SetWidth(36.5)
-			frame:SetHeight(36.5)
-
-			frame.icon:SetWidth(36)
-			frame.icon:SetHeight(36)
-			frame.icon:SetTexCoord(.07,.93,.07,.93)
-
-			frame.border:Show()
-			frame.border:SetPoint('CENTER', 0, 0)
-			frame.border:SetWidth(38)
-			frame.border:SetHeight(38)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\elvui\Border]])
-			frame.border:SetTexCoord(0, 1, 0, 1)
-			frame.border:SetVertexColor(0, 0, 0)
-
-			frame.gloss:Hide()
-
-			frame.cooldown:SetScale(38/36)
-
-			frame.count:SetFont([[Fonts\ARIALN.ttf]], 17, 'THICKOUTLINE')
-		end,
-		darion = function(frame)
-			frame:SetWidth(34.5)
-			frame:SetHeight(34.5)
-
-			frame.icon:SetWidth(33)
-			frame.icon:SetHeight(33)
-			frame.icon:SetTexCoord(0, 1, 0, 1)
-
-			frame.border:Show()
-			frame.border:SetPoint('CENTER', 0, 0)
-			frame.border:SetWidth(40)
-			frame.border:SetHeight(40)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Border]])
-			frame.border:SetTexCoord(0, 1, 0, 1)
-			frame.border:SetVertexColor(.2, .2, .2)
-
-			frame.gloss:Show()
-			frame.gloss:SetWidth(40)
-			frame.gloss:SetHeight(40)
-			frame.gloss:SetTexture([[Interface\Addons\cooldowns\Textures\darion\Gloss]])
-			frame.gloss:SetTexCoord(0, 1, 0, 1)
-
-			frame.cooldown:SetScale(34/36)
-
-			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
-			end,
-		modui = function(frame)
-			frame:SetWidth(33)
-			frame:SetHeight(33)
-
-			frame.icon:SetWidth(30)
-			frame.icon:SetHeight(30)
-			frame.icon:SetTexCoord(0, 1, 0, 1)
-
-			frame.border:Show()
-			frame.border:SetPoint('CENTER', 0, 0)
-			frame.border:SetWidth(38.5)
-			frame.border:SetHeight(38.5)
-			frame.border:SetTexture([[Interface\Addons\cooldowns\Textures\modui\Border]])
-			frame.border:SetTexCoord(0, 1, 0, 1)
-			frame.border:SetVertexColor(.22, .22, .22)
-
-			frame.gloss:Hide()
-
-			frame.cooldown:SetScale(32.5/36)
-
-			frame.count:SetFont([[Fonts\ARIALN.ttf]], 15, 'THICKOUTLINE')
-		end,
-	}
-	function skin(frame, skin)
-		apply[skin](frame)
-	end
-end
-
 function method:CDFrame()
 	local frame = CreateFrame('Frame', nil, self.frame)
 	frame:SetScript('OnEnter', function()
@@ -216,7 +205,7 @@ function method:CDFrame()
 
 	frame.background = frame:CreateTexture(nil, 'BACKGROUND')
 	frame.background:SetAllPoints(frame.icon)
-	frame.background:SetTexture(unpack(self.color))
+	frame.background:SetTexture(.5, .5, .5)
 	frame.background:SetAlpha(.6)
 
 	frame.border = frame:CreateTexture(nil, 'ARTWORK')
@@ -304,17 +293,23 @@ function method:Lock()
 end
 
 do
-	ROTATIONS = {
+	local ROTATIONS = {
 		D = 0,
 		R = 1,
 		U = 2,
 		L = 3,
 	}
+	local function rotate_texture(tex, n)
+		for i = 1, n do
+			local x1, y1, x2, y2, x3, y3, x4, y4 = tex:GetTexCoord()
+			tex:SetTexCoord(x3, y3, x1, y1, x4, y4, x2, y2)
+		end
+	end
 	function method:Unlock()
 		self.frame:EnableMouse(true)
 		self.frame.arrow:Show()
 		self.frame.arrow:SetTexCoord(0, .5625, 0, 1)
-		rotate(self.frame.arrow, ROTATIONS[strsub(self.settings.orientation, 1, 1)])
+		rotate_texture(self.frame.arrow, ROTATIONS[strsub(self.settings.orientation, 1, 1)])
 		for i = 1, self.settings.size do
 			local frame = self.frame.cd_frames[i]
 			frame:EnableMouse(false)
@@ -369,78 +364,53 @@ function method:Ignored(name)
 	return contains(strupper(self.settings.ignore_list), strupper(name))
 end
 
-function method:CDID(cooldown) return tostring(cooldown) end
-
-function method:Update()
+function method:Update(cooldowns)
 	local tm = GetTime()
 
 	local cooldown_list = temp-T
-	for _, cooldown in self.cooldowns do tinsert(cooldown_list, cooldown) end
-	sort(cooldown_list, function(a, b) local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm return tb < ta or tb == ta and a.name < b.name end)
-
-	local i = 1
-	for _, cooldown in ipairs(cooldown_list) do
-		local timeLeft = cooldown.started + cooldown.duration - tm
-
-		if timeLeft > 0 then
-			if i <= self.settings.size and not self:Ignored(cooldown.name) then
-				local frame = self.frame.cd_frames[i]
-				do
-					local alpha = timeLeft <= self.settings.blink and blink_alpha1(tm) or 1
-					frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
-				end
-				frame.icon:SetTexture(cooldown.icon)
-				frame.count:SetText(self.settings.count and time_text(timeLeft) or '')
-				frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
-				release(frame.tooltip)
-				frame.tooltip = A(cooldown.name, cooldown.info)
-				frame:Show()
-
-				i = i + 1
-			end
-		else
-			self.cooldowns[self:CDID(cooldown)] = nil
+	for _, cooldown in cooldowns do
+		if not self:Ignored(cooldown.name) then
+			tinsert(cooldown_list, cooldown)
 		end
 	end
-	for j = i, self.settings.size do self.frame.cd_frames[j]:Hide() end
+	sort(cooldown_list, function(a, b)
+		local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm
+		return tb < ta or tb == ta and a.name < b.name
+	end)
+
+	for i, cooldown in ipairs(cooldown_list) do
+		local frame = self.frame.cd_frames[i]
+		local time_left = cooldown.started + cooldown.duration - tm
+		do
+			local alpha = time_left <= self.settings.blink and blink_alpha(tm) or 1
+			frame.icon:SetAlpha(alpha); frame.border:SetAlpha(alpha); frame.gloss:SetAlpha(alpha); frame.cooldown:SetAlpha(alpha)
+		end
+		frame.icon:SetTexture(cooldown.icon)
+		frame.count:SetText(self.settings.count and time_text(time_left) or '')
+		frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
+		release(frame.tooltip)
+		frame.tooltip = A(cooldown.name, cooldown.info)
+		frame:Show()
+	end
+	for i = getn(cooldown_list) + 1, self.settings.size do
+		self.frame.cd_frames[i]:Hide()
+	end
 end
 
-function method:StartCD(name, info, icon, started, duration)
-	local cooldown = O(
-		'name', name,
-		'info', info,
-		'icon', icon,
-		'started', started,
-		'duration', duration
-	)
-	self.cooldowns[self:CDID(cooldown)] = cooldown
-	return self:CDID(cooldown)
-end
-
-function method:CancelCD(CDID)
-	local cooldowns = self.cooldowns
-	cooldowns[CDID] = cooldowns[CDID] and release(cooldowns[CDID])
-end
-
-function rotate(tex, n)
-	for i = 1, n do
-	    local x1, y1, x2, y2, x3, y3, x4, y4 = tex:GetTexCoord()
-	    tex:SetTexCoord(x3, y3, x1, y1, x4, y4, x2, y2)
-    end
-end
-
-function blink_alpha1(t)
+function blink_alpha(t)
 	local x = t * 4/3
 	return (mod(floor(x), 2) == 0 and x - floor(x) or 1 - x + floor(x)) * .7 + .3
 end
 
-function blink_alpha2(t)
-	return (sin(t * 240) + 1) / 2 * .7 + .3
-end
+--function blink_alpha(t)
+--	return (sin(t * 240) + 1) / 2 * .7 + .3
+--end
 
 do
 	local DAY, HOUR, MINUTE = 86400, 3600, 60
-
+	local function color_code(r, g, b)
+		return format('|cFF%02X%02X%02X', r*255, g*255, b*255)
+	end
 	function time_text(t)
 		if t > HOUR then
 			return color_code(.7, .7, .7) .. ceil(t / HOUR * 10) / 10

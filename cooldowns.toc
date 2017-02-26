@@ -8,4 +8,4 @@ libs\T.lua
 core.lua
 frame.lua
 player.lua
-target.lua
+other.lua
