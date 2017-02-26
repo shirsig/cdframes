@@ -31,6 +31,4 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cooldowns clickthrough** (toggles click-through behavior, default off)<br/>
 **/cooldowns reset** (restores the defaults for all settings)<br/>
 
-If you use **player**, **target**, **targettarget** or a comma separated list of these as the first parameter the command will only be applied for the specified frames.
-
 When unlocked you can drag the frame with the left button or rotate it by **\<Left Click>**. **\<Right Click>** has the same effect as **/cooldowns frame lock**.
