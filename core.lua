@@ -29,7 +29,7 @@ CreateFrame'Frame':SetScript('OnUpdate', function()
 end)
 
 function M.print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '[cooldowns] ' .. msg)
+	DEFAULT_CHAT_FRAME:AddMessage('<cdframes> ' .. msg)
 end
 
 function M.list(first, ...)
@@ -62,8 +62,8 @@ function parse_number(params)
 	return params.integer and floor(number + .5) or number
 end
 
-_G.SLASH_COOLDOWNS1 = '/cdframes'
-function SlashCmdList.COOLDOWNS(str)
+_G.SLASH_CDFRAMES1 = '/cdframes'
+function SlashCmdList.CDFRAMES(str)
 	local parameters = tokenize(strupper(str))
 	if parameters[1] == 'USED' then
 		cdframes.used = not cdframes.used
