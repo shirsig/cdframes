@@ -11,7 +11,7 @@ This addOn adds frames with icons and countdowns for enemies' as well as your ow
 **/cdframes used** (shows player cooldowns only for the spells used, ignoring shared cooldowns, default on)<br/>
 **/cdframes frame name code** (Adds a new frame with name **name**. **code** is a lua expression which must evaluate to the name of the unit who's cooldowns the frame should show. Without **code** the frame is removed and without **name** the existing frames are listed)<br/>
 
-## For the following commands the first parameter must be a comma separated list of frame names or **\*** for all frames
+#### For the following commands the first parameter must be a comma separated list of frame names or **\*** for all frames
 
 **/cdframes lock** (locks frames, default off)<br/>
 **/cdframes unlock** (unlocks frames)<br/>
