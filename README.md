@@ -1,6 +1,6 @@
 # cdframes - WoW 1.12 addOn
 
-This addOn adds frames with icons and countdowns for enemies' as well as your own cooldowns.
+This addOn adds frames with icons and countdowns for your as well as other players' cooldowns.
 
 ![Alt text](http://i.imgur.com/Yrd8vPf.png)
 
