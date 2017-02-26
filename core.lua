@@ -4,7 +4,7 @@ include 'T'
 
 local cdframes_frame = require 'cdframes.frame'
 
-CreateFrame('GameTooltip', 'cooldowns_Tooltip', nil, 'GameTooltipTemplate')
+CreateFrame('GameTooltip', 'cdframes_tooltip', nil, 'GameTooltipTemplate')
 
 _G.cdframes = {
 	used = true,

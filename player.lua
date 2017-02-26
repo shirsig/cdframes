@@ -183,9 +183,9 @@ do
 		local orig = UseAction
 		function _G.UseAction(...)
 			if not cast and HasAction(arg[1]) and not GetActionText(arg[1]) then
-				cooldowns_Tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
-				cooldowns_Tooltip:SetAction(arg[1])
-				last_used = cooldowns_TooltipTextLeft1:GetText()
+				cdframes_tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
+				cdframes_tooltip:SetAction(arg[1])
+				last_used = cdframes_tooltipTextLeft1:GetText()
 			end
 			return orig(unpack(arg))
 		end
