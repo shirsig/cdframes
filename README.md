@@ -26,7 +26,7 @@ Some examples for custom frames you might want to add:<br/>
 **/cdframes spacing** *x* (*x* between 0 and 1, default 0, represents fraction of icon size)<br/>
 **/cdframes skin** *name* (changes the style. available options for *name*: darion, blizzard, zoomed, elvui, modui)<br/>
 **/cdframes blink** *x* (starts blinking at *x* seconds, default 0)<br/>
-**/cdframes animation** (cooldown shadow animation, default off)<br/>
+**/cdframes shadow** (cooldown shadow animation, default off)<br/>
 **/cdframes count** (toggles the countdown, default on)<br/>
 **/cdframes ignore add** *list* (*list* is a comma separated list of skill names to ignore, no spaces except within the name, case insensitive. example: **mortal strike,blink,shadow word: pain**)<br/>
 **/cdframes ignore remove** *list*<br/>

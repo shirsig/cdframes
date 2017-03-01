@@ -109,8 +109,8 @@ function SlashCmdList.CDFRAMES(str)
 				settings.count = not settings.count
 			elseif parameters[1] == 'BLINK' then
 				settings.blink = parse_number(parameters[2], 0)
-			elseif parameters[1] == 'ANIMATION' then
-				settings.animation = not settings.animation
+			elseif parameters[1] == 'SHADOW' then
+				settings.shadow = not settings.shadow
 			elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 				local _, _, match = strfind(strupper(str), 'IGNORE%s+ADD%s+(.-)%s*$')
 				local names = temp-T

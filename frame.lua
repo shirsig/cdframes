@@ -20,7 +20,7 @@ local DEFAULT_SETTINGS = {
 	skin = 'darion',
 	count = true,
 	blink = 0,
-	animation = false,
+	shadow = false,
 	ignore_list = '',
 }
 
@@ -217,7 +217,7 @@ function cdframe(self)
 		cooldown:SetHeight(36)
 		cooldown:SetScript('OnAnimFinished', nil)
 		cooldown:SetScript('OnUpdateModel', function()
-			if self.settings.animation and this.started then
+			if self.settings.shadow and this.started then
 				local progress = (GetTime() - this.started) / this.duration
 				this:SetSequenceTime(0, (1 - progress) * 1000)
 			end
