@@ -4,6 +4,7 @@ include 'T'
 include 'cdframes'
 
 local last_used
+local ignore_last_used = {}
 
 do
 	local t = {}
@@ -18,7 +19,7 @@ do
 		return t
 	end
 	function start_cooldown(name, icon, started, duration, pet)
-		if cdframes.used and not pet and name ~= last_used then
+		if cdframes.used and not pet and name ~= last_used and not ignore_last_used[name] then
 			return
 		end
 		t[name] = O(
@@ -95,6 +96,9 @@ function SPELL_UPDATE_COOLDOWN()
 	for id = 1, total_spells do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
+		if enabled == 0 then
+			ignore_last_used[name] = true
+		end
 		if enabled == 1 and duration > 2.5 then
 			start_cooldown(
 				name,
