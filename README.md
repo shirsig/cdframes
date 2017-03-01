@@ -24,7 +24,7 @@ Some examples for custom frames you might want to add:
 **/cdframes line** *x* (maximum number of timers per line, *x* between 1 and 100, default 8)<br/>
 **/cdframes scale** *x* (*x* between 0.5 and 2, default 1)<br/>
 **/cdframes spacing** *x* (*x* between 0 and 1, default 0, represents fraction of icon size)<br/>
-**/cdframes skin** (changes the style. available skins: blizzard, zoomed, elvui, darion)<br/>
+**/cdframes skin** *name* (changes the style. available options for *name*: darion, blizzard, zoomed, elvui, modui)<br/>
 **/cdframes blink** *x* (starts blinking at *x* seconds, default 0)<br/>
 **/cdframes animation** (cooldown shadow animation, default off)<br/>
 **/cdframes count** (toggles the countdown, default on)<br/>

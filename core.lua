@@ -104,7 +104,7 @@ function SlashCmdList.CDFRAMES(str)
 				settings.y = settings.y * settings.scale / scale
 				settings.scale = scale
 			elseif parameters[1] == 'SKIN' then
-				settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2])
+				settings.skin = (temp-S('darion', 'blizzard', 'zoomed', 'elvui', 'modui'))[strlower(parameters[2] or '')] and strlower(parameters[2])
 			elseif parameters[1] == 'COUNT' then
 				settings.count = not settings.count
 			elseif parameters[1] == 'BLINK' then
