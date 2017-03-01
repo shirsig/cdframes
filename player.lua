@@ -96,9 +96,6 @@ function SPELL_UPDATE_COOLDOWN()
 	for id = 1, total_spells do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_SPELL)
 		local name = GetSpellName(id, BOOKTYPE_SPELL)
-		if enabled == 0 then
-			ignore_last_used[name] = true
-		end
 		if enabled == 1 and duration > 2.5 then
 			start_cooldown(
 				name,
@@ -109,6 +106,7 @@ function SPELL_UPDATE_COOLDOWN()
 		elseif duration == 0 then
 			stop_cooldown(name)
 		end
+		ignore_last_used[name] = enabled == 0 or nil
 	end
 	for id = 1, HasPetSpells() or 0 do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_PET)
