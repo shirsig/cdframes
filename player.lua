@@ -23,7 +23,6 @@ do
 		end
 		t[name] = O(
 			'name', name,
-			'info', '',
 			'icon', icon,
 			'started', started,
 			'duration', duration

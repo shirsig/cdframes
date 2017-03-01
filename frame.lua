@@ -21,9 +21,10 @@ local DEFAULT_SETTINGS = {
 	count = true,
 	blink = 0,
 	animation = false,
-	clickthrough = false,
 	ignore_list = '',
 }
+
+local frames = {}
 
 do
 	local t = {
@@ -131,24 +132,18 @@ do
 	end
 end
 
-function M.new(key)
-	local self = O('title', key)
-	for k, v in method do self[k] = v end
-	return self
-end
-
-method = {}
-
-function method:LoadSettings(settings)
+function M.load(key, settings)
+	frames[key] = frames[key] or O('title', key)
+	local self = frames[key]
 	self.unit = loadstring('return ' .. settings.code)
 	for k, v in DEFAULT_SETTINGS do
 		if settings[k] == nil then settings[k] = v end
 	end
 	self.settings = settings
-	self:Configure()
+	configure(self)
 end
 
-function method:CreateFrames()
+function create_frames(self)
 	if not self.frame then
 		local frame = CreateFrame('Button', nil, UIParent)
 		self.frame = frame
@@ -162,14 +157,14 @@ function method:CreateFrames()
 			this:StopMovingOrSizing()
 			self.settings.x, self.settings.y = this:GetCenter()
 		end)
-		frame:SetScript('OnClick', function() self:OnClick() end)
-		frame:SetScript('OnEnter', function() self:Tooltip() end)
+		frame:SetScript('OnClick', function() click(self) end)
+		frame:SetScript('OnEnter', function() tooltip(self) end)
 		frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
-		frame:SetScript('OnUpdate', function() self:Update() end)
+		frame:SetScript('OnUpdate', function() update(self) end)
 		frame.cd_frames = T
 	end
 	for i = getn(self.frame.cd_frames) + 1, self.settings.size do
-		tinsert(self.frame.cd_frames, self:CDFrame())
+		tinsert(self.frame.cd_frames, cdframe(self))
 	end
 	for i = self.settings.size + 1, getn(self.frame.cd_frames) do
 		self.frame.cd_frames[i]:Hide()
@@ -177,7 +172,6 @@ function method:CreateFrames()
 	for i = 1, self.settings.size do
 		local cd_frame = self.frame.cd_frames[i]
 		apply_skin(cd_frame, self.settings.skin)
-		cd_frame:EnableMouse(not self.settings.clickthrough)
 		cd_frame.cooldown:SetSequenceTime(0, 1000)
 	end
 	if not self.frame.arrow then
@@ -190,14 +184,8 @@ function method:CreateFrames()
 	end
 end
 
-function method:CDFrame()
+function cdframe(self)
 	local frame = CreateFrame('Frame', nil, self.frame)
-	frame:SetScript('OnEnter', function()
-		self:CDTooltip()
-	end)
-	frame:SetScript('OnLeave', function()
-		GameTooltip:Hide()
-	end)
 
 	frame.icon = frame:CreateTexture(nil, 'BORDER')
 	frame.icon:SetPoint('CENTER', 0, 0)
@@ -237,18 +225,18 @@ function method:CDFrame()
 		cooldown:Show()
 		frame.cooldown = cooldown
 	end
-	frame.tooltip = T
+
 	return frame
 end
 
-function method:Configure()
-	self:CreateFrames()
+function configure(self)
+	create_frames(self)
 	self.frame:Show()
-	if self.settings.locked then self:Lock() else self:Unlock() end
-	self:PlaceFrames()
+	if self.settings.locked then lock(self) else unlock(self) end
+	place_frames(self)
 end
 
-function method:PlaceFrames()
+function place_frames(self)
 	local scale = self.settings.scale
 	self.frame:SetScale(scale)
 	local orientation = self.settings.orientation
@@ -281,7 +269,7 @@ function method:PlaceFrames()
 	self.frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', self.settings.x, self.settings.y)
 end
 
-function method:Lock()
+function lock(self)
 	self.frame:EnableMouse(false)
 	self.frame.arrow:Hide()
 	for i = 1, self.settings.size do
@@ -304,7 +292,7 @@ do
 			tex:SetTexCoord(x3, y3, x1, y1, x4, y4, x2, y2)
 		end
 	end
-	function method:Unlock()
+	function unlock(self)
 		self.frame:EnableMouse(true)
 		self.frame.arrow:Show()
 		self.frame.arrow:SetTexCoord(0, .5625, 0, 1)
@@ -326,7 +314,7 @@ do
 	end
 end
 
-function method:Tooltip()
+function tooltip(self)
 	GameTooltip_SetDefaultAnchor(GameTooltip, this)
 	GameTooltip:AddLine(self.title)
 	GameTooltip:AddLine('<Left Drag> move', 1, 1, 1)
@@ -335,14 +323,7 @@ function method:Tooltip()
 	GameTooltip:Show()
 end
 
-function method:CDTooltip()
-	GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
-	GameTooltip:AddLine(this.tooltip[1])
-	GameTooltip:AddLine(this.tooltip[2], .8, .8, .8, 1)
-	GameTooltip:Show()
-end
-
-function method:OnClick()
+function click(self)
 	if arg1 == 'LeftButton' then
 		for i, orientation in ipairs(ORIENTATIONS) do
 			if orientation == self.settings.orientation then
@@ -356,14 +337,10 @@ function method:OnClick()
 	elseif arg1 == 'RightButton' then
 		self.settings.locked = true
 	end
-	self:Configure()
+	configure(self)
 end
 
-function method:Ignored(name)
-	return contains(strupper(self.settings.ignore_list), strupper(name))
-end
-
-function method:Update(cooldowns)
+function update(self)
 	if not self.settings.locked then
 		return
 	end
@@ -379,7 +356,7 @@ function method:Update(cooldowns)
 
 	local cooldown_list = temp-T
 	for _, cooldown in cooldowns do
-		if not self:Ignored(cooldown.name) then
+		if not contains(self.settings.ignore_list, strupper(cooldown.name)) then
 			tinsert(cooldown_list, cooldown)
 		end
 	end
@@ -398,8 +375,6 @@ function method:Update(cooldowns)
 		frame.icon:SetTexture(cooldown.icon)
 		frame.count:SetText(self.settings.count and time_text(time_left) or '')
 		frame.cooldown.started, frame.cooldown.duration = cooldown.started, cooldown.duration
-		release(frame.tooltip)
-		frame.tooltip = A(cooldown.name, cooldown.info)
 		frame:Show()
 	end
 	for i = getn(cooldown_list) + 1, self.settings.size do

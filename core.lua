@@ -14,12 +14,9 @@ _G.cdframes = {
 	},
 }
 
-local frames = {}
-
 function update_frames()
 	for k, v in cdframes.frames do
-		frames[k] = frames[k] or cdframes_frame.new(k)
-		frames[k]:LoadSettings(v)
+		cdframes_frame.load(k, v)
 	end
 end
 
@@ -55,11 +52,13 @@ function tokenize(str)
 	return tokens
 end
 
-function parse_number(params)
-	local number = tonumber(params.input) or params.default
-	if params.min then number = max(params.min, number) end
-	if params.max then number = min(params.max, number) end
-	return params.integer and floor(number + .5) or number
+function parse_number(input, lower_bound, upper_bound, integer)
+	local number = tonumber(input)
+	if number then
+		if lower_bound then number = max(lower_bound, number) end
+		if upper_bound then number = min(upper_bound, number) end
+		return integer and floor(number + .5) or number
+	end
 end
 
 _G.SLASH_CDFRAMES1 = '/cdframes'
@@ -73,7 +72,7 @@ function SlashCmdList.CDFRAMES(str)
 			if code then
 				cdframes.frames[parameters[2]] = {code=code}
 			elseif cdframes.frames[parameters[2]] then
-				frames[parameters[2]]:LoadSettings{code=[[nil]], locked=true}
+				cdframes_frame.load(parameters[2], {code=[[nil]], locked=true})
 				cdframes.frames[parameters[2]] = nil
 			end
 			update_frames()
@@ -83,65 +82,58 @@ function SlashCmdList.CDFRAMES(str)
 			end
 		end
 	elseif parameters[1] then
-		local selected_frames
-		if parameters[1] == '*' then
-			selected_frames = {}
-			for k in cdframes.frames do
-				tinsert(selected_frames, k)
-			end
-		else
-			selected_frames = elems(parameters[1])
+		local selected_frames = {}
+		while cdframes.frames[parameters[1]] do
+			selected_frames[tremove(parameters, 1)] = true
 		end
-		for _, k in selected_frames do
+		for k in next(selected_frames) and selected_frames or cdframes.frames do
 			local settings = cdframes.frames[k]
-			if parameters[2] == 'LOCK' then
+			if parameters[1] == 'LOCK' then
 				settings.locked = true
-			elseif parameters[2] == 'UNLOCK' then
+			elseif parameters[1] == 'UNLOCK' then
 				settings.locked = false
-			elseif parameters[2] == 'SIZE' then
-				settings.size = parse_number{input=parameters[3], min=1, max=100, default=16, integer=true}
-			elseif parameters[2] == 'LINE' then
-				settings.line = parse_number{input=parameters[3], min=1, max=100, default=8, integer=true}
-			elseif parameters[2] == 'SPACING' then
-				settings.spacing = parse_number{input=parameters[3], min=0, max=1, default=0}
-			elseif parameters[2] == 'SCALE' then
-				local scale = parse_number{input=parameters[3], min=.5, max=2, default=1}
+			elseif parameters[1] == 'SIZE' then
+				settings.size = parse_number(parameters[2], 1, 100, true)
+			elseif parameters[1] == 'LINE' then
+				settings.line = parse_number(parameters[2], 1, 100, true)
+			elseif parameters[1] == 'SPACING' then
+				settings.spacing = parse_number(parameters[2], 0, 1)
+			elseif parameters[1] == 'SCALE' then
+				local scale = parse_number(parameters[2], .5, 2)
 				settings.x = settings.x * settings.scale / scale
 				settings.y = settings.y * settings.scale / scale
 				settings.scale = scale
-			elseif parameters[2] == 'SKIN' then
-				settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[3] or '')] and strlower(parameters[3]) or 'darion'
-			elseif parameters[2] == 'COUNT' then
+			elseif parameters[1] == 'SKIN' then
+				settings.skin = (temp-S('darion', 'blizzard', 'modui', 'zoomed', 'elvui'))[strlower(parameters[2] or '')] and strlower(parameters[2])
+			elseif parameters[1] == 'COUNT' then
 				settings.count = not settings.count
-			elseif parameters[2] == 'BLINK' then
-				settings.blink = parse_number{input=parameters[3], min=0, default=7}
-			elseif parameters[2] == 'ANIMATION' then
+			elseif parameters[1] == 'BLINK' then
+				settings.blink = parse_number(parameters[2], 0)
+			elseif parameters[1] == 'ANIMATION' then
 				settings.animation = not settings.animation
-			elseif parameters[2] == 'CLICKTHROUGH' then
-				settings.clickthrough = not settings.clickthrough
-			elseif parameters[2] == 'IGNORE' and parameters[3] == 'ADD' then
-				local _, _, match = strfind(strupper(str), '[^,]*ADD%s+(.-)%s*$')
+			elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
+				local _, _, match = strfind(strupper(str), 'IGNORE%s+ADD%s+(.-)%s*$')
 				local names = temp-T
 				for _, name in temp-elems(match) do
 					if not contains(settings.ignore_list, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = settings.ignore_list == '' and list(unpack(names)) or settings.ignore_list .. ',' .. list(unpack(names))
-			elseif parameters[2] == 'IGNORE' and parameters[3] == 'REMOVE' then
-				local _, _, match = strfind(strupper(str), '[^,]*REMOVE%s+(.-)%s*$')
+			elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
+				local _, _, match = strfind(strupper(str), 'IGNORE%s+REMOVE%s+(.-)%s*$')
 				local names = temp-T
 				for _, name in temp-elems(settings.ignore_list) do
 					if not contains(match, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = list(unpack(names))
-			elseif parameters[2] == 'IGNORE' then
+			elseif parameters[1] == 'IGNORE' then
 				print(k .. ':')
-				for _, name in temp-elems(settings.ignore_list) do print(name) end
-			elseif parameters[2] == 'RESET' then
-				wipe(settings)
+				for _, name in temp-elems(settings.ignore_list) do
+					print(name)
+				end
 			else
 				return
 			end
-			frames[k]:LoadSettings(settings)
+			cdframes_frame.load(k, settings)
 		end
 	end
 end
