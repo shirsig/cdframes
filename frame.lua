@@ -367,6 +367,7 @@ function update(self)
 
 	for i, cooldown in ipairs(cooldown_list) do
 		local frame = self.frame.cd_frames[i]
+		if not frame then break end
 		local time_left = cooldown.started + cooldown.duration - tm
 		do
 			local alpha = time_left <= self.settings.blink and blink_alpha(tm) or 1
