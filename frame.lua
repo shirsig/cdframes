@@ -365,9 +365,8 @@ function update(self)
 		return tb < ta or tb == ta and a.name < b.name
 	end)
 
-	for i, cooldown in ipairs(cooldown_list) do
-		local frame = self.frame.cd_frames[i]
-		if not frame then break end
+	for i = 1, min(getn(cooldown_list), self.settings.size) do
+		local frame, cooldown = self.frame.cd_frames[i], cooldown_list[i]
 		local time_left = cooldown.started + cooldown.duration - tm
 		do
 			local alpha = time_left <= self.settings.blink and blink_alpha(tm) or 1
