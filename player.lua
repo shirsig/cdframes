@@ -3,7 +3,7 @@ module 'cdframes.player'
 include 'T'
 include 'cdframes'
 
-local last_used
+local last_used = ''
 local ignore_last_used = {}
 
 do
@@ -19,7 +19,7 @@ do
 		return t
 	end
 	function start_cooldown(name, icon, started, duration, pet)
-		if cdframes.used and not pet and name ~= last_used and not ignore_last_used[name] then
+		if cdframes.used and not pet and strlower(name) ~= strlower(last_used) and not ignore_last_used[name] then
 			return
 		end
 		t[name] = O(
@@ -166,7 +166,7 @@ do
 		local orig = CastSpellByName
 		function _G.CastSpellByName(...)
 			if not cast then
-				last_used = arg[1]
+				_, _, last_used = strfind(arg[1], '([^(*]*)')
 			end
 			return orig(unpack(arg))
 		end
