@@ -1,7 +1,9 @@
 module 'cdframes.other'
 
-include 'T'
-include 'cdframes'
+include 'cdframes.util'
+
+local T = require 'T'
+
 
 local DATA = {
 	-- Trinkets & Racials
@@ -242,21 +244,21 @@ do
 		if t[unit] then
 			for k, v in t[unit] do
 				if v.started + v.duration <= time or class[unit] and DATA[k].classes and not contains(DATA[k].classes, class[unit]) then
-					release(t[unit][k])
+					T.release(t[unit][k])
 					t[unit][k] = nil
 				end
 			end
 			if not next(t[unit]) then
-				release(t[unit])
+				T.release(t[unit])
 				t[unit] = nil
 			end
 		end
-		return t[unit] or empty
+		return t[unit] or T.empty
 	end
 	function start_cooldown(unit, action)
 		triggers(unit, action)
-		t[unit] = t[unit] or T
-		t[unit][action] = O(
+		t[unit] = t[unit] or T.acquire()
+		t[unit][action] = T.map(
 			'name', action,
 			'icon', [[Interface\Icons\]] .. DATA[action].icon,
 			'started', GetTime(),
@@ -267,7 +269,7 @@ do
 		if t[unit] then
 			for i = 1, arg.n do
 				if t[unit][arg[i]] then
-					release(t[unit][arg[i]])
+					T.release(t[unit][arg[i]])
 					t[unit][arg[i]] = nil
 				end
 			end
@@ -330,11 +332,11 @@ do
 		if UnitIsEnemy('player', 'target') and UnitIsPlayer'target' then
 			for i, unit in recent do
 				if i == 100 or unit.name == UnitName'target' then
-					release(tremove(recent, i))
+					T.release(tremove(recent, i))
 					break
 				end
 			end
-			tinsert(recent, 1, O('name', UnitName'target', 'class', UnitClass'target'))
+			tinsert(recent, 1, T.map('name', UnitName'target', 'class', UnitClass'target'))
 		end
 	end)
 end

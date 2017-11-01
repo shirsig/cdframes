@@ -1,5 +1,4 @@
-if defined 'T' then return end
-module 'T'
+if module 'T' then return end
 
 local next, getn, setn, tremove, setmetatable = next, getn, table.setn, tremove, setmetatable
 
@@ -8,7 +7,7 @@ local pool, pool_size, overflow_pool, auto_release = {}, 0, setmetatable({}, {__
 
 function wipe(t)
 	setmetatable(t, nil)
-	for k, v in t do
+	for k, v in pairs(t) do
 		t[k] = nil
 	end
 	t.reset, t.reset = nil, 1
@@ -17,7 +16,7 @@ end
 M.wipe = wipe
 
 CreateFrame'Frame':SetScript('OnUpdate', function()
-	for t in auto_release do release(t) end
+	for t in pairs(auto_release) do release(t) end
 	wipe(auto_release)
 end)
 
@@ -56,17 +55,15 @@ do
 	M.static = setmetatable({}, {__metatable=false, __newindex=nop, __call=f, __sub=f})
 end
 
-M.get_T = acquire
-
 do
-	local function ret(t)
+	local function unpack(t)
 		if getn(t) > 0 then
-			return tremove(t, 1), ret(t)
+			return tremove(t, 1), unpack(t)
 		else
 			release(t)
 		end
 	end
-	M.ret = ret
+	M.unpack = unpack
 end
 
 M.empty = setmetatable({}, {__metatable=false, __newindex=nop})
@@ -118,18 +115,18 @@ do
 	})
 end
 
-M.A = vararg(function(arg)
+M.list = vararg(function(arg)
 	auto_release[arg] = nil
 	return arg
 end)
-M.S = vararg(function(arg)
+M.set = vararg(function(arg)
 	local t = acquire()
-	for _, v in arg do
+	for _, v in pairs(arg) do
 		t[v] = true
 	end
 	return t
 end)
-M.O = vararg(function(arg)
+M.map = vararg(function(arg)
 	local t = acquire()
 	for i = 1, getn(arg), 2 do
 		t[arg[i]] = arg[i + 1]

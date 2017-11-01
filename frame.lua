@@ -1,7 +1,8 @@
 module 'cdframes.frame'
 
-include 'T'
-include 'cdframes'
+include 'cdframes.util'
+
+local T = require 'T'
 
 local cdframes_player = require 'cdframes.player'
 local cdframes_other = require 'cdframes.other'
@@ -11,7 +12,7 @@ local ORIENTATIONS = {'RU', 'RD', 'DR', 'DL', 'LD', 'LU', 'UL', 'UR'}
 local DEFAULT_SETTINGS = {
 	locked = false,
 	x = UIParent:GetCenter(),
-	y = (temp-A(UIParent:GetCenter()))[2],
+	y = (T.temp-T.list(UIParent:GetCenter()))[2],
 	scale = 1,
 	size = 15,
 	line = 8,
@@ -133,7 +134,7 @@ do
 end
 
 function M.load(key, settings)
-	frames[key] = frames[key] or O('title', key)
+	frames[key] = frames[key] or T.map('title', key)
 	local self = frames[key]
 	self.unit = loadstring('return ' .. settings.code)
 	for k, v in DEFAULT_SETTINGS do
@@ -161,7 +162,7 @@ function create_frames(self)
 		frame:SetScript('OnEnter', function() tooltip(self) end)
 		frame:SetScript('OnLeave', function() GameTooltip:Hide() end)
 		frame:SetScript('OnUpdate', function() update(self) end)
-		frame.cd_frames = T
+		frame.cd_frames = T.acquire()
 	end
 	for i = getn(self.frame.cd_frames) + 1, self.settings.size do
 		tinsert(self.frame.cd_frames, cdframe(self))
@@ -240,8 +241,8 @@ function place_frames(self)
 	local scale = self.settings.scale
 	self.frame:SetScale(scale)
 	local orientation = self.settings.orientation
-	local axis1, axis2 = ret(strfind(orientation, '^[LR]') and A('x', 'y') or A('y', 'x'))
-	local sign = temp-O(
+	local axis1, axis2 = T.unpack(strfind(orientation, '^[LR]') and T.list('x', 'y') or T.list('y', 'x'))
+	local sign = T.temp-T.map(
 		'x', (strfind(orientation, 'R') and 1 or -1),
 		'y', (strfind(orientation, 'U') and 1 or -1)
 	)
@@ -258,7 +259,7 @@ function place_frames(self)
 	for i = 1, self.settings.size do
 		local frame = self.frame.cd_frames[i]
 		frame:ClearAllPoints()
-		local offset = temp-O(
+		local offset = T.temp-T.map(
 			axis1, sign[axis1] * mod(i - 1, self.settings.line) * slotSize,
 			axis2, sign[axis2] * floor((i - 1) / self.settings.line) * slotSize
 		)
@@ -347,14 +348,14 @@ function update(self)
 
 	local cooldowns
 	if self.unit() == UnitName'player' then
-		cooldowns = cdframes_player.cooldowns
+		cooldowns = cdframes_player.cooldowns()
 	else
 		cooldowns = cdframes_other.cooldowns(self.unit())
 	end
 
 	local tm = GetTime()
 
-	local cooldown_list = temp-T
+	local cooldown_list = T.temp-T.acquire()
 	for _, cooldown in cooldowns do
 		if not contains(self.settings.ignore_list, strupper(cooldown.name)) then
 			tinsert(cooldown_list, cooldown)

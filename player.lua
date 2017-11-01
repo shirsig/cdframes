@@ -1,18 +1,19 @@
 module 'cdframes.player'
 
-include 'T'
-include 'cdframes'
+include 'cdframes.util'
+
+local T = require 'T'
 
 local last_used
 local ignore_last_used = {}
 
 do
 	local t = {}
-	function M.get_cooldowns()
+	function M.cooldowns()
 		local time = GetTime()
 		for k, v in t do
 			if v.started + v.duration <= time then
-				release(t[k])
+				T.release(t[k])
 				t[k] = nil
 			end
 		end
@@ -22,7 +23,7 @@ do
 		if cdframes.used and not pet and name ~= last_used and not ignore_last_used[name] then
 			return
 		end
-		t[name] = O(
+		t[name] = T.map(
 			'name', name,
 			'icon', icon,
 			'started', started,
@@ -31,7 +32,7 @@ do
 	end
 	function stop_cooldown(name)
 		if t[name] then
-			release(t[name])
+			T.release(t[name])
 			t[name] = nil
 		end
 	end

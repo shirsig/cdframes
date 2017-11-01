@@ -1,6 +1,8 @@
 module 'cdframes'
 
-include 'T'
+include 'cdframes.util'
+
+local T = require 'T'
 
 local cdframes_frame = require 'cdframes.frame'
 
@@ -19,35 +21,13 @@ function update_frames()
 		cdframes_frame.load(k, v)
 	end
 end
-
 CreateFrame'Frame':SetScript('OnUpdate', function()
 	update_frames()
 	this:SetScript('OnUpdate', nil)
 end)
 
-function M.print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage('<cdframes> ' .. msg)
-end
-
-function M.list(first, ...)
-	for i = 1, arg.n do first = first .. ',' .. arg[i] end
-	return first or ''
-end
-
-function M.elems(list)
-	local elems = T
-	for elem in string.gfind(list, '[^,]+') do tinsert(elems, elem) end
-	return elems
-end
-
-function M.contains(list, str)
-	for element in string.gfind(list, '[^,]+') do
-		if element == str then return true end
-	end
-end
-
 function tokenize(str)
-	local tokens = T
+	local tokens = T.acquire()
 	for token in string.gfind(str, '%S+') do tinsert(tokens, token) end
 	return tokens
 end
@@ -104,7 +84,7 @@ function SlashCmdList.CDFRAMES(str)
 				settings.y = settings.y * settings.scale / scale
 				settings.scale = scale
 			elseif parameters[1] == 'SKIN' then
-				settings.skin = (temp-S('darion', 'blizzard', 'zoomed', 'elvui', 'modui'))[strlower(parameters[2] or '')] and strlower(parameters[2])
+				settings.skin = (T.temp-T.set('darion', 'blizzard', 'zoomed', 'elvui', 'modui'))[strlower(parameters[2] or '')] and strlower(parameters[2])
 			elseif parameters[1] == 'COUNT' then
 				settings.count = not settings.count
 			elseif parameters[1] == 'BLINK' then
@@ -113,21 +93,21 @@ function SlashCmdList.CDFRAMES(str)
 				settings.shadow = not settings.shadow
 			elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 				local _, _, match = strfind(strupper(str), 'IGNORE%s+ADD%s+(.-)%s*$')
-				local names = temp-T
-				for _, name in temp-elems(match) do
+				local names = T.temp-T.acquire()
+				for _, name in T.temp-elems(match) do
 					if not contains(settings.ignore_list, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = settings.ignore_list == '' and list(unpack(names)) or settings.ignore_list .. ',' .. list(unpack(names))
 			elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 				local _, _, match = strfind(strupper(str), 'IGNORE%s+REMOVE%s+(.-)%s*$')
-				local names = temp-T
-				for _, name in temp-elems(settings.ignore_list) do
+				local names = T.temp-T.acquire()
+				for _, name in T.temp-elems(settings.ignore_list) do
 					if not contains(match, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = list(unpack(names))
 			elseif parameters[1] == 'IGNORE' then
 				print(k .. ':')
-				for _, name in temp-elems(settings.ignore_list) do
+				for _, name in T.temp-elems(settings.ignore_list) do
 					print(name)
 				end
 			else

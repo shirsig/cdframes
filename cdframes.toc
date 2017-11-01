@@ -5,7 +5,8 @@
 ## SavedVariables: cdframes
 libs\module.lua
 libs\T.lua
-core.lua
-frame.lua
+util.lua
 player.lua
 other.lua
+frame.lua
+core.lua
