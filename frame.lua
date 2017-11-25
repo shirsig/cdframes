@@ -1,9 +1,7 @@
 module 'cdframes.frame'
 
-include 'cdframes.util'
-
 local T = require 'T'
-
+local util = require 'cdframes.util'
 local cdframes_player = require 'cdframes.player'
 local cdframes_other = require 'cdframes.other'
 
@@ -357,7 +355,7 @@ function update(self)
 
 	local cooldown_list = T.temp-T.acquire()
 	for _, cooldown in cooldowns do
-		if not contains(self.settings.ignore_list, strupper(cooldown.name)) then
+		if not util.contains(self.settings.ignore_list, strupper(cooldown.name)) then
 			tinsert(cooldown_list, cooldown)
 		end
 	end

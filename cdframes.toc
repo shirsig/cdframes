@@ -3,7 +3,7 @@
 ## Notes: Cooldown timer frames
 ## Author: shirsig
 ## SavedVariables: cdframes
-libs\module.lua
+libs\package.lua
 libs\T.lua
 util.lua
 player.lua

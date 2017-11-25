@@ -1,7 +1,5 @@
 module 'cdframes.player'
 
-include 'cdframes.util'
-
 local T = require 'T'
 
 local last_used = ''

@@ -1,9 +1,7 @@
 module 'cdframes.other'
 
-include 'cdframes.util'
-
 local T = require 'T'
-
+local util = require 'cdframes.util'
 
 local DATA = {
 	-- Trinkets & Racials
@@ -243,7 +241,7 @@ do
 		local time = GetTime()
 		if t[unit] then
 			for k, v in t[unit] do
-				if v.started + v.duration <= time or class[unit] and DATA[k].classes and not contains(DATA[k].classes, class[unit]) then
+				if v.started + v.duration <= time or class[unit] and DATA[k].classes and not util.contains(DATA[k].classes, class[unit]) then
 					T.release(t[unit][k])
 					t[unit][k] = nil
 				end
@@ -307,7 +305,7 @@ do
 			if DATA[action] then
 				for _, enemy in recent do
 					local cooldowns = cooldowns(enemy.name)
-					if not (cooldowns and cooldowns[action]) and (not DATA[action].classes or contains(DATA[action].classes, enemy.class)) then
+					if not (cooldowns and cooldowns[action]) and (not DATA[action].classes or util.contains(DATA[action].classes, enemy.class)) then
 						start_cooldown(enemy.name, action)
 						break
 					end
