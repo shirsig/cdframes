@@ -1,29 +1,28 @@
 module 'cdframes.player'
 
-include 'T'
-include 'cdframes'
+local T = require 'T'
 
-local last_used
+local last_used = ''
+local ignore_last_used = {}
 
 do
 	local t = {}
-	function M.get_cooldowns()
+	function M.cooldowns()
 		local time = GetTime()
 		for k, v in t do
 			if v.started + v.duration <= time then
-				release(t[k])
+				T.release(t[k])
 				t[k] = nil
 			end
 		end
 		return t
 	end
 	function start_cooldown(name, icon, started, duration, pet)
-		if cdframes.used and not pet and name ~= last_used then
+		if cdframes.used and not pet and strlower(name) ~= strlower(last_used) and not ignore_last_used[name] then
 			return
 		end
-		t[name] = O(
+		t[name] = T.map(
 			'name', name,
-			'info', '',
 			'icon', icon,
 			'started', started,
 			'duration', duration
@@ -31,7 +30,7 @@ do
 	end
 	function stop_cooldown(name)
 		if t[name] then
-			release(t[name])
+			T.release(t[name])
 			t[name] = nil
 		end
 	end
@@ -106,6 +105,7 @@ function SPELL_UPDATE_COOLDOWN()
 		elseif duration == 0 then
 			stop_cooldown(name)
 		end
+		ignore_last_used[name] = enabled == 0 or nil
 	end
 	for id = 1, HasPetSpells() or 0 do
 		local started, duration, enabled = GetSpellCooldown(id, BOOKTYPE_PET)
@@ -165,7 +165,7 @@ do
 		local orig = CastSpellByName
 		function _G.CastSpellByName(...)
 			if not cast then
-				last_used = arg[1]
+				_, _, last_used = strfind(arg[1], '([^(*]*)')
 			end
 			return orig(unpack(arg))
 		end
