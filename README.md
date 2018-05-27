@@ -13,7 +13,7 @@ This addOn adds frames with icons and countdowns for your as well as other playe
 
 Some examples for custom frames you might want to add:<br/>
 **/cdframes targettarget UnitName'targettarget'** (adds a frame for the target's target)<br/>
-**/cdframes frame focus CURR_FOCUS_TARGET** (adds a frame for the focus of [FocusFrame](https://github.com/wardz/FocusFrame))<br/>
+**/cdframes frame focus FocusCore:GetName()** (adds a frame for the focus of [FocusFrame](https://github.com/wardz/FocusFrame))<br/>
 **/cdframes frame party1 UnitName'party1'** (adds a frame for the first party member)<br/>
 
 #### The following commands by default are applied to all frames. To apply them to specific frames just use those as the first parameters (e.g., **/cdframes player target unlock** to unlock the frames player and target).
