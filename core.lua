@@ -90,7 +90,7 @@ function SlashCmdList.CDFRAMES(str)
 			elseif parameters[1] == 'SHADOW' then
 				settings.shadow = not settings.shadow
 			elseif parameters[1] == 'ORDER' then
-				settings.skin = (T.temp-T.set('remaining', 'start'))[strlower(parameters[2] or '')] and strlower(parameters[2])
+				settings.order = (T.temp-T.set('remaining', 'start'))[strlower(parameters[2] or '')] and strlower(parameters[2])
 			elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 				local _, _, match = strfind(strupper(str), 'IGNORE%s+ADD%s+(.-)%s*$')
 				local names = T.temp-T.acquire()
