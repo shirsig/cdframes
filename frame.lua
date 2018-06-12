@@ -20,6 +20,7 @@ local DEFAULT_SETTINGS = {
 	count = true,
 	blink = 0,
 	shadow = false,
+	order = 'remaining',
 	ignore_list = '',
 }
 
@@ -360,8 +361,12 @@ function update(self)
 		end
 	end
 	sort(cooldown_list, function(a, b)
-		local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm
-		return tb < ta or tb == ta and a.name < b.name
+		if self.settings.sort == 'start' then
+			return a.started < b.started
+		else
+			local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm
+			return tb < ta or tb == ta and a.name < b.name
+		end
 	end)
 
 	for i = 1, min(getn(cooldown_list), self.settings.size) do
