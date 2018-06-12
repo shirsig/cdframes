@@ -2,8 +2,9 @@ module 'cdframes.player'
 
 local T = require 'T'
 
-local last_used = ''
+local last_used = {}
 local ignore_last_used = {}
+local updated = true
 
 do
 	local t = {}
@@ -18,7 +19,7 @@ do
 		return t
 	end
 	function start_cooldown(name, icon, started, duration, pet)
-		if cdframes.used and not pet and strlower(name) ~= strlower(last_used) and not ignore_last_used[name] then
+		if cdframes.used and not pet and not last_used[strlower(name)] and not ignore_last_used[name] then
 			return
 		end
 		t[name] = T.map(
@@ -37,6 +38,8 @@ do
 end
 
 CreateFrame'Frame':SetScript('OnUpdate', function()
+	updated = true
+
 	local f = CreateFrame'Frame'
 	f:SetScript('OnEvent', function() _M[event]() end)
 	f:RegisterEvent('BAG_UPDATE_COOLDOWN')
@@ -128,6 +131,14 @@ function link_name(link)
 	for name in string.gfind(link, '|Hitem:%d+:%d+:%d+:%d+|h[[]([^]]+)[]]|h') do return name end
 end
 
+function add_to_last_used(ability)
+	if updated then
+		updated = false
+		T.wipe(last_used)
+	end
+	last_used[strlower(ability)] = true
+end
+
 do
 	local cast
 	function SPELLCAST_START()
@@ -147,7 +158,7 @@ do
 		local orig = UseContainerItem
 		function _G.UseContainerItem(...)
 			if not cast then
-				last_used = link_name(GetContainerItemLink(unpack(arg)) or '')
+				add_to_last_used(link_name(GetContainerItemLink(unpack(arg)) or ''))
 			end
 			return orig(unpack(arg))
 		end
@@ -156,7 +167,7 @@ do
 		local orig = UseInventoryItem
 		function _G.UseInventoryItem(...)
 			if not cast then
-				last_used = link_name(GetInventoryItemLink('player', arg[1]) or '')
+				add_to_last_used(link_name(GetInventoryItemLink('player', arg[1]) or ''))
 			end
 			return orig(unpack(arg))
 		end
@@ -165,7 +176,8 @@ do
 		local orig = CastSpellByName
 		function _G.CastSpellByName(...)
 			if not cast then
-				_, _, last_used = strfind(arg[1], '([^(*]*)')
+				local _, _, ability = strfind(arg[1], '([^(*]*)')
+				add_to_last_used(ability)
 			end
 			return orig(unpack(arg))
 		end
@@ -174,7 +186,7 @@ do
 		local orig = CastSpell
 		function _G.CastSpell(...)
 			if not cast then
-				last_used = GetSpellName(unpack(arg))
+				add_to_last_used(GetSpellName(unpack(arg)))
 			end
 			return orig(unpack(arg))
 		end
@@ -185,7 +197,7 @@ do
 			if not cast and HasAction(arg[1]) and not GetActionText(arg[1]) then
 				cdframes_tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
 				cdframes_tooltip:SetAction(arg[1])
-				last_used = cdframes_tooltipTextLeft1:GetText()
+				add_to_last_used(cdframes_tooltipTextLeft1:GetText())
 			end
 			return orig(unpack(arg))
 		end
