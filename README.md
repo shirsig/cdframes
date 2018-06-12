@@ -29,6 +29,7 @@ Some examples for custom frames you might want to add:<br/>
 **/cdframes blink** *x* (starts blinking at *x* seconds, default 0)<br/>
 **/cdframes shadow** (cooldown shadow animation, default off)<br/>
 **/cdframes count** (toggles the countdown, default on)<br/>
+**/cdframes order** *attribute* (changes the order of cooldowns. available options for *attribute*: remaining, start)<br/>
 **/cdframes ignore add** *list* (*list* is a comma separated list of skill names to ignore, no spaces except within the name, case insensitive. example: **mortal strike,blink,shadow word: pain**)<br/>
 **/cdframes ignore remove** *list*<br/>
 **/cdframes ignore** (shows the current ignore lists)<br/>
