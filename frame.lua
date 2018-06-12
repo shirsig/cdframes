@@ -361,7 +361,7 @@ function update(self)
 		end
 	end
 	sort(cooldown_list, function(a, b)
-		if self.settings.sort == 'start' then
+		if self.settings.order == 'start' then
 			return a.started < b.started
 		else
 			local ta, tb = a.started + a.duration - tm, b.started + b.duration - tm
