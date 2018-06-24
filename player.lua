@@ -132,6 +132,9 @@ function link_name(link)
 end
 
 function add_to_last_used(ability)
+	if not ability then
+		return
+	end
 	if updated then
 		updated = false
 		T.wipe(last_used)
