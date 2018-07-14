@@ -38,9 +38,12 @@ do
 end
 
 CreateFrame'Frame':SetScript('OnUpdate', function()
-	updated = true
+    updated = true
+end)
 
+CreateFrame'Frame':SetScript('OnUpdate', function()
 	local f = CreateFrame'Frame'
+
 	f:SetScript('OnEvent', function() _M[event]() end)
 	f:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	f:RegisterEvent('SPELL_UPDATE_COOLDOWN')
