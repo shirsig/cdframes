@@ -240,7 +240,7 @@ do
 	function M.cooldowns(unit)
 		local time = GetTime()
 		if t[unit] then
-			for k, v in t[unit] do
+			for k, v in pairs(t[unit]) do
 				if v.started + v.duration <= time or class[unit] and DATA[k].classes and not util.contains(DATA[k].classes, class[unit]) then
 					T.release(t[unit][k])
 					t[unit][k] = nil
@@ -285,25 +285,25 @@ end
 
 do
 	local f = CreateFrame'Frame'
-	for _, event in {
-		'CHAT_MSG_SPELL_PARTY_DAMAGE',
-		'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
-		'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
-		'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
-		'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
-		'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
-		'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
-		'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
-		'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
-		'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
-		'CHAT_MSG_SPELL_PARTY_BUFF',
-		'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
-		'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
+	for _, event in pairs{
+--		'CHAT_MSG_SPELL_PARTY_DAMAGE',
+--		'CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE',
+--		'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE',
+--		'CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE',
+--		'CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE',
+--		'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE',
+--		'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE',
+--		'CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS',
+--		'CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS',
+--		'CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS',
+--		'CHAT_MSG_SPELL_PARTY_BUFF',
+--		'CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF',
+--		'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF',
 	} do f:RegisterEvent(event) end
 	f:SetScript('OnEvent', function()
 		for action in string.gfind(arg1, PARTIAL_PATTERN) do
 			if DATA[action] then
-				for _, enemy in recent do
+				for _, enemy in pairs(recent) do
 					local cooldowns = cooldowns(enemy.name)
 					if not (cooldowns and cooldowns[action]) and (not DATA[action].classes or util.contains(DATA[action].classes, enemy.class)) then
 						start_cooldown(enemy.name, action)
@@ -312,7 +312,7 @@ do
 				end
 			end
 		end
-		for _, pattern in PATTERNS do
+		for _, pattern in pairs(PATTERNS) do
 			for unit, action in string.gfind(arg1, pattern) do
 				if DATA[action] then
 					start_cooldown(unit, action)
@@ -328,7 +328,7 @@ do
 	f:RegisterEvent'PLAYER_TARGET_CHANGED'
 	f:SetScript('OnEvent', function()
 		if UnitIsEnemy('player', 'target') and UnitIsPlayer'target' then
-			for i, unit in recent do
+			for i, unit in pairs(recent) do
 				if i == 100 or unit.name == UnitName'target' then
 					T.release(tremove(recent, i))
 					break

@@ -136,7 +136,7 @@ function M.load(key, settings)
 	frames[key] = frames[key] or T.map('title', key)
 	local self = frames[key]
 	self.unit = loadstring('return ' .. settings.code)
-	for k, v in DEFAULT_SETTINGS do
+	for k, v in pairs(DEFAULT_SETTINGS) do
 		if settings[k] == nil then settings[k] = v end
 	end
 	self.settings = settings
@@ -355,7 +355,7 @@ function update(self)
 	local tm = GetTime()
 
 	local cooldown_list = T.temp-T.acquire()
-	for _, cooldown in cooldowns do
+	for _, cooldown in pairs(cooldowns) do
 		if not util.contains(self.settings.ignore_list, strupper(cooldown.name)) then
 			tinsert(cooldown_list, cooldown)
 		end

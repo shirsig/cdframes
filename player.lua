@@ -10,7 +10,7 @@ do
 	local t = {}
 	function M.cooldowns()
 		local time = GetTime()
-		for k, v in t do
+		for k, v in pairs(t) do
 			if v.started + v.duration <= time then
 				T.release(t[k])
 				t[k] = nil
@@ -47,8 +47,8 @@ CreateFrame'Frame':SetScript('OnUpdate', function()
 	f:SetScript('OnEvent', function() _M[event]() end)
 	f:RegisterEvent('BAG_UPDATE_COOLDOWN')
 	f:RegisterEvent('SPELL_UPDATE_COOLDOWN')
-	f:RegisterEvent('SPELLCAST_START')
-	f:RegisterEvent('SPELLCAST_STOP')
+--	f:RegisterEvent('SPELLCAST_START')
+--	f:RegisterEvent('SPELLCAST_STOP')
 	f:RegisterEvent('CHAT_MSG_SPELL_FAILED_LOCALPLAYER')
 	BAG_UPDATE_COOLDOWN()
 	SPELL_UPDATE_COOLDOWN()
@@ -147,12 +147,13 @@ end
 
 do
 	local cast
-	function SPELLCAST_START()
-		cast = arg1
-	end
-	function SPELLCAST_STOP()
-		cast = nil
-	end
+-- TODO retail spellcast system not vanilla like
+--	function SPELLCAST_START()
+--		cast = arg1
+--	end
+--	function SPELLCAST_STOP()
+--		cast = nil
+--	end
 	function CHAT_MSG_SPELL_FAILED_LOCALPLAYER()
 		for name, reason in string.gfind(arg1, 'You fail to %a+ (.*): (.*)') do
 			if name == cast and reason ~= 'Another action is in progress.' then
@@ -164,48 +165,48 @@ do
 		local orig = UseContainerItem
 		function _G.UseContainerItem(...)
 			if not cast then
-				add_to_last_used(link_name(GetContainerItemLink(unpack(arg)) or ''))
+				add_to_last_used(link_name(GetContainerItemLink(...) or ''))
 			end
-			return orig(unpack(arg))
+			return orig(...)
 		end
 	end
 	do
 		local orig = UseInventoryItem
-		function _G.UseInventoryItem(...)
+		function _G.UseInventoryItem(slotId, ...)
 			if not cast then
-				add_to_last_used(link_name(GetInventoryItemLink('player', arg[1]) or ''))
+				add_to_last_used(link_name(GetInventoryItemLink('player', slotId) or ''))
 			end
-			return orig(unpack(arg))
+			return orig(slotId, ...)
 		end
 	end
 	do
 		local orig = CastSpellByName
-		function _G.CastSpellByName(...)
+		function _G.CastSpellByName(spellName, ...)
 			if not cast then
-				local _, _, ability = strfind(arg[1], '([^(*]*)')
+				local _, _, ability = strfind(spellName, '([^(*]*)')
 				add_to_last_used(ability)
 			end
-			return orig(unpack(arg))
+			return orig(spellName, ...)
 		end
 	end
 	do
 		local orig = CastSpell
 		function _G.CastSpell(...)
 			if not cast then
-				add_to_last_used(GetSpellName(unpack(arg)))
+				add_to_last_used(GetSpellName(...))
 			end
-			return orig(unpack(arg))
+			return orig(...)
 		end
 	end
 	do
 		local orig = UseAction
-		function _G.UseAction(...)
-			if not cast and HasAction(arg[1]) and not GetActionText(arg[1]) then
+		function _G.UseAction(slot, ...)
+			if not cast and HasAction(slot) and not GetActionText(slot) then
 				cdframes_tooltip:SetOwner(UIParent, 'ANCHOR_NONE')
-				cdframes_tooltip:SetAction(arg[1])
+				cdframes_tooltip:SetAction(slot)
 				add_to_last_used(cdframes_tooltipTextLeft1:GetText())
 			end
-			return orig(unpack(arg))
+			return orig(slot, ...)
 		end
 	end
 end

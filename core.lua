@@ -15,7 +15,7 @@ _G.cdframes = {
 }
 
 function update_frames()
-	for k, v in cdframes.frames do
+	for k, v in pairs(cdframes.frames) do
 		cdframes_frame.load(k, v)
 	end
 end
@@ -55,7 +55,7 @@ function SlashCmdList.CDFRAMES(str)
 			end
 			update_frames()
 		else
-			for k, v in cdframes.frames do
+			for k, v in pairs(cdframes.frames) do
 				util.print(k .. ': ' .. v.code)
 			end
 		end
@@ -64,7 +64,7 @@ function SlashCmdList.CDFRAMES(str)
 		while cdframes.frames[parameters[1]] do
 			selected_frames[tremove(parameters, 1)] = true
 		end
-		for k in next(selected_frames) and selected_frames or cdframes.frames do
+		for k in pairs(next(selected_frames) and selected_frames or cdframes.frames) do
 			local settings = cdframes.frames[k]
 			if parameters[1] == 'LOCK' then
 				settings.locked = true
@@ -94,20 +94,20 @@ function SlashCmdList.CDFRAMES(str)
 			elseif parameters[1] == 'IGNORE' and parameters[2] == 'ADD' then
 				local _, _, match = strfind(strupper(str), 'IGNORE%s+ADD%s+(.-)%s*$')
 				local names = T.temp-T.acquire()
-				for _, name in T.temp-util.elems(match) do
+				for _, name in pairs(T.temp-util.elems(match)) do
 					if not util.contains(settings.ignore_list, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = settings.ignore_list == '' and util.list(unpack(names)) or settings.ignore_list .. ',' .. util.list(unpack(names))
 			elseif parameters[1] == 'IGNORE' and parameters[2] == 'REMOVE' then
 				local _, _, match = strfind(strupper(str), 'IGNORE%s+REMOVE%s+(.-)%s*$')
 				local names = T.temp-T.acquire()
-				for _, name in T.temp-util.elems(settings.ignore_list) do
+				for _, name in pairs(T.temp-util.elems(settings.ignore_list)) do
 					if not util.contains(match, name) then tinsert(names, name) end
 				end
 				settings.ignore_list = util.list(unpack(names))
 			elseif parameters[1] == 'IGNORE' then
 				util.print(k .. ':')
-				for _, name in T.temp-util.elems(settings.ignore_list) do
+				for _, name in pairs(T.temp-util.elems(settings.ignore_list)) do
 					util.print(name)
 				end
 			else

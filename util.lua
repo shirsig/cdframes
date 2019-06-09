@@ -7,13 +7,18 @@ function M.print(msg)
 end
 
 function M.list(first, ...)
-    for i = 1, arg.n do first = first .. ',' .. arg[i] end
+    local arg = { n = select("#", ...), ... }
+    for i = 1, arg.n do
+        first = first .. ',' .. arg[i]
+    end
     return first or ''
 end
 
 function M.elems(list)
     local elems = T.acquire()
-    for elem in string.gfind(list, '[^,]+') do tinsert(elems, elem) end
+    for elem in string.gfind(list, '[^,]+') do
+        tinsert(elems, elem)
+    end
     return elems
 end
 
